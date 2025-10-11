@@ -1,0 +1,28 @@
+.footer {
+  background-color: #212222 ;
+  color: #ffffff;
+  text-align: center;
+  padding: 1rem 1.5rem;
+  font-size: 0.95rem;
+  font-family: "Montserrat", sans-serif;
+  border-top: 8px solid rgb(233, 191, 141);
+
+  margin-top: auto;
+}
+
+.footer p {
+  margin: 0.3rem 0;
+  line-height: 1.5;
+}
+
+.footer strong {
+  color: #edbe80;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .footer {
+    font-size: 0.85rem;
+    padding: 0.8rem 1rem;
+  }
+}

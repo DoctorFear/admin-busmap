@@ -1,0 +1,102 @@
+.roadContainer {
+  margin-bottom: 1.5rem;
+}
+
+.roadInput {
+  display: flex;
+  gap: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #edbe80;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: black;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ff960a;
+  box-shadow: 0 0 5px rgba(255, 208, 0, 0.3);
+}
+
+.addButton {
+  background-color: #212222;
+  color: #edbe80;
+  border: 1px solid rgb(233, 191, 141);
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.addButton:hover {
+  background-color: #edbe80;
+  color: #212222;
+}
+
+.roadList {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.roadItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.roadItem:hover {
+  background-color: #fff9f1;
+  transform: translateY(-2px);
+}
+
+.removeButton {
+  background-color: #F44336;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.removeButton:hover {
+  background-color: #d32f2f;
+}
+
+.error {
+  color: #F44336;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .roadInput {
+    flex-direction: column;
+  }
+
+  .addButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .roadItem {
+    padding: 0.5rem;
+  }
+}

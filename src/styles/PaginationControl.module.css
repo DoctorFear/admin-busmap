@@ -1,0 +1,56 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin: 2rem auto;
+  flex-wrap: wrap;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Nút chuyển trang */
+.pageButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #212222;
+  color: #edbe80;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgb(233, 191, 141);
+}
+
+.pageButton:hover:not(:disabled) {
+      filter: brightness(140%);
+  transform: translateY(-2px);
+}
+
+.pageButton:active {
+  transform: translateY(0);
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Nút có chữ */
+.buttonText {
+  font-size: 0.95rem;
+}
+
+/* Thông tin trang */
+.pageInfo {
+    color: #fff;
+    background-color: #212222;
+    border-radius: 6px;
+    padding: 0.5rem 1.6rem;
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .15);
+    border: 1px solid rgb(233, 191, 141);
+}

@@ -1,0 +1,28 @@
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  padding: 1rem 2rem;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.success {
+  background-color: #4CAF50;
+}
+
+.error {
+  background-color: #F44336;
+}
+
+@media (max-width: 768px) {
+  .notification {
+    top: 70px;
+    right: 10px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
