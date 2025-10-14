@@ -7,6 +7,30 @@ export interface OverviewItem {
   status: 'Chờ đón' | 'Đang trên xe' | 'Đã trả' | 'Vắng mặt' | 'Sự cố';
 }
 
+export interface DriverStudent {
+  id: string;
+  name: string;
+  pickupLocation: string;
+  status: 'chua-don' | 'da-don' | 'dang-tren-xe' | 'da-tra' | 'vang-mat' | 'su-co';
+}
+
+export interface ScheduleItem {
+  date: string;
+  route: string;
+  time: string;
+}
+
+export const driverStudents: DriverStudent[] = [
+  { id: '1', name: 'Nguyễn Văn An', pickupLocation: '123 Đường Lê Lợi', status: 'chua-don' },
+  { id: '2', name: 'Trần Thị Bình', pickupLocation: '456 Đường Nguyễn Huệ', status: 'da-don' },
+  { id: '3', name: 'Lê Văn Cường', pickupLocation: '789 Đường Trần Hưng Đạo', status: 'vang-mat' },
+];
+
+export const weeklySchedule: ScheduleItem[] = [
+  { date: '20/09/2025', route: 'Tuyến A', time: '6:30 AM - 8:00 AM' },
+  { date: '21/09/2025', route: 'Tuyến A', time: '6:30 AM - 8:00 AM' },
+];
+
 export const overviewData: OverviewItem[] = [
   { id: '1', student: 'Nguyễn Văn An', driver: 'Trần Văn A', bus: 'Xe 01', route: 'Tuyến A', status: 'Chờ đón' },
   { id: '2', student: 'Trần Thị Bình', driver: 'Nguyễn Văn B', bus: 'Xe 02', route: 'Tuyến B', status: 'Đang trên xe' },
