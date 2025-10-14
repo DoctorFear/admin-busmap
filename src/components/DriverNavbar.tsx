@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import styles from "../styles/Navbar.module.css";
 import {
   LayoutDashboard,
@@ -11,17 +13,12 @@ import {
 } from "lucide-react";
 
 export default function DriverNavbar() {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+  const pathname = usePathname();
 
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Driver navigation">
       <div className={styles.logo}>
-        <a href="/driver" style={{ cursor: 'pointer' }}>
+        <Link href="/driver">
           <Image
             src="/twilight-logo-taixe-icon.png"
             alt="Twilight Logo"
@@ -29,45 +26,41 @@ export default function DriverNavbar() {
             height={40}
             priority
           />
-        </a>
+        </Link>
       </div>
 
       <ul className={styles.navLinks}>
         <li>
-          <a
-            onClick={() => scrollToSection('home')}
-            className={styles.link}
-            style={{ cursor: 'pointer' }}
+          <Link
+            href="/driver"
+            className={`${styles.link} ${pathname === "/driver" ? styles.active : ""}`}
           >
             <LayoutDashboard size={18} /> Trang chủ
-          </a>
+          </Link>
         </li>
         <li>
-          <a
-            onClick={() => scrollToSection('schedule')}
-            className={styles.link}
-            style={{ cursor: 'pointer' }}
+          <Link
+            href="/driver/schedule"
+            className={`${styles.link} ${pathname === "/driver/schedule" ? styles.active : ""}`}
           >
             <CalendarDays size={18} /> Lịch làm việc
-          </a>
+          </Link>
         </li>
         <li>
-          <a
-            onClick={() => scrollToSection('students')}
-            className={styles.link}
-            style={{ cursor: 'pointer' }}
+          <Link
+            href="/driver/students"
+            className={`${styles.link} ${pathname === "/driver/students" ? styles.active : ""}`}
           >
             <Users size={18} /> Danh sách học sinh
-          </a>
+          </Link>
         </li>
         <li>
-          <a
-            onClick={() => scrollToSection('alerts')}
-            className={styles.link}
-            style={{ cursor: 'pointer' }}
+          <Link
+            href="/driver/alerts"
+            className={`${styles.link} ${pathname === "/driver/alerts" ? styles.active : ""}`}
           >
             <AlertTriangle size={18} /> Cảnh báo
-          </a>
+          </Link>
         </li>
       </ul>
 
