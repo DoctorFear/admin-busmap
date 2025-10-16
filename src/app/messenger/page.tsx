@@ -80,7 +80,7 @@ export default function MessagingPage() {
         </div>
       </div>
 
-      <MessagingForm
+      <MessagingForm  
         recipients={filteredRecipients}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
