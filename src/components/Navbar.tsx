@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image"; // ✅ thêm dòng này
-import { usePathname } from "next/navigation";
+import Link from "next/link"; //  Điều hướng nội bộ
+import Image from "next/image";  // Hình ảnh
+import { usePathname } from "next/navigation"; // Lấy đường dẫn hiện tại thường làm menu
 import styles from "../styles/Navbar.module.css";
 import {
   LayoutDashboard,
@@ -12,21 +12,20 @@ import {
   LogOut,
   ListChecksIcon,
   MessageCircle,
-} from "lucide-react";
+} from "lucide-react"; // lấy icon từ lucide-reacts
 
 export default function Navbar() {
-  const pathname = usePathname();
+  const pathname = usePathname(); // Lấy đường dẫn hiện tại
 
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
       {/* Logo */}
       <div className={styles.logo}>
         <Link href="/">
-          {/* ✅ Thay chữ MyApp bằng logo */}
           <Image
             src="/twilight-logo-admin-icon.png"
             alt="Twilight Logo"
-            width={150}  // bạn có thể chỉnh lại cho cân đối
+            width={150} 
             height={40}
             priority
           />
@@ -45,16 +44,16 @@ export default function Navbar() {
         </li>
         <li>
           <Link
-            href="/about"
-            className={`${styles.link} ${pathname === "/about" ? styles.active : ""}`}
+            href="/schedule"
+            className={`${styles.link} ${pathname === "/schedule" ? styles.active : ""}`}
           >
             <CalendarDays size={18} /> Lịch trình
           </Link>
         </li>
         <li>
           <Link
-            href="/assign"
-            className={`${styles.link} ${pathname === "/assign" ? styles.active : ""}`}
+            href="/assignment"
+            className={`${styles.link} ${pathname === "/assignment" ? styles.active : ""}`}
           >
             <Users size={18} /> Phân công
           </Link>

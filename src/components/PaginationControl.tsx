@@ -32,9 +32,9 @@ export default function PaginationControl({
       </span>
 
       <button
-        className={styles.pageButton}
-        disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
+        className={styles.pageButton} // nút chuyển trang
+        disabled={currentPage === totalPages} // vô hiệu hóa nút nếu đang ở trang cuối
+        onClick={() => onPageChange(currentPage + 1)} // gọi hàm chuyển trang với trang tiếp theo
       >
         <ChevronRight size={18} />
       </button>
