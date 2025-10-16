@@ -1,0 +1,35 @@
+.autocomplete {
+  width: 100%;
+}
+
+.react-select__control {
+  border: 2px solid #edbe80;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: black;
+  background-color: white;
+}
+
+.react-select__control--is-focused {
+  border-color: #ff960a;
+  box-shadow: 0 0 5px rgba(255, 208, 0, 0.3);
+}
+
+.react-select__menu {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.react-select__option {
+  color: black;
+}
+
+.react-select__option--is-focused {
+  background-color: #fff9f1;
+}
+
+.react-select__option--is-selected {
+  background-color: #edbe80;
+  color: #212222;
+}

@@ -42,4 +42,32 @@ export const mockAssignments: AssignmentItem[] = [
     route: 'Tuyến 2 - Quận 7',
     startTime: '08:00',
   },
+    {
+    id: '1',
+    driver: 'Nguyễn Văn A',
+    bus: 'Xe 01 - 29A-12345',
+    route: 'Tuyến 1 - Quận 1',
+    startTime: '07:00',
+  },
+  {
+    id: '2',
+    driver: 'Trần Thị B',
+    bus: 'Xe 02 - 29B-67890',
+    route: 'Tuyến 2 - Quận 7',
+    startTime: '08:00',
+  },
+    {
+    id: '1',
+    driver: 'Nguyễn Văn A',
+    bus: 'Xe 01 - 29A-12345',
+    route: 'Tuyến 1 - Quận 1',
+    startTime: '07:00',
+  },
+  {
+    id: '2',
+    driver: 'Trần Thị B',
+    bus: 'Xe 02 - 29B-67890',
+    route: 'Tuyến 2 - Quận 7',
+    startTime: '08:00',
+  },
 ];

@@ -9,13 +9,14 @@ import Notification from '@/components/Notification';
 import styles from './page.module.css';
 import { AssignmentItem, mockAssignments } from '@/lib/data_assignment';
 
+
 export default function AssignmentPage() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>(mockAssignments);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentItem | undefined>();
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
 
   // Filter assignments based on search term
   const filteredAssignments = assignments.filter(
@@ -81,7 +82,7 @@ export default function AssignmentPage() {
         initialData={editingAssignment}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
-        setNotification={setNotification}
+        setNotification={(message, type) => setNotification({ message, type })}
       />
 
       <div className={styles.headerRow}>

@@ -1,0 +1,97 @@
+.formContainer {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #212222;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #edbe80;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: black;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 208, 0, 0.3);
+}
+
+.recipientList {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.recipientItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.checkbox {
+  margin-right: 0.5rem;
+}
+
+.noResults {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+  padding: 1rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.submitButton {
+  background-color: #212222;
+  color: #edbe80;
+  border: 1px solid rgb(233, 191, 141);
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.submitButton:hover {
+  filter: brightness(140%);
+}
+
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 1rem;
+  }
+
+  .recipientList {
+    max-height: 150px;
+  }
+}
