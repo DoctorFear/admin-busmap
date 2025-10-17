@@ -14,17 +14,18 @@ export default function MessagingPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [recipientType, setRecipientType] = useState<'all' | 'parent' | 'driver'>('all');
 
-  // Filter recipients based on search term and date
+  // Filter recipients based on search term, date, and recipient type
   const filteredRecipients = recipients.filter(
     (recipient) =>
       recipient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (!recipient.availableDates || recipient.availableDates.includes(selectedDate))
+      (!recipient.availableDates || recipient.availableDates.includes(selectedDate)) &&
+      (recipientType === 'all' || recipient.type === recipientType)
   );
 
   // Simulate receiving new incidents from drivers
   useEffect(() => {
-    // Mock API call to fetch new incidents
     const interval = setInterval(() => {
       const newIncident: Incident = {
         id: String(incidents.length + 1),
@@ -32,9 +33,10 @@ export default function MessagingPage() {
         bus: `Xe ${Math.floor(Math.random() * 10) + 1}`,
         issue: ['Kẹt xe', 'Hỏng xe', 'Trễ giờ'][Math.floor(Math.random() * 3)],
         timestamp: new Date().toISOString(),
+        status: 'pending',
       };
       setIncidents((prev) => [newIncident, ...prev]);
-    }, 60000); // Simulate new incident every minute
+    }, 60000);
     return () => clearInterval(interval);
   }, [incidents]);
 
@@ -44,23 +46,24 @@ export default function MessagingPage() {
       setNotification({ message: 'Vui lòng chọn ít nhất một người nhận và nhập nội dung tin nhắn.', type: 'error' });
       return;
     }
-    // Simulate API call to send message
     console.log('Sending message to:', recipientIds, 'Message:', message);
     setNotification({ message: 'Gửi tin nhắn thành công!', type: 'success' });
   };
 
   // Handle sending incident notification to parents
   const handleSendIncidentNotification = (incident: Incident) => {
-    // Simulate fetching parents linked to the bus
     const parentsForBus = mockParents.filter((parent) => parent.bus === incident.bus);
     if (parentsForBus.length === 0) {
       setNotification({ message: 'Không có phụ huynh nào liên kết với xe này.', type: 'error' });
       console.error('No parents linked to bus:', incident.bus);
       return;
     }
-    // Simulate sending push notification
     console.log('Sending push notification to parents:', parentsForBus, 'Incident:', incident);
     setNotification({ message: 'Gửi thông báo sự cố đến phụ huynh thành công!', type: 'success' });
+    // Update incident status to 'sent'
+    setIncidents((prev) =>
+      prev.map((inc) => (inc.id === incident.id ? { ...inc, status: 'sent' } : inc))
+    );
   };
 
   return (
@@ -74,8 +77,16 @@ export default function MessagingPage() {
       )}
 
       <div className={styles.headerRow}>
-        <h1>Gửi Tin Nhắn</h1>
         <div className={styles.searchWrapper}>
+          <select
+            value={recipientType}
+            onChange={(e) => setRecipientType(e.target.value as 'all' | 'parent' | 'driver')}
+            style={{ marginRight: '1rem', padding: '0.5rem', borderRadius: '5px', border: '2px solid #edbe80' }}
+          >
+            <option value="all">Tất cả</option>
+            <option value="parent">Phụ huynh</option>
+            <option value="driver">Tài xế</option>
+          </select>
           <SearchBar onSearch={setSearchTerm} />
         </div>
       </div>

@@ -19,7 +19,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     <div className={styles.searchContainer}>
       <input
         type="text"
-        placeholder="Tìm kiếm học sinh, tài xế, xe hoặc tuyến đường..."
+        placeholder="Mời nhập nôi dung tìm kiếm..."
         className={styles.searchInput}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}

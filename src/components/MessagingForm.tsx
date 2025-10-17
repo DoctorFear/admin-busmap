@@ -38,7 +38,7 @@ export default function MessagingForm({ recipients, selectedDate, onDateChange, 
     <div className={styles.formContainer}>
       <h2>Soạn Tin Nhắn</h2>
       <div className={styles.formGroup}>
-        <label>Ngày gửi</label>
+        <label>Lọc theo ngày</label>
         <input
           type="date"
           value={selectedDate}

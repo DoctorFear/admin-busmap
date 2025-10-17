@@ -8,6 +8,7 @@ interface Incident {
   bus: string;
   issue: string;
   timestamp: string;
+  status?: 'pending' | 'sent';
 }
 
 interface IncidentTableProps {
@@ -26,6 +27,7 @@ export default function IncidentTable({ incidents, onSendNotification }: Inciden
             <th className={styles.th}>Xe buýt</th>
             <th className={styles.th}>Sự cố</th>
             <th className={styles.th}>Thời gian</th>
+            <th className={styles.th}>Trạng thái</th>
             <th className={styles.th}>Hành động</th>
           </tr>
         </thead>
@@ -38,18 +40,22 @@ export default function IncidentTable({ incidents, onSendNotification }: Inciden
                 <td className={styles.td}>{incident.issue}</td>
                 <td className={styles.td}>{new Date(incident.timestamp).toLocaleString()}</td>
                 <td className={styles.td}>
+                  {incident.status === 'sent' ? 'Đã gửi' : 'Chưa gửi'}
+                </td>
+                <td className={styles.td}>
                   <button
                     onClick={() => onSendNotification(incident)}
-                    className={styles.notifyButton}
+                    className={`${styles.notifyButton} ${incident.status === 'sent' ? styles.sentButton : ''}`}
+                    disabled={incident.status === 'sent'}
                   >
-                    Gửi thông báo
+                    {incident.status === 'sent' ? 'Đã gửi' : 'Gửi thông báo'}
                   </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5} className={styles.noResults}>
+              <td colSpan={6} className={styles.noResults}>
                 Không có sự cố nào
               </td>
             </tr>

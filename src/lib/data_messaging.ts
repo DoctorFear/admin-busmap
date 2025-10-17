@@ -12,6 +12,7 @@ export interface Incident {
   bus: string;
   issue: string;
   timestamp: string;
+  status?: 'pending' | 'sent'; // Added status field
 }
 
 export const mockParents: Recipient[] = [
@@ -29,7 +30,6 @@ export const mockParents: Recipient[] = [
     bus: 'Xe 02',
     availableDates: ['2025-10-16', '2025-10-18'],
   },
-  // Add more for testing large lists
   {
     id: 'p3',
     name: 'Lê Thị C',
@@ -59,7 +59,6 @@ export const mockDrivers: Recipient[] = [
     type: 'driver',
     availableDates: ['2025-10-16', '2025-10-18'],
   },
-  // Add more for testing large lists
   {
     id: 'd3',
     name: 'Nguyễn Văn E',
@@ -81,6 +80,7 @@ export const mockIncidents: Incident[] = [
     bus: 'Xe 01',
     issue: 'Kẹt xe',
     timestamp: '2025-10-16T08:00:00Z',
+    status: 'pending',
   },
   {
     id: '2',
@@ -88,5 +88,6 @@ export const mockIncidents: Incident[] = [
     bus: 'Xe 02',
     issue: 'Hỏng xe',
     timestamp: '2025-10-16T09:00:00Z',
+    status: 'pending',
   },
 ];

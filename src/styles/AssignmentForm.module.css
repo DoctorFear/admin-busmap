@@ -15,7 +15,7 @@
 .formGroup label {
   display: block;
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  margin: .5rem 0rem;
   color: #212222;
 }
 

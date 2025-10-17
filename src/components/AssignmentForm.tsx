@@ -80,15 +80,6 @@ export default function AssignmentForm({ initialData, onSubmit, onCancel, setNot
           ))}
         </select>
       </div>
-      <div className={styles.formGroup}>
-        <label>Thời gian bắt đầu</label>
-        <input
-          type="time"
-          value={formData.startTime}
-          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-          className={styles.input}
-        />
-      </div>
       <div className={styles.formActions}>
         <button onClick={handleSubmit} className={styles.submitButton}>
           {initialData ? 'Cập nhật' : 'Lưu'}
