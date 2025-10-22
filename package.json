@@ -6,10 +6,12 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "server": "node src/server/server.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "express": "^5.1.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.545.0",
     "next": "15.5.4",
