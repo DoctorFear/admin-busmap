@@ -18,8 +18,17 @@
 
 1. To kill port:
 
-`npx kill-port [PORT]`
+  `npx kill-port [PORT]`
 
+2. All port we use:
+
+- BE
+  + server(express): 8888
+  + 3000
+- FE:
+
+
+## Documents of NextJS
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
