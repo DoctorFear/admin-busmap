@@ -1,5 +1,9 @@
 
 //-------- 1. FileSync --------
+// - Chương trình chờ đọc/ghi xong -> thực hiện tiếp
+// - Node.js bị tạm dừng đến khi thao tác I/O hoàn tất.
+// - Cấu trúc đơn giản, dễ đọc, nhưng có thể làm treo toàn bộ chương trình khi thao tác I/O lâu.
+// => Khi viết script ngắn, xử lý file cục bộ, hoặc chạy một lần (ví dụ: import dữ liệu).
 //-----------------------------
 
 const {readFileSync, writeFileSync} = require('fs');

@@ -1,44 +1,39 @@
 //----------- 0. Basic -----------
-// const { symbolName } = require('typescript')
-// const name = require('./4-names')
-// const sayHello = require('./5-utils')
+/*
+    - File: async
+*/
 
-// const { imageOptimizer } = require("next/dist/server/image-optimizer");
 
-// // console.log(name)
-// sayHello('twilight')
-// sayHello(name.peter)
+/*  JAVASCRIPT
+--- JavaScript là “single-threaded”:
+    - JavaScript chỉ có một luồng thực thi chính (main thread).
+    - Mọi lệnh đều chạy từng dòng một, theo thứ tự — không có hai lệnh chạy song song.
+    => synchronous (đồng bộ) & single-threaded (một luồng).
 
-const {readFile, writeFile} = require('fs')
+--- Event Loop là cơ chế giúp JavaScript xử lý bất đồng bộ (asynchronous) mà không cần nhiều luồng.
+Trong đó: 
+    - Call Stack: nơi lưu các hàm đang được thực thi.
+    - Web APIs: nơi trình duyệt thực hiện các tác vụ bất đồng bộ (setTimeout, fetch, DOM events, v.v).
+    - Callback Queue (Task Queue): nơi lưu các callback (hàm sẽ chạy sau).
+    - Event Loop: liên tục quan sát Call Stack; nếu stack trống → nó lấy một hàm trong Queue đẩy vào Stack để thực thi.
+        + Khi stack bận → callback phải chờ.
+        + Khi stack rảnh → event loop “đưa” callback vào để chạy.
+*/
 
-readFile('./practice/sub/first.txt', 'utf8', (err, res) => {
-    // If reading the first file has error
-    if (err) {
-        console.log("- Read the first file, err:", err)
-        return
-    }
-    const first = res
+/*
+--- Từng bước:
+1. console.log('first task') → in ra ngay.
+2. setTimeout(...) được gửi sang Web API của trình duyệt (timer).
+    - Trình duyệt đếm thời gian (ở đây là 0ms).
+    - Khi hết thời gian, callback (()=> console.log('second task')) được đưa vào Callback Queue.
+3. JavaScript tiếp tục chạy dòng kế: console.log('next task').
+4. Sau khi Stack rỗng, Event Loop thấy có callback trong Queue → đưa nó vào Stack để chạy → in ra 'second task'.
+*/
+console.log('first task')
 
-    // Read the next file
-    readFile('./practice/sub/second.txt', 'utf8', (err, res) => {
-        if (err){
-            console.log("- Read the second file, err:", err)
-            return
-        }
-        const second = res
-        
-        // If success, write to file
-        writeFile(
-            './practice/sub/writeFileAsync.txt',
-            `This is written by writeFile (async)\n${first}\n${second}`,
-            (err, res) => {
-                if(err){
-                    console.log("- Write file, err:", err)
-                    return
-                }
-                console.log("- Write file successfully. Res:", res)
-            }
-        )
-    })
-})
+setTimeout(() => {
+    console.log('Event Loop send this cmd to Callback Queue')
+}, 0);
+
+console.log('the second task')
 
