@@ -1,0 +1,25 @@
+.toggleContainer {
+  display: flex;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+}
+
+.toggleBtn {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.toggleBtn.active {
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(#ff960a 0%, #ffc06e 100%);
+}

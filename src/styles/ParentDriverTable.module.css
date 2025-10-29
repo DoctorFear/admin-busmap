@@ -1,0 +1,53 @@
+.table {
+  width: 100%;
+  max-width: 1200px;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.th {
+  background: linear-gradient(#ff960a 0%, #ffc06e 100%);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.td {
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  color: #212;
+}
+
+.tr:hover {
+  background-color: #fff9f1;
+}
+
+.passwordCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.eyeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #edbe80;
+}
+
+.eyeBtn:hover {
+  color: #d35400;
+}
+
+.noResults {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}

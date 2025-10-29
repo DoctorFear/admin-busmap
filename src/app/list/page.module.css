@@ -1,0 +1,36 @@
+.container {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem;
+  background-color: #faf7ff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin-top: 4rem;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 1.5rem;
+}
+
+.searchWrapper {
+  flex: 1;
+;
+}
+
+.paginationControls {
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  .headerRow {
+    justify-content: center;
+  }
+}
