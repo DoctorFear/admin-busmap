@@ -1,3 +1,0 @@
-This content is written by writeFileSync
-The first file for FileSync
-The second file for FileSync
