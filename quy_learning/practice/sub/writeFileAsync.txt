@@ -1,3 +1,0 @@
-This is written by writeFile (async)
-The first file for FileSync
-The second file for FileSync
