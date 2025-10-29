@@ -1,3 +1,35 @@
+# Busmap admin
+
+## [Install express](https://www.npmjs.com/package/express), in path with contain package.json:
+
+`npm install express`
+
+- Add this code to package.json to run server Express with cmd: `npm run server`
+
+```
+"scripts": {
+  "server": "node src/server/server.js"
+}
+
+```
+
+
+## Utils:
+
+1. To kill port:
+
+  `npx kill-port [PORT]`
+
+2. All port we use:
+
+- BE
+  + server(express): 8888
+  + 3000
+- FE:
+
+
+## Documents of NextJS
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
