@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 // Thêm xe buýt mới
 router.post('/', (req, res) => {
   const { licensePlate, capacity } = req.body;
-  const sql = 'INSERT INTO buses (licensePlate, capacity) VALUES (?, ?)';
+  const sql = 'INSERT INTO Bus (licensePlate, capacity) VALUES (?, ?)';
   db.query(sql, [licensePlate, capacity], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.status(201).json({ id: result.insertId, licensePlate, capacity });

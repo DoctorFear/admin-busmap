@@ -19,6 +19,29 @@ src/server/
 └── sockets/
     └── trackingSocket.js   // nhận & phát vị trí qua WebSocket
 
+- Operation of socket:
+
+Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent)
+    |                           |                                    |
+    | -- socket.connect() --->  |                                    |
+    |                           |  (connection established)           |
+    |                           | <--- socket.on('connect') --------- |
+    |                           |                                    |
+    | -- emit 'busLocation' --> |                                    |
+    |    {busID, lat, lng...}   |                                    |
+    |                           |  console.log("📍 Nhận vị trí")     |
+    |                           |  -> optionally save DB             |
+    |                           |                                    |
+    |                           | -- io.emit('updateBusLocation') -->|
+    |                           |    {busID, lat, lng...}            |
+    |                           |                                    |
+    |                           |                                    | -- update UI (move marker)
+    |                           |                                    |    update local state
+    | <--- optional ACK --------|                                    |
+    |                           |                                    |
+
+
+
 ## UI
 
 ### Tổng quan kiến trúc
@@ -110,6 +133,7 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 ### 3. socket.io (tracking realtime)
 
 `npm install socket.io`
+`npm install socket.io-client`
 
 ### Utils
 
