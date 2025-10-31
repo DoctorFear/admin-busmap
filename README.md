@@ -21,24 +21,24 @@ src/server/
 
 - Operation of socket:
 
-Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent)
-    |                           |                                    |
-    | -- socket.connect() --->  |                                    |
-    |                           |  (connection established)           |
-    |                           | <--- socket.on('connect') --------- |
-    |                           |                                    |
-    | -- emit 'busLocation' --> |                                    |
-    |    {busID, lat, lng...}   |                                    |
-    |                           |  console.log("📍 Nhận vị trí")     |
-    |                           |  -> optionally save DB             |
-    |                           |                                    |
-    |                           | -- io.emit('updateBusLocation') -->|
-    |                           |    {busID, lat, lng...}            |
-    |                           |                                    |
-    |                           |                                    | -- update UI (move marker)
-    |                           |                                    |    update local state
-    | <--- optional ACK --------|                                    |
-    |                           |                                    |
+Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent) <br>
+    |                           |                                    |<br>
+    | -- socket.connect() --->  |                                    |<br>
+    |                           |  (connection established)           |<br>
+    |                           | <--- socket.on('connect') --------- |<br>
+    |                           |                                    |<br>
+    | -- emit 'busLocation' --> |                                    |<br>
+    |    {busID, lat, lng...}   |                                    |<br>
+    |                           |  console.log("📍 Nhận vị trí")     |<br>
+    |                           |  -> optionally save DB             |<br>
+    |                           |                                    |<br>
+    |                           | -- io.emit('updateBusLocation') -->|<br>
+    |                           |    {busID, lat, lng...}            |<br>
+    |                           |                                    |<br>
+    |                           |                                    | -- update UI (move marker)<br>
+    |                           |                                    |    update local state<br>
+    | <--- optional ACK --------|                                    |<br>
+    |                           |                                    |<br>
 
 
 
