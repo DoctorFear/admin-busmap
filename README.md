@@ -8,6 +8,7 @@
 
 ### Structures
 
+```
 src/server/
 │
 ├── server.js
@@ -18,39 +19,42 @@ src/server/
 │   └── trackingRoutes.js   // theo dõi vị trí
 └── sockets/
     └── trackingSocket.js   // nhận & phát vị trí qua WebSocket
+```
 
 - Operation of socket:
-
-Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent) <br>
-    |                           |                                    |<br>
-    | -- socket.connect() --->  |                                    |<br>
-    |                           |  (connection established)           |<br>
-    |                           | <--- socket.on('connect') --------- |<br>
-    |                           |                                    |<br>
-    | -- emit 'busLocation' --> |                                    |<br>
-    |    {busID, lat, lng...}   |                                    |<br>
-    |                           |  console.log("📍 Nhận vị trí")     |<br>
-    |                           |  -> optionally save DB             |<br>
-    |                           |                                    |<br>
-    |                           | -- io.emit('updateBusLocation') -->|<br>
-    |                           |    {busID, lat, lng...}            |<br>
-    |                           |                                    |<br>
-    |                           |                                    | -- update UI (move marker)<br>
-    |                           |                                    |    update local state<br>
-    | <--- optional ACK --------|                                    |<br>
-    |                           |                                    |<br>
-
+```
+Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent) 
+    |                           |                                    |
+    | -- socket.connect() --->  |                                    |
+    |                           |  (connection established)           |
+    |                           | <--- socket.on('connect') --------- |
+    |                           |                                    |
+    | -- emit 'busLocation' --> |                                    |
+    |    {busID, lat, lng...}   |                                    |
+    |                           |  console.log("📍 Nhận vị trí")     |
+    |                           |  -> optionally save DB             |
+    |                           |                                    |
+    |                           | -- io.emit('updateBusLocation') -->|
+    |                           |    {busID, lat, lng...}            |
+    |                           |                                    |
+    |                           |                                    | -- update UI (move marker)
+    |                           |                                    |    update local state
+    | <--- optional ACK --------|                                    |
+    |                           |                                    |
+```
 
 
 ## UI
 
 ### Tổng quan kiến trúc
 
+```
 src/
 ├── app/ → App Router (Next.js 13+)
 ├── components/ → Component UI tái sử dụng
 ├── lib/ → Dữ liệu giả lập & hàm tiện ích
 └── server/ → Server Actions / API Routes (tương lai)
+```
 
 ### Chi tiết cấu trúc thư mục
 
