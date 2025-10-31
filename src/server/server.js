@@ -1,7 +1,9 @@
-// 1. Import Express framework
+// 1. Import 
 import express from "express";
 // Nếu Node chưa cấu hình, có thể dùng 
 //          const express = require('express')
+import busRoutes from './routes/busRoutes.js'
+
 
 // 2. Tạo object, ứng dụng Express, thực hiện route, mIddleware,..
 const app = express();
@@ -18,6 +20,8 @@ const PORT = 8888;
 //   và gán kết quả vào req.body (vd: req.body = { name: "A" }).
 // - Middleware được đăng ký BEFORE các route để mọi route sau đó có thể sử dụng req.body.
 app.use(express.json())
+// 4.1 Add route for buses
+app.use('/api/buses', busRoutes)
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)
 //    endpoint: GET - /api/students -> Lấy danh sách học sinh 
