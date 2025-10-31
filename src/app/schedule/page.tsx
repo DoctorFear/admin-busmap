@@ -1,7 +1,9 @@
 // app/schedule/page.tsx
 'use client';
 
-import { useState } from 'react';
+const PORT_SERVER = 8888;
+
+import { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import ScheduleForm from '@/components/ScheduleForm';
 import ScheduleTable from '@/components/ScheduleTable';
@@ -10,8 +12,18 @@ import Notification from '@/components/Notification';
 import styles from './page.module.css';
 import { ScheduleItem, mockSchedules } from '@/lib/data_schedule';
 
+import BusMap_GG from '@/components/BusMap_GG';
+
 export default function SchedulePage() {
-  const [schedules, setSchedules] = useState<ScheduleItem[]>(mockSchedules); // sử dụng dữ liệu mẫu
+  // const [schedules, setSchedules] = useState<ScheduleItem[]>(mockSchedules); // sử dụng dữ liệu mẫu
+  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
+  useEffect(() => {
+    fetch(`http://localhost:${PORT_SERVER}/api/schedules`)
+      .then((res) => res.json())
+      .then((data) => setSchedules(data))
+      .catch((err) => console.error(err));
+  }, []);
+  
   const [searchTerm, setSearchTerm] = useState(''); // thêm trạng thái tìm kiếm
   const [currentPage, setCurrentPage] = useState(1); // thêm trạng thái trang hiện tại
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | undefined>(); // thêm trạng thái lịch trình đang chỉnh sửa
@@ -71,6 +83,12 @@ export default function SchedulePage() {
         onCancel={handleCancel} // hàm xử lý khi hủy
         setNotification={(message, type) => setNotification({ message, type })} // hàm hiển thị thông báo
       />
+
+      {/* Google Maps */}
+      <div className={styles.mapArea}>
+        <BusMap_GG buses={[]} /> 
+        {/* truyền danh sách tuyến / bus */}
+      </div>
 
       <div className={styles.headerRow}>
         <div className={styles.searchWrapper}>

@@ -4,8 +4,9 @@ import express from "express";      // Nếu Node chưa cấu hình, có thể d
 import { createServer } from "http";
 import { Server } from "socket.io";
 import initTrackingSocket from "./sockets/trackingSocket.js";
+// Route:
 import busRoutes from './routes/busRoutes.js'
-
+import scheduleRoutes from "./routes/scheduleRoutes.js"
 
 // 2. Tạo object, ứng dụng Express, thực hiện route, mIddleware,..
 const app = express();
@@ -24,6 +25,8 @@ const PORT = 8888;
 app.use(express.json())
 // 4.1 Add route API for buses
 app.use('/api/buses', busRoutes)
+// 4.2 Add route API for schedule 
+app.use("/api/schedules", scheduleRoutes)
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)
 //    endpoint: GET - /api/students -> Lấy danh sách học sinh 

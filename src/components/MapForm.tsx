@@ -1,18 +1,14 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import { useEffect, useState } from 'react';
-import styles from '../styles/MapForm.module.css';
-
-// Fix default icon issue with Leaflet in React
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/leaflet/marker-icon-2x.png',
-  iconUrl: '/leaflet/marker-icon.png',
-  shadowUrl: '/leaflet/marker-shadow.png',
-});
+import { useEffect, useState, useMemo } from "react";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  DirectionsService,
+  DirectionsRenderer,
+} from "@react-google-maps/api";
+import styles from "../styles/MapForm.module.css";
 
 interface MapFormProps {
   roads: string[];
@@ -25,49 +21,151 @@ interface Coordinate {
 
 export default function MapForm({ roads }: MapFormProps) {
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
+  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Mock coordinates for roads (replace with real geocoding API in production)
-  useEffect(() => {
-    // Simulate geocoding: map road names to coordinates
-    const mockCoordinates: { [key: string]: Coordinate } = {
-      'Đường Lê Lợi': { lat: 10.7765, lng: 106.7009 },
-      'Đường Nguyễn Huệ': { lat: 10.7746, lng: 106.7015 },
-      'Đường Hai Bà Trưng': { lat: 10.7790, lng: 106.6980 },
-      'Đường Đồng Khởi': { lat: 10.7750, lng: 106.7020 },
-    };
+  const googleApiKey = process.env.NEXT_PUBLIC_GG_MAPS_KEY as string;
 
-    const newCoordinates = roads
-      .map((road) => mockCoordinates[road] || { lat: 10.7765 + Math.random() * 0.01, lng: 106.7009 + Math.random() * 0.01 })
-      .filter((coord) => coord.lat && coord.lng);
-    setCoordinates(newCoordinates);
-  }, [roads]);
-
-  // Validate route continuity (mock implementation)
-  const isRouteValid = () => {
-    // In production, use OpenStreetMap API to check if roads form a continuous route
-    return coordinates.length >= 2; // Simple mock: valid if at least 2 points
+  /**
+   * 🧭 1️⃣ Geocode thật để lấy lat/lng cho từng đường
+   */
+  const geocodeRoad = async (road: string): Promise<Coordinate | null> => {
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          road + ", Hồ Chí Minh, Việt Nam"
+        )}&key=${googleApiKey}`
+      );
+      const data = await res.json();
+      if (data.status === "OK" && data.results[0]) {
+        return data.results[0].geometry.location;
+      }
+      console.warn("Không tìm thấy:", road);
+      return null;
+    } catch (err) {
+      console.error("Lỗi Geocoding:", err);
+      return null;
+    }
   };
 
+  /**
+   * 🚀 2️⃣ Khi danh sách roads thay đổi → geocode và vẽ tuyến
+   */
+  useEffect(() => {
+    if (roads.length < 2) {
+      setDirections(null);
+      return;
+    }
+
+    const fetchRoute = async () => {
+      setLoading(true);
+      const coords: Coordinate[] = [];
+
+      for (const road of roads) {
+        const c = await geocodeRoad(road);
+        if (c) coords.push(c);
+      }
+
+      if (coords.length >= 2) {
+        setCoordinates(coords);
+      } else {
+        console.warn("Không đủ điểm hợp lệ để vẽ tuyến");
+        setCoordinates([]);
+      }
+
+      setLoading(false);
+    };
+
+    fetchRoute();
+  }, [roads]);
+
+  /**
+   * 📍 3️⃣ Tính trung tâm bản đồ
+   */
+  const mapCenter = useMemo(() => {
+    if (coordinates.length === 0) return { lat: 10.7765, lng: 106.7009 };
+    const avgLat =
+      coordinates.reduce((sum, c) => sum + c.lat, 0) / coordinates.length;
+    const avgLng =
+      coordinates.reduce((sum, c) => sum + c.lng, 0) / coordinates.length;
+    return { lat: avgLat, lng: avgLng };
+  }, [coordinates]);
+
+  /**
+   * 🚦 4️⃣ Khi có đủ điểm → gọi DirectionsService để vẽ đường thật
+   */
+  useEffect(() => {
+    if (coordinates.length < 2) return;
+
+    const origin = coordinates[0];
+    const destination = coordinates[coordinates.length - 1];
+    const waypoints = coordinates
+      .slice(1, -1)
+      .map((coord) => ({ location: coord }));
+
+    const service = new google.maps.DirectionsService();
+
+    service.route(
+      {
+        origin,
+        destination,
+        waypoints,
+        travelMode: google.maps.TravelMode.DRIVING,
+        optimizeWaypoints: true,
+      },
+      (result, status) => {
+        if (status === "OK" && result) {
+          setDirections(result);
+        } else {
+          console.warn("Lỗi Directions API:", status);
+        }
+      }
+    );
+  }, [coordinates]);
+
+  const isRouteValid = directions !== null;
+
+  /**
+   * 🗺️ 5️⃣ Render map (giữ nguyên layout)
+   */
   return (
     <div className={styles.mapContainer}>
       <h3>Tuyến đường</h3>
-      <MapContainer center={[10.7765, 106.7009]} zoom={15} className={styles.map}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {coordinates.map((coord, index) => (
-          <Marker key={index} position={[coord.lat, coord.lng]} />
-        ))}
-        {coordinates.length >= 2 && (
-          <Polyline positions={coordinates} color="#edbe80" weight={5} />
-        )}
-      </MapContainer>
+
+      <LoadScript googleMapsApiKey={googleApiKey}>
+        <GoogleMap
+          mapContainerStyle={{ width: "100%", height: "700px" }}
+          center={mapCenter}
+          zoom={13}
+        >
+          {!isRouteValid &&
+            coordinates.map((coord, i) => (
+              <Marker key={i} position={coord} />
+            ))}
+
+          {directions && (
+            <DirectionsRenderer
+              directions={directions}
+              options={{
+                polylineOptions: {
+                  strokeColor: "#edbe80",
+                  strokeWeight: 5,
+                  strokeOpacity: 0.9,
+                },
+                suppressMarkers: false,
+              }}
+            />
+          )}
+        </GoogleMap>
+      </LoadScript>
+
       <div className={styles.validationStatus}>
-        {isRouteValid() ? (
-          <span className={styles.valid}>Tuyến đường hợp lệ</span>
+        {loading ? (
+          <span style={{ color: "#888" }}>⏳ Đang tải tuyến đường thật...</span>
+        ) : isRouteValid ? (
+          <span className={styles.valid}>Tuyến đường hợp lệ (đúng lộ trình)</span>
         ) : (
-          <span className={styles.invalid}>Tuyến đường không hợp lệ (đứt đoạn)</span>
+          <span className={styles.invalid}>Tuyến đường không hợp lệ</span>
         )}
       </div>
     </div>

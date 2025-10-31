@@ -13,7 +13,14 @@ src/server/
 │
 ├── server.js
 ├── db.js                   // kết nối MySQL
+├── controllers/
+│   └── scheduleController.js
+├── models/
+│   ├── routeModel.js
+│   ├── routeDetailModel.js
+│   └── tripModel.js
 ├── routes/
+│   ├── scheduleRoutes.js   // quản lý lịch trình 
 │   ├── busRoutes.js        // quản lý xe buýt
 │   ├── driverRoutes.js     // quản lý tài xế
 │   └── trackingRoutes.js   // theo dõi vị trí
@@ -111,8 +118,7 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 
 > **Sau này**: thay bằng gọi API từ backend.
 
-
---- 
+---
 
 ## INSTALL AND UTILS
 
@@ -130,34 +136,27 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 
 ```
 
-### 2. mysql2 (connect MySQL)
-
-`npm install mysql2`
+### 2. mysql2 (connect MySQL): `npm install mysql2`
 
 ### 3. socket.io (tracking realtime)
 
 `npm install socket.io`
 `npm install socket.io-client`
 
+### 4. Google Maps API: `npm install react-google-maps/api`
+
 ### Utils
 
-1. To kill port:
-
-`npx kill-port [PORT]`
+1. To kill port: `npx kill-port [PORT]`
 
 2. All port we use:
 
-- BE
-  - server(express): 8888
-  - admin FE: 3000
-- FE:
-
-
+- BE, server(express): 8888
+- FE: 3000
 
 ---
---- 
 ---
-
+---
 
 ## Documents of NextJS
 

@@ -10,6 +10,7 @@
     "server": "node src/server/server.js"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.7",
     "clsx": "^2.1.1",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
