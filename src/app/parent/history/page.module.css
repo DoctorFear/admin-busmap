@@ -1,0 +1,104 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+  background: #faf7ff;
+  min-height: 100vh;
+}
+
+.historyCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #212222;
+}
+
+.form {
+  margin-bottom: 2rem;
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.dateInput {
+  padding: 0.6rem 0.8rem;
+  border: 2px solid #edbe80;
+  border-radius: 6px;
+  font-size: 1rem;
+  flex-grow: 1;
+}
+
+
+.submitBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ff960a;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  filter: brightness(1.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th {
+  background: linear-gradient(#ff960a, #ffc06e);
+  color: white;
+  padding: 0.8rem;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.table tr:hover {
+  background-color: #fff9f1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  border: none;
+  background: #3f51b5;
+  color: white;
+  border-radius: 5px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  filter: brightness(1.2);
+}
