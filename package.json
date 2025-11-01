@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.545.0",

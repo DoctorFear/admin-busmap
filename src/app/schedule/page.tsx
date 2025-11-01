@@ -10,7 +10,8 @@ import ScheduleTable from '@/components/ScheduleTable';
 import PaginationControl from '@/components/PaginationControl';
 import Notification from '@/components/Notification';
 import styles from './page.module.css';
-import { ScheduleItem, mockSchedules } from '@/lib/data_schedule';
+// import { ScheduleItem, mockSchedules } from '@/lib/data_schedule';
+import { ScheduleItem} from '@/lib/data_schedule';
 
 import BusMap_GG from '@/components/BusMap_GG';
 
@@ -18,11 +19,26 @@ export default function SchedulePage() {
   // const [schedules, setSchedules] = useState<ScheduleItem[]>(mockSchedules); // sử dụng dữ liệu mẫu
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   useEffect(() => {
+    // fetch(`http://localhost:8888/api/schedules`)
     fetch(`http://localhost:${PORT_SERVER}/api/schedules`)
       .then((res) => res.json())
-      .then((data) => setSchedules(data))
-      .catch((err) => console.error(err));
+      .then((data) => {
+        console.log(data);
+        const normalized = data.map((item: any) => ({
+          tripID: item.tripID,
+          routeName: item.routeName,
+          tripDate: item.tripDate,
+          startTime: item.startTime?.slice(0, 5),
+          endTime: item.endTime?.slice(0, 5),
+          licensePlate: item.licensePlate,
+          driverName: item.driverName,
+          status: item.status,
+        }));
+        setSchedules(normalized);
+      })
+      .catch((err) => console.error("Fetch error:", err));
   }, []);
+
   
   const [searchTerm, setSearchTerm] = useState(''); // thêm trạng thái tìm kiếm
   const [currentPage, setCurrentPage] = useState(1); // thêm trạng thái trang hiện tại
