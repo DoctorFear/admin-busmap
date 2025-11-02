@@ -78,7 +78,7 @@ CREATE INDEX idx_student_parent ON Student(parentUserID);
 CREATE INDEX idx_student_grade ON Student(grade);
 
 -- ============================
--- BẢNG: Rout: Lưu tuyến đường tổng thể
+-- BẢNG: Route: Lưu tuyến đường tổng thể
 -- ============================
 CREATE TABLE Route (
   routeID INT AUTO_INCREMENT PRIMARY KEY,               -- Mã tuyến
@@ -190,7 +190,6 @@ CREATE TABLE DriverAssignment (
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Phân công tài xế cho xe và tuyến theo ngày (đưa & rước học sinh)';
-
 
 CREATE INDEX idx_driverassignment_driver_date ON DriverAssignment(driverID, assignmentDate);
 
@@ -334,24 +333,20 @@ CREATE INDEX idx_audit_actor ON AuditLog(actorID);
 CREATE INDEX idx_audit_time ON AuditLog(timestamp);
 
 -- ============================
--- Một vài ràng buộc 
+-- Một vài ràng buộc bổ sung
 -- ============================
 CREATE INDEX idx_trip_date ON Trip(tripDate);
 CREATE INDEX idx_vehiclelocation_time ON VehicleLocation(recordedAt);
 CREATE INDEX idx_notification_sentat ON Notification(sentAt);
 
---
--- NEW 
---
+-- =================================================
+-- DỮ LIỆU MẪU 
+-- =================================================
 
--- ============================
--- DỮ LIỆU MẪU CHO SchoolBusManagement
--- Chạy sau khi bạn đã tạo tất cả bảng
--- ============================
-
-/* 1) Users: (10 parents, 3 drivers, 1 admin) */
+/* 1) Users: 15 parents, 3 drivers, 1 admin */
 INSERT INTO Users (fullName, username, passwordHash, email, phone, role)
 VALUES
+-- PHỤ HUYNH 
 ('Nguyễn Văn A',  'parent01', 'parent', 'a@gmail.com', '0901110001', 'parent'),
 ('Trần Thị B',    'parent02', 'parent', 'b@gmail.com', '0901110002', 'parent'),
 ('Lê Văn C',      'parent03', 'parent', 'c@gmail.com', '0901110003', 'parent'),
@@ -362,16 +357,21 @@ VALUES
 ('Bùi Thị H',     'parent08', 'parent', 'h@gmail.com', '0901110008', 'parent'),
 ('Phan Văn I',    'parent09', 'parent', 'i@gmail.com', '0901110009', 'parent'),
 ('Đặng Thị J',    'parent10', 'parent', 'j@gmail.com', '0901110010', 'parent'),
+('Trịnh Văn K',   'parent11', 'parent', 'k2@gmail.com', '0901110011', 'parent'),
+('Mai Thị L',     'parent12', 'parent', 'l2@gmail.com', '0901110012', 'parent'),
+('Lý Văn M',      'parent13', 'parent', 'm2@gmail.com', '0901110013', 'parent'),
+('Cao Thị N',     'parent14', 'parent', 'n@gmail.com', '0901110014', 'parent'),
+('Dương Văn O',   'parent15', 'parent', 'o@gmail.com', '0901110015', 'parent'),
 
+-- TÀI XẾ 
 ('Ngô Minh K',    'driver01', 'driver', 'k@gmail.com', '0902220001', 'driver'),
 ('Lâm Văn L',     'driver02', 'driver', 'l@gmail.com', '0902220002', 'driver'),
 ('Trương Thị M',  'driver03', 'driver', 'm@gmail.com', '0902220003', 'driver'),
 
-('Quản trị viên',  'admin01',  'admin',  'admin@gmail.com', '0999999999', 'admin')
-;
+-- ADMIN
+('Quản trị viên',  'admin01',  'admin',  'admin@gmail.com', '0999999999', 'admin');
 
-/* 2) Parent details: parentID must equal corresponding Users.userID
-   (Assumes Users inserted auto-increment from 1..14 in order above) */
+/* 2) Parent details */
 INSERT INTO Parent (parentID, address, workInfo)
 VALUES
 (1, '123 Lê Lợi, Quận 1, TP.HCM', 'Công ty A'),
@@ -383,10 +383,14 @@ VALUES
 (7, '9B Trường Chinh, Quận Tân Bình','Công ty G'),
 (8, '77 Hoàng Văn Thụ, Quận Tân Bình','Công ty H'),
 (9, '2A Cách Mạng Tháng 8, Quận 1','Công ty I'),
-(10,'30 Bùi Thị Xuân, Quận 1','Công ty J')
-;
+(10,'30 Bùi Thị Xuân, Quận 1','Công ty J'),
+(11,'15 Nguyễn Văn Cừ, Quận 5','Công ty K'),
+(12,'44 Lý Thường Kiệt, Quận 10','Công ty L'),
+(13,'66 Điện Biên Phủ, Quận 3','Công ty M'),
+(14,'99 Cộng Hòa, Quận Tân Bình','Công ty N'),
+(15,'112 Xô Viết Nghệ Tĩnh, Bình Thạnh','Công ty O');
 
-/* 3) Student: each student -> parentUserID */
+/* 3) Student: TĂNG LÊN 15 HỌC SINH */
 INSERT INTO Student (fullName, grade, schoolName, parentUserID)
 VALUES
 ('Nguyễn Minh Anh', '1A', 'Trường Tiểu học A', 1),
@@ -398,168 +402,232 @@ VALUES
 ('Vũ Thanh Hà',    '2B', 'Trường Tiểu học A', 7),
 ('Bùi Đức Huy',    '3A', 'Trường Tiểu học A', 8),
 ('Phan Mỹ Linh',   '3A', 'Trường Tiểu học A', 9),
-('Đặng Nam Sơn',   '3B', 'Trường Tiểu học A', 10)
-;
+('Đặng Nam Sơn',   '3B', 'Trường Tiểu học A', 10),
+('Trịnh Ngọc Anh', '1A', 'Trường Tiểu học A', 11),
+('Mai Quốc Bảo',   '1B', 'Trường Tiểu học A', 12),
+('Lý Minh Châu',   '2A', 'Trường Tiểu học A', 13),
+('Cao Thùy Dung',  '2B', 'Trường Tiểu học A', 14),
+('Dương Gia Hưng', '3A', 'Trường Tiểu học A', 15);
 
-/* 4) Driver: userID references Users.userID (drivers users are 11..13) 
-   Note: driverID will auto-increment (we can later reference driverID 1..3) */
+/* 4) Driver */
 INSERT INTO Driver (userID, fullName, phoneNumber, driverLicense, status)
 VALUES
-(11, 'Ngô Minh K',   '0902220001', 'B2-987654', 'ACTIVE'),
-(12, 'Lâm Văn L',    '0902220002', 'C1-876543', 'ACTIVE'),
-(13, 'Trương Thị M', '0902220003', 'B2-765432', 'ACTIVE')
-;
+(16, 'Ngô Minh K',   '0902220001', 'B2-987654', 'ACTIVE'),
+(17, 'Lâm Văn L',    '0902220002', 'C1-876543', 'ACTIVE'),
+(18, 'Trương Thị M', '0902220003', 'B2-765432', 'ACTIVE');
 
-/* 5) Bus: use columns licensePlate, capacity, model, status (status enum lowercase per schema) */
+/* 5) Bus */
 INSERT INTO Bus (licensePlate, capacity, model, status)
 VALUES
 ('51A-10001', 40, 'Thaco', 'active'),
 ('51A-10002', 40, 'Hyundai', 'active'),
 ('51A-10003', 30, 'Samco', 'active'),
-('51A-10004', 35, 'Isuzu', 'active')
-;
+('51A-10004', 35, 'Isuzu', 'active');
 
-/* 6) Route: routeName, description, estimatedTime (minutes) */
+/* 6) Route */
 INSERT INTO Route (routeName, description, estimatedTime)
 VALUES
 ('Tuyến 1: Quận 1 → Trường A', 'Tuyến buổi sáng từ Quận 1 tới Trường A', 30),
 ('Tuyến 2: Quận 3 → Trường A', 'Tuyến buổi sáng từ Quận 3 tới Trường A', 25),
-('Tuyến 3: Quận 5 → Trường B', 'Tuyến buổi sáng từ Quận 5 tới Trường B', 45)
-;
+('Tuyến 3: Quận 5 → Trường B', 'Tuyến buổi sáng từ Quận 5 tới Trường B', 45);
 
-/* 7) BusStop: tạo vài điểm dừng cho mỗi route (lat/lng ví dụ) */
+/* 7) BusStop */
 INSERT INTO BusStop (routeID, name, lat, lng, sequence, estimatedArrivalTime)
 VALUES
 (1, 'Điểm dừng 1 - Q1', 10.7710, 106.6980, 1, '06:45:00'),
 (1, 'Điểm dừng 2 - Q1', 10.7685, 106.6890, 2, '06:55:00'),
 (2, 'Điểm dừng 1 - Q3', 10.7760, 106.6920, 1, '06:50:00'),
-(3, 'Điểm dừng 1 - Q5', 10.7600, 106.6640, 1, '06:40:00')
-;
+(3, 'Điểm dừng 1 - Q5', 10.7600, 106.6640, 1, '06:40:00');
 
-/* 8) Trip: chuyến hôm nay (gán bus & driver). 
-   assignedDriverID references Driver.driverID (driverIDs sẽ là 1..3 theo thứ tự insert),
-   assignedBusID tham chiếu Bus.busID (1..4)
-*/
+/* 8) Trip: (driverID = 1) */
 INSERT INTO Trip (routeID, tripDate, startTime, endTime, assignedBusID, assignedDriverID, status)
 VALUES
-(1, CURDATE(), '07:00:00', '08:00:00', 1, 1, 'PLANNED'),
-(2, CURDATE(), '07:30:00', '08:20:00', 2, 2, 'PLANNED'),
-(3, CURDATE(), '06:45:00', '07:40:00', 3, 3, 'PLANNED')
-;
+-- Thứ 2 - 4/11/2025 (2 chuyến: sáng + chiều)
+(1, '2025-11-04', '06:30:00', '08:00:00', 1, 1, 'RUNNING'),  -- Sáng: Đưa đi học
+(1, '2025-11-04', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),  -- Chiều: Đón về
 
-/* 9) DriverAssignment: phân công theo ngày (driverID, busID, routeID) */
+-- Thứ 3 - 5/11/2025 (2 chuyến)
+(1, '2025-11-05', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+(1, '2025-11-05', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
+
+-- Thứ 4 - 6/11/2025 (1 chuyến: chỉ sáng)
+(1, '2025-11-06', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+
+-- Thứ 5 - 7/11/2025 (2 chuyến)
+(1, '2025-11-07', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+(1, '2025-11-07', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
+
+-- Thứ 6 - 8/11/2025 (2 chuyến)
+(1, '2025-11-08', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+(1, '2025-11-08', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
+
+-- Thứ 7 - 9/11/2025 (1 chuyến: chỉ sáng) 
+(1, '2025-11-09', '06:30:00', '08:00:00', 1, 1, 'PLANNED');   -- Đang chạy
+
+/* 9) DriverAssignment: LỊCH PHÂN CÔNG 3/11 - 9/11 */
 INSERT INTO DriverAssignment (driverID, busID, routeID, assignmentDate, note)
 VALUES
-(1, 1, 1, CURDATE(), 'Phân công sáng - tuyến 1'),
-(2, 2, 2, CURDATE(), 'Phân công sáng - tuyến 2'),
-(3, 3, 3, CURDATE(), 'Phân công sáng - tuyến 3')
-;
 
-/* 10) Device: giả lập 1 thiết bị cho mỗi driver và 1 cho admin (userID 14) */
+-- Thứ 3-7: 4/11 đến 8/11
+(1, 1, 1, '2025-11-04', 'Ca sáng và chiều - Tuyến 1'),
+(1, 1, 1, '2025-11-05', 'Ca sáng và chiều - Tuyến 1'),
+(1, 1, 1, '2025-11-06', 'Chỉ ca sáng - Tuyến 1'),
+(1, 1, 1, '2025-11-07', 'Ca sáng và chiều - Tuyến 1'),
+(1, 1, 1, '2025-11-08', 'Ca sáng và chiều - Tuyến 1'),
+
+-- Thứ 7: 9/11 
+(1, 1, 1, '2025-11-09', 'Ca sáng - Tuyến 1');
+
+/* 10) BoardingRecord: Danh sách học sinh cho mỗi chuyến */
+-- Thứ 3 - 4/11 SÁNG (tripID = 1)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(1, 1, 1, '2025-11-04 06:35:00', '2025-11-04 07:50:00', 'PICKED', 16),
+(1, 2, 1, '2025-11-04 06:40:00', '2025-11-04 07:50:00', 'PICKED', 16),
+(1, 3, 2, '2025-11-04 06:58:00', '2025-11-04 07:50:00', 'PICKED', 16),
+(1, 5, 2, '2025-11-04 07:00:00', '2025-11-04 07:50:00', 'PICKED', 16),
+(1, 7, 1, NULL, NULL, 'MISSED', 16),  -- Vắng
+(1, 9, 2, '2025-11-04 07:05:00', '2025-11-04 07:50:00', 'PICKED', 16),
+(1, 11, 1, '2025-11-04 06:42:00', '2025-11-04 07:50:00', 'PICKED', 16),
+(1, 13, 2, '2025-11-04 07:02:00', '2025-11-04 07:50:00', 'PICKED', 16);
+
+-- Thứ 3 - 4/11 CHIỀU (tripID = 2)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(2, 1, NULL, '2025-11-04 16:10:00', '2025-11-04 17:05:00', 'PICKED', 16),
+(2, 2, NULL, '2025-11-04 16:10:00', '2025-11-04 17:10:00', 'PICKED', 16),
+(2, 3, NULL, '2025-11-04 16:10:00', '2025-11-04 17:15:00', 'PICKED', 16),
+(2, 5, NULL, '2025-11-04 16:10:00', '2025-11-04 17:18:00', 'PICKED', 16),
+(2, 9, NULL, '2025-11-04 16:10:00', '2025-11-04 17:12:00', 'PICKED', 16),
+(2, 11, NULL, '2025-11-04 16:10:00', '2025-11-04 17:08:00', 'PICKED', 16),
+(2, 13, NULL, '2025-11-04 16:10:00', '2025-11-04 17:20:00', 'PICKED', 16);
+
+-- Thứ 4 - 5/11 SÁNG (tripID = 3)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(3, 1, 1, '2025-11-05 06:37:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 2, 1, '2025-11-05 06:41:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 3, 2, NULL, NULL, 'MISSED', 16),  -- Vắng
+(3, 4, 1, '2025-11-05 06:45:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 5, 2, '2025-11-05 07:00:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 7, 1, '2025-11-05 06:50:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 9, 2, '2025-11-05 07:04:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 11, 1, '2025-11-05 06:43:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 13, 2, '2025-11-05 07:01:00', '2025-11-05 07:52:00', 'PICKED', 16),
+(3, 15, 1, '2025-11-05 06:48:00', '2025-11-05 07:52:00', 'PICKED', 16);
+
+-- Thứ 4 - 5/11 CHIỀU (tripID = 4)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(4, 1, NULL, '2025-11-05 16:10:00', '2025-11-05 17:06:00', 'PICKED', 16),
+(4, 2, NULL, '2025-11-05 16:10:00', '2025-11-05 17:11:00', 'PICKED', 16),
+(4, 4, NULL, '2025-11-05 16:10:00', '2025-11-05 17:14:00', 'PICKED', 16),
+(4, 5, NULL, '2025-11-05 16:10:00', '2025-11-05 17:19:00', 'PICKED', 16),
+(4, 7, NULL, '2025-11-05 16:10:00', '2025-11-05 17:13:00', 'PICKED', 16),
+(4, 9, NULL, '2025-11-05 16:10:00', '2025-11-05 17:12:00', 'PICKED', 16),
+(4, 11, NULL, '2025-11-05 16:10:00', '2025-11-05 17:09:00', 'PICKED', 16),
+(4, 13, NULL, '2025-11-05 16:10:00', '2025-11-05 17:21:00', 'PICKED', 16),
+(4, 15, NULL, '2025-11-05 16:10:00', '2025-11-05 17:16:00', 'PICKED', 16);
+
+-- Thứ 5 - 6/11 SÁNG (tripID = 5)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(5, 1, 1, '2025-11-06 06:36:00', '2025-11-06 07:51:00', 'PICKED', 16),
+(5, 2, 1, '2025-11-06 06:39:00', '2025-11-06 07:51:00', 'PICKED', 16),
+(5, 3, 2, '2025-11-06 06:57:00', '2025-11-06 07:51:00', 'PICKED', 16),
+(5, 4, 1, NULL, NULL, 'MISSED', 16),  -- Vắng
+(5, 5, 2, '2025-11-06 06:59:00', '2025-11-06 07:51:00', 'PICKED', 16),
+(5, 9, 2, '2025-11-06 07:03:00', '2025-11-06 07:51:00', 'PICKED', 16),
+(5, 11, 1, '2025-11-06 06:44:00', '2025-11-06 07:51:00', 'PICKED', 16);
+
+-- Thứ 6 - 7/11 SÁNG (tripID = 6)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(6, 1, 1, '2025-11-07 06:38:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 2, 1, '2025-11-07 06:41:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 3, 2, '2025-11-07 06:58:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 4, 1, '2025-11-07 06:46:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 5, 2, '2025-11-07 07:01:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 6, 1, '2025-11-07 06:52:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 7, 1, NULL, NULL, 'MISSED', 16),  -- Vắng
+(6, 9, 2, '2025-11-07 07:05:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 11, 1, '2025-11-07 06:43:00', '2025-11-07 07:53:00', 'PICKED', 16),
+(6, 13, 2, '2025-11-07 07:02:00', '2025-11-07 07:53:00', 'PICKED', 16);
+
+-- Thứ 6 - 7/11 CHIỀU (tripID = 7)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(7, 1, NULL, '2025-11-07 16:10:00', '2025-11-07 17:07:00', 'PICKED', 16),
+(7, 2, NULL, '2025-11-07 16:10:00', '2025-11-07 17:12:00', 'PICKED', 16),
+(7, 3, NULL, '2025-11-07 16:10:00', '2025-11-07 17:16:00', 'PICKED', 16),
+(7, 4, NULL, '2025-11-07 16:10:00', '2025-11-07 17:15:00', 'PICKED', 16),
+(7, 5, NULL, '2025-11-07 16:10:00', '2025-11-07 17:20:00', 'PICKED', 16),
+(7, 6, NULL, '2025-11-07 16:10:00', '2025-11-07 17:14:00', 'PICKED', 16),
+(7, 9, NULL, '2025-11-07 16:10:00', '2025-11-07 17:13:00', 'PICKED', 16),
+(7, 11, NULL, '2025-11-07 16:10:00', '2025-11-07 17:10:00', 'PICKED', 16),
+(7, 13, NULL, '2025-11-07 16:10:00', '2025-11-07 17:22:00', 'PICKED', 16);
+
+-- Thứ 7 - 8/11 SÁNG (tripID = 8)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(8, 1, 1, '2025-11-08 06:37:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 2, 1, '2025-11-08 06:40:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 3, 2, '2025-11-08 06:59:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 4, 1, '2025-11-08 06:47:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 5, 2, NULL, NULL, 'MISSED', 16),  -- Vắng
+(8, 6, 1, '2025-11-08 06:51:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 7, 1, '2025-11-08 06:49:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 9, 2, '2025-11-08 07:04:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 11, 1, '2025-11-08 06:44:00', '2025-11-08 07:52:00', 'PICKED', 16),
+(8, 12, 2, '2025-11-08 07:00:00', '2025-11-08 07:52:00', 'PICKED', 16);
+
+-- Thứ 7 - 8/11 CHIỀU (tripID = 9)
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(9, 1, NULL, '2025-11-08 16:10:00', '2025-11-08 17:08:00', 'PICKED', 16),
+(9, 2, NULL, '2025-11-08 16:10:00', '2025-11-08 17:11:00', 'PICKED', 16),
+(9, 3, NULL, '2025-11-08 16:10:00', '2025-11-08 17:17:00', 'PICKED', 16),
+(9, 4, NULL, '2025-11-08 16:10:00', '2025-11-08 17:16:00', 'PICKED', 16),
+(9, 6, NULL, '2025-11-08 16:10:00', '2025-11-08 17:15:00', 'PICKED', 16),
+(9, 7, NULL, '2025-11-08 16:10:00', '2025-11-08 17:14:00', 'PICKED', 16),
+(9, 9, NULL, '2025-11-08 16:10:00', '2025-11-08 17:13:00', 'PICKED', 16),
+(9, 11, NULL, '2025-11-08 16:10:00', '2025-11-08 17:09:00', 'PICKED', 16),
+(9, 12, NULL, '2025-11-08 16:10:00', '2025-11-08 17:18:00', 'PICKED', 16);
+
+-- CN - 9/11 SÁNG (tripID = 10) 
+INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
+VALUES
+(10, 1, 1, '2025-11-09 06:36:00', NULL, 'PICKED', 16),  
+(10, 2, 1, '2025-11-09 06:39:00', NULL, 'PICKED', 16),
+(10, 3, 2, '2025-11-09 06:58:00', NULL, 'PICKED', 16),
+(10, 4, 1, '2025-11-09 06:45:00', NULL, 'PICKED', 16),
+(10, 5, 2, '2025-11-09 07:00:00', NULL, 'PICKED', 16),
+(10, 6, 1, NULL, NULL, 'MISSED', 16),  -- Vắng hôm nay
+(10, 7, 1, '2025-11-09 06:50:00', NULL, 'PICKED', 16),
+(10, 9, 2, '2025-11-09 07:03:00', NULL, 'PICKED', 16),
+(10, 11, 1, '2025-11-09 06:42:00', NULL, 'PICKED', 16),
+(10, 12, 2, '2025-11-09 07:01:00', NULL, 'PICKED', 16),
+(10, 13, 2, '2025-11-09 07:04:00', NULL, 'PICKED', 16),
+(10, 15, 1, '2025-11-09 06:47:00', NULL, 'PICKED', 16);
+
+/* 11) Device */
 INSERT INTO Device (busID, userID, deviceType, fcmToken)
 VALUES
-(1, 11, 'driver_app', NULL),
-(2, 12, 'driver_app', NULL),
-(3, 13, 'driver_app', NULL),
-(NULL, 14, 'other', NULL)  -- admin client
-;
+(1, 16, 'driver_app', NULL),
+(2, 17, 'driver_app', NULL),
+(3, 18, 'driver_app', NULL),
+(NULL, 19, 'other', NULL);  -- admin
 
-/* 11) Notification: gửi 1 thông báo mẫu từ admin (userID 14) tới 3 phụ huynh */
+/* 12) Notification */
 INSERT INTO Notification (toUserID, fromUserID, type, title, content, sentAt)
 VALUES
-(1, 14, 'ARRIVAL', 'Xe sắp đến', 'Xe buýt tuyến 1 sắp đến điểm đón của con bạn', NOW()),
-(2, 14, 'PICKUP', 'Xe đang trên đường', 'Xe buýt đang trên đường đón học sinh', NOW()),
-(5, 14, 'INCIDENT', 'Xe trễ', 'Xe buýt gặp kẹt xe, dự kiến trễ 10 phút', NOW())
-;
+(1, 19, 'ARRIVAL', 'Xe sắp đến', 'Xe buýt tuyến 1 sắp đến điểm đón của con bạn', NOW()),
+(2, 19, 'PICKUP', 'Xe đang trên đường', 'Xe buýt đang trên đường đón học sinh', NOW()),
+(5, 19, 'INCIDENT', 'Xe trễ', 'Xe buýt gặp kẹt xe, dự kiến trễ 10 phút', NOW());
 
-/* 12) VehicleLocation: vài bản ghi vị trí ban đầu (history) */
+/* 13) VehicleLocation */
 INSERT INTO VehicleLocation (busID, lat, lng, heading, speed)
 VALUES
 (1, 10.7710, 106.6980, 180, 30),
 (2, 10.7760, 106.6920, 90, 25),
-(3, 10.7600, 106.6640, 270, 28)
-;
-
-/* 13) BoardingRecord: mẫu (một vài record) */
-INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, status, reportedBy)
-VALUES
-(1, 1, 1, NOW(), 'PICKED', 11),
-(1, 2, 2, NULL, 'MISSED', 11)
-;
-
--- KẾT THÚC DỮ LIỆU MẪU
-
-
-
--- ============================
--- THÔNG TIN MẪU
--- ============================
--- INSERT INTO Users (username, password, fullName, role, email, phoneNumber)
--- VALUES
--- ('parent01', '123456', 'Nguyễn Văn A', 'parent', 'a@gmail.com', '0901110001'),
--- ('parent02', '123456', 'Trần Thị B', 'parent', 'b@gmail.com', '0901110002'),
--- ('parent03', '123456', 'Lê Văn C', 'parent', 'c@gmail.com', '0901110003'),
--- ('parent04', '123456', 'Phạm Thị D', 'parent', 'd@gmail.com', '0901110004'),
--- ('parent05', '123456', 'Hoàng Văn E', 'parent', 'e@gmail.com', '0901110005'),
--- ('parent06', '123456', 'Đỗ Thị F', 'parent', 'f@gmail.com', '0901110006'),
--- ('parent07', '123456', 'Vũ Văn G', 'parent', 'g@gmail.com', '0901110007'),
--- ('parent08', '123456', 'Bùi Thị H', 'parent', 'h@gmail.com', '0901110008'),
--- ('parent09', '123456', 'Phan Văn I', 'parent', 'i@gmail.com', '0901110009'),
--- ('parent10', '123456', 'Đặng Thị J', 'parent', 'j@gmail.com', '0901110010'),
-
--- ('driver01', '123456', 'Ngô Minh K', 'driver', 'k@gmail.com', '0902220001'),
--- ('driver02', '123456', 'Lâm Văn L', 'driver', 'l@gmail.com', '0902220002'),
--- ('driver03', '123456', 'Trương Thị M', 'driver', 'm@gmail.com', '0902220003'),
-
--- ('admin01', 'admin123', 'Quản trị viên', 'admin', 'admin@gmail.com', '0999999999');
-
-
--- INSERT INTO Student (fullName, grade, parentUserID)
--- VALUES
--- ('Nguyễn Minh Anh', '1A', 1),
--- ('Trần Gia Bảo', '1A', 2),
--- ('Lê Khánh Chi', '1B', 3),
--- ('Phạm Anh Duy', '1B', 4),
--- ('Hoàng Bảo Em', '2A', 5),
--- ('Đỗ Hồng Phúc', '2A', 6),
--- ('Vũ Thanh Hà', '2B', 7),
--- ('Bùi Đức Huy', '3A', 8),
--- ('Phan Mỹ Linh', '3A', 9),
--- ('Đặng Nam Sơn', '3B', 10);
-
-
--- INSERT INTO Driver (userID, fullName, phoneNumber, driverLicense, experienceYears, status)
--- VALUES
--- (11, 'Ngô Minh K', '0902220001', 'B2-987654', 5, 'ACTIVE'),
--- (12, 'Lâm Văn L', '0902220002', 'C1-876543', 3, 'ACTIVE'),
--- (13, 'Trương Thị M', '0902220003', 'B2-765432', 2, 'ACTIVE');
-
-
--- INSERT INTO Bus (plateNumber, capacity, brand, status)
--- VALUES
--- ('51A-10001', 40, 'Thaco', 'ACTIVE'),
--- ('51A-10002', 40, 'Hyundai', 'ACTIVE'),
--- ('51A-10003', 30, 'Samco', 'ACTIVE'),
--- ('51A-10004', 35, 'Isuzu', 'ACTIVE');
-
-
--- INSERT INTO Route (routeName, startLocation, endLocation, distance)
--- VALUES
--- ('Tuyến 1: Quận 1 → Trường A', 'Quận 1', 'Trường Tiểu học A', 12.5),
--- ('Tuyến 2: Quận 3 → Trường A', 'Quận 3', 'Trường Tiểu học A', 9.3),
--- ('Tuyến 3: Quận 5 → Trường B', 'Quận 5', 'Trường Tiểu học B', 15.1);
-
-
--- INSERT INTO DriverAssignment (driverID, busID, routeID, assignmentDate, note)
--- VALUES
--- (1, 1, 1, CURDATE(), 'Phân công sáng nay'),
--- (2, 2, 2, CURDATE(), 'Phân công sáng nay'),
--- (3, 3, 3, CURDATE(), 'Phân công sáng nay');
-
-
--- INSERT INTO Notification (toUserID, fromUserID, type, title, content, channel, sentAt)
--- VALUES
--- (1, 14, 'ARRIVAL', 'Xe đã đến trường', 'Học sinh Nguyễn Minh Anh đã đến trường an toàn', 'PUSH', NOW()),
--- (2, 14, 'PICKUP', 'Xe đang đến đón', 'Xe đang trên đường đón Trần Gia Bảo', 'PUSH', NOW()),
--- (5, 14, 'INCIDENT', 'Xe trễ giờ', 'Xe gặp kẹt xe, sẽ trễ khoảng 10 phút', 'PUSH', NOW());
-
+(3, 10.7600, 106.6640, 270, 28);
