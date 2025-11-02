@@ -57,3 +57,33 @@ export const deleteTrip = (id, callback) => {
   const sql = "DELETE FROM Trip WHERE tripID=?";
   db.query(sql, [id], callback);
 };
+
+// Lấy lịch trình theo ID Tài xế
+export const getTripsByDriverID = (driverID, callback) => {
+  const sql = `
+    SELECT 
+        d.driverID, 
+        da.assignmentDate AS date, 
+        r.routeName AS route,
+        t.startTime,
+        t.endTime
+    FROM DriverAssignment da
+    JOIN Route r ON da.routeID = r.routeID
+    JOIN Driver d ON da.driverID = d.driverID
+    LEFT JOIN Trip t 
+        ON t.routeID = da.routeID 
+        AND t.assignedDriverID = da.driverID
+        AND DATE(t.tripDate) = da.assignmentDate
+    WHERE da.driverID = ?
+      AND DATE(da.assignmentDate) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+    ORDER BY da.assignmentDate ASC, t.startTime ASC
+  `;
+
+  db.query(sql, [driverID], (err, rows) => {
+    if (err) {
+      console.error("Lỗi truy vấn:", err);
+      return callback(err, null);
+    }
+    callback(null, rows);
+  });
+};

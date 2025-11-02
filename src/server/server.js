@@ -7,10 +7,12 @@ import initTrackingSocket from "./sockets/trackingSocket.js";
 // Route:
 import busRoutes from './routes/busRoutes.js'
 import scheduleRoutes from "./routes/scheduleRoutes.js"
+import studentsRoutes from "./routes/studentsRoutes.js"
+import cors from "cors";
 
 // 2. Tạo object, ứng dụng Express, thực hiện route, mIddleware,..
 const app = express();
-
+app.use(cors());
 // 3. Cấu hình port để server lister
 // - Có thể đặt cố định (8888) hoặc dùng biến môi trường: 
 //          const PORT = process.env.PORT || 8888;
@@ -27,6 +29,8 @@ app.use(express.json())
 app.use('/api/buses', busRoutes)
 // 4.2 Add route API for schedule 
 app.use("/api/schedules", scheduleRoutes)
+// 4.3 Add route API for students
+app.use("/api/students", studentsRoutes)
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)
 //    endpoint: GET - /api/students -> Lấy danh sách học sinh 

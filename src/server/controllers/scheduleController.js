@@ -1,4 +1,4 @@
-import { getAllTrips, createTrip, updateTrip, deleteTrip } from "../models/tripModel.js";
+import { getAllTrips, createTrip, updateTrip, deleteTrip, getTripsByDriverID } from "../models/tripModel.js";
 
 export const getSchedules = (req, res) => {
   getAllTrips((err, result) => {
@@ -25,5 +25,12 @@ export const removeSchedule = (req, res) => {
   deleteTrip(req.params.id, (err, result) => {
     if (err) return res.status(500).json({ error: "Không thể xóa lịch trình" });
     res.json({ message: "Xóa thành công" });
+  });
+};
+
+export const getSchedulesByDriverID = (req, res) => {
+  getTripsByDriverID(req.params.driverID, (err, result) => {
+    if (err) return res.status(500).json({ error: "Lỗi truy vấn database" });
+    res.json(result);
   });
 };
