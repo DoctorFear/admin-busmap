@@ -1,6 +1,6 @@
 import db from "../db.js";
 
-// Lấy danh sách học sinh của chuyến xe sắp tới do tài xế phụ trách
+// Lấy danh sách học sinh của chuyến xe sắp tới do tài xế phụ trách 
 export const getStudentsByDriverID = (driverID, callback) => {
   const sql = `
     SELECT 
@@ -44,3 +44,24 @@ export const getStudentsByDriverID = (driverID, callback) => {
     callback(null, rows);
   });
 };
+
+// Cập nhật trạng thái học sinh trong BoardingRecord
+export const updateStudentStatusModel = (studentID, status, callback) => {
+  const sql = `
+    UPDATE BoardingRecord
+    SET status = ?
+    WHERE studentID = ?
+      AND tripID IN (
+        SELECT tripID FROM Trip
+        WHERE tripDate = CURDATE()
+      )
+  `;
+  db.query(sql, [status, studentID], (err, result) => {
+    if (err) {
+      console.error("Lỗi cập nhật trạng thái:", err);
+      return callback(err);
+    }
+    callback(null, result);
+  });
+};
+
