@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { notifications, NotificationItem } from "@/lib/data1";
+import { notifications, NotificationItem } from "@/lib/data";
 import styles from "./page.module.css";
 
 export default function ParentNotificationPage() {
