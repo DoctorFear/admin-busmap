@@ -87,3 +87,9 @@ export const getTripsByDriverID = (driverID, callback) => {
     callback(null, rows);
   });
 };
+
+// Cập nhật trạng thái chuyến xe
+export const updateTripStatus = (tripID, status, callback) => {
+  const sql = `UPDATE Trip SET status = ? WHERE tripID = ?`;
+  db.query(sql, [status, tripID], callback);
+};
