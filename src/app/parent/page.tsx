@@ -1,45 +1,46 @@
 "use client";
 
-import { useState } from "react";
-import { notifications, NotificationItem } from "@/lib/data";
+import { Bus, Bell, User } from "lucide-react";
 import styles from "./page.module.css";
 
-export default function ParentNotificationPage() {
-  const [enabled, setEnabled] = useState(true);
+export default function Home() {
+  const busCount = 12;
+  const notificationCount = 3;
+  const parentName = "Phụ huynh Nguyễn Văn A";
 
   return (
     <div className={styles.mainContent}>
-      <div className={styles.notifications}>
-        <h3>Thông báo</h3>
+      <div className={styles.home}>
+        <h2 className={styles.title}>Trang chủ</h2>
+        <p className={styles.welcome}>Xin chào, {parentName} 👋</p>
 
-        <div style={{ marginBottom: "10px" }}>
-          <input
-            type="checkbox"
-            id="push-notifications"
-            checked={enabled}
-            onChange={() => setEnabled(!enabled)}
-          />
-          <label htmlFor="push-notifications">Bật thông báo đẩy</label>
-        </div>
-
-        {notifications.map((item: NotificationItem, index: number) => (
-          <div
-            key={index}
-            className={`${styles.notificationItem} ${
-              item.status.includes("Trễ") ? styles.alert : ""
-            }`}
-          >
-            <strong>
-              {item.bus} ({item.driver}):
-            </strong>{" "}
-            {item.status} - {item.time}
+        <div className={styles.stats}>
+          <div className={styles.card}>
+            <Bus className={styles.icon} />
+            <div>
+              <h4>{busCount}</h4>
+              <p>Xe buýt đang hoạt động</p>
+            </div>
           </div>
-        ))}
 
-        <div className={styles.contactLinks}>
-          <a href="tel:0123456789">Liên hệ tài xế</a> |{" "}
-          <a href="mailto:manager@ssb1.0.edu.vn">Liên hệ quản lý</a>
+          <div className={styles.card}>
+            <Bell className={styles.icon} />
+            <div>
+              <h4>{notificationCount}</h4>
+              <p>Thông báo mới</p>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <User className={styles.icon} />
+            <div>
+              <h4>Phụ huynh</h4>
+              <p>{parentName}</p>
+            </div>
+          </div>
         </div>
+
+        <button className={styles.btn}>Xem chi tiết</button>
       </div>
     </div>
   );

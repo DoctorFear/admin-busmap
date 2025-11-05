@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { JSX } from 'react';
 import { Plus } from 'lucide-react';
 import styles from './page.module.css';
 import { historyData, HistoryItem } from '@/lib/history';
