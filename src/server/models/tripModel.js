@@ -1,6 +1,6 @@
 import db from "../db.js";
 
-// Lấy toàn bộ lịch trình (JOIN với Route)
+// Lấy toàn bộ lịch trình
 export const getAllTrips = (callback) => {
   const sql = `
     SELECT t.tripID, r.routeName, t.tripDate, t.startTime, t.endTime,
@@ -14,7 +14,7 @@ export const getAllTrips = (callback) => {
   db.query(sql, callback);
 };
 
-// Tạo mới lịch trình (Trip)
+// Tạo mới lịch trình
 export const createTrip = (data, callback) => {
   const sql = `
     INSERT INTO Trip (routeID, tripDate, startTime, endTime, assignedBusID, assignedDriverID, status)
@@ -58,25 +58,21 @@ export const deleteTrip = (id, callback) => {
   db.query(sql, [id], callback);
 };
 
-// Lấy lịch trình theo ID Tài xế
+// Lấy lịch trình theo ID Tài xế (tuần + hôm nay)
 export const getTripsByDriverID = (driverID, callback) => {
   const sql = `
     SELECT 
-        d.driverID, 
-        da.assignmentDate AS date, 
+        t.tripID,
+        DATE_FORMAT(t.tripDate, '%Y-%m-%d') AS date, 
         r.routeName AS route,
-        t.startTime,
-        t.endTime
-    FROM DriverAssignment da
-    JOIN Route r ON da.routeID = r.routeID
-    JOIN Driver d ON da.driverID = d.driverID
-    LEFT JOIN Trip t 
-        ON t.routeID = da.routeID 
-        AND t.assignedDriverID = da.driverID
-        AND DATE(t.tripDate) = da.assignmentDate
-    WHERE da.driverID = ?
-      AND DATE(da.assignmentDate) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
-    ORDER BY da.assignmentDate ASC, t.startTime ASC
+        TIME_FORMAT(t.startTime, '%H:%i:%s') AS startTime,
+        TIME_FORMAT(t.endTime, '%H:%i:%s') AS endTime,
+        t.status
+    FROM Trip t
+    JOIN Route r ON t.routeID = r.routeID
+    WHERE t.assignedDriverID = ?
+      AND t.tripDate BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 DAY)
+    ORDER BY t.tripDate ASC, t.startTime ASC
   `;
 
   db.query(sql, [driverID], (err, rows) => {

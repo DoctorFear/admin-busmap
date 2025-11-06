@@ -4,21 +4,22 @@ import { useEffect, useState } from "react";
 import styles from "../page.module.css";
 
 interface ScheduleItem {
-  driverID: number;
+  tripID: number;
   date: string;
   route: string;
   startTime: string;
   endTime: string;
+  status: string;
 }
 
 const PORT_SERVER = 8888;
 
 export default function DriverSchedulePage() {
   const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>([]);
-  const [todaySchedule, setTodaySchedule] = useState<ScheduleItem | null>(null);
+  const [todaySchedule, setTodaySchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const driverID = 1; // Giả định đăng nhập tài xế ID = 1
+  const driverID = 1;
 
   useEffect(() => {
     const fetchSchedule = async () => {
@@ -30,15 +31,25 @@ export default function DriverSchedulePage() {
 
         if (!Array.isArray(data)) throw new Error("Dữ liệu trả về không hợp lệ");
 
-        // Cập nhật lịch tuần
+        console.log("Lịch tuần:", data); // Debug
+
         setWeeklySchedule(data);
 
-        // Tìm lịch hôm nay
-        const today = new Date().toISOString().split("T")[0];
-        const todayItem = data.find((item) => item.date.split("T")[0] === today);
-        setTodaySchedule(todayItem || null);
+        // So sánh ngày ĐÚNG (không dùng new Date)
+        const today = new Date();
+        const todayStr = today.getFullYear() + '-' + 
+          String(today.getMonth() + 1).padStart(2, '0') + '-' +
+          String(today.getDate()).padStart(2, '0');
+        
+        console.log("Hôm nay:", todayStr); // Debug
+        
+        const todayItems = data.filter((item) => item.date === todayStr);
+        
+        console.log("Chuyến hôm nay:", todayItems.length); // Debug
+        
+        setTodaySchedule(todayItems);
       } catch (err: any) {
-        console.error(" Lỗi fetch:", err);
+        console.error("Lỗi fetch:", err);
         setError("Không thể tải dữ liệu từ máy chủ.");
       } finally {
         setLoading(false);
@@ -48,12 +59,11 @@ export default function DriverSchedulePage() {
     fetchSchedule();
   }, [driverID]);
 
-  // ================== HÀM HỖ TRỢ ==================
+  // Hàm format 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
+    if (!dateString) return "";
+    // dateString là "YYYY-MM-DD"
+    const [year, month, day] = dateString.split("-");
     return `${day}/${month}/${year}`;
   };
 
@@ -69,9 +79,8 @@ export default function DriverSchedulePage() {
     return `${formatHour(startTime)} - ${formatHour(endTime)}`;
   };
 
-  // ================== GIAO DIỆN HIỂN THỊ ==================
   if (loading) return <p>⏳ Đang tải dữ liệu...</p>;
-  if (error) return <p className={styles.error}>{error}</p>;
+  if (error) return <p className={styles.error}> {error}</p>;
 
   return (
     <div className={styles.driverContainer}>
@@ -105,19 +114,34 @@ export default function DriverSchedulePage() {
       {/* LỊCH HÔM NAY */}
       <div className={styles.schedule}>
         <h3>Lịch làm việc hôm nay</h3>
-        {todaySchedule ? (
+        {todaySchedule.length > 0 ? (
           <>
-            <p><strong>Tuyến đường:</strong> {todaySchedule.route}</p>
-            <p>
-              <strong>Thời gian:</strong>{" "}
-              {formatTime(todaySchedule.startTime, todaySchedule.endTime)},{" "}
-              {formatDate(todaySchedule.date)}
-            </p>
+            {todaySchedule.map((schedule, index) => (
+              <div key={schedule.tripID} style={{ marginBottom: "1rem", padding: "0.5rem", background: "#f3f4f6", borderRadius: "8px" }}>
+                <p><strong>Chuyến {index + 1}:</strong> {schedule.route}</p>
+                <p>
+                  <strong>Thời gian:</strong>{" "}
+                  {formatTime(schedule.startTime, schedule.endTime)},{" "}
+                  {formatDate(schedule.date)}
+                </p>
+                <p>
+                  <strong>Trạng thái:</strong>{" "}
+                  <span style={{ 
+                    color: schedule.status === 'COMPLETED' ? '#22c55e' : 
+                           schedule.status === 'RUNNING' ? '#3b82f6' : '#6b7280',
+                    fontWeight: "bold"
+                  }}>
+                    {schedule.status === 'COMPLETED' ? 'Đã hoàn thành' :
+                     schedule.status === 'RUNNING' ? 'Đang chạy' : 'Đã lên lịch'}
+                  </span>
+                </p>
+              </div>
+            ))}
           </>
         ) : (
           <p>Hôm nay không có lịch làm việc.</p>
         )}
-        <p>
+        <p style={{ marginTop: "1rem" }}>
           <a href="mailto:manager@ssb1.0.edu.vn">Liên hệ quản lý</a>
         </p>
       </div>

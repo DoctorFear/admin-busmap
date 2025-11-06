@@ -1,17 +1,36 @@
 import db from "../db.js";
 
-// CHuyển đổi trạng thái học sinh (frontend - database)
+// Chuyển đổi trạng thái đúng với database 
 const statusMap = {
-  "chua-don": "not_picked",
-  "da-don": "picked",
-  "da-tra": "dropped",
-  "vang-mat": "absent",
+  "chua-don": "NOT_PICKED",
+  "da-don": "PICKED",
+  "da-tra": "DROPPED",
+  "vang-mat": "ABSENT",
 };
-const reverseStatusMap = Object.fromEntries(
-  Object.entries(statusMap).map(([k, v]) => [v, k])
-);
 
-// Lấy danh sách học sinh của chuyến xe sắp tới do tài xế phụ trách 
+const reverseStatusMap = {
+  "NOT_PICKED": "chua-don",
+  "PICKED": "da-don",
+  "DROPPED": "da-tra",
+  "ABSENT": "vang-mat",
+};
+
+// SỬA ĐỔI: Format ngày ĐÚNG - Xử lý timezone
+const formatDateOnly = (date) => {
+  if (!date) return null;
+  
+  // Nếu date là string, parse nó
+  const d = typeof date === 'string' ? new Date(date) : date;
+  
+  // Lấy ngày theo UTC để tránh lệch múi giờ
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+};
+
+// Lấy danh sách học sinh của chuyến HÔM NAY
 export const getStudentsByDriverID = (driverID, callback) => {
   const sql = `
     SELECT 
@@ -22,23 +41,18 @@ export const getStudentsByDriverID = (driverID, callback) => {
         br.pickupTime,
         br.dropoffTime,
         t.tripID,
-        t.tripDate,
-        t.startTime AS tripStartTime,
-        t.endTime AS tripEndTime,
+        DATE_FORMAT(t.tripDate, '%Y-%m-%d') AS tripDate,
+        TIME_FORMAT(t.startTime, '%H:%i:%s') AS tripStartTime,
+        TIME_FORMAT(t.endTime, '%H:%i:%s') AS tripEndTime,
         t.status AS tripStatus,
         r.routeName
     FROM (
         SELECT tripID, tripDate, startTime, endTime, routeID, status
         FROM Trip
         WHERE assignedDriverID = ?
-          AND (
-              (tripDate = CURDATE() AND startTime >= CURTIME())
-              OR
-              (tripDate = CURDATE() AND status = 'RUNNING')
-              OR
-              (tripDate > CURDATE())
-          )
-        ORDER BY tripDate ASC, startTime ASC
+          AND tripDate = CURDATE()
+          AND status IN ('PLANNED', 'RUNNING')
+        ORDER BY startTime ASC
         LIMIT 1
     ) AS next_trip
     JOIN BoardingRecord br ON next_trip.tripID = br.tripID
@@ -54,42 +68,101 @@ export const getStudentsByDriverID = (driverID, callback) => {
       return callback(err, null);
     }
 
+    // Nếu không có chuyến hôm nay
+    if (rows.length === 0) {
+      return callback(null, { allCompleted: true, students: [] });
+    }
+
+    // SỬA ĐỔI: Map trạng thái - KHÔNG cần format lại tripDate vì đã format ở SQL
     const mappedRows = rows.map((row) => ({
       ...row,
       status: reverseStatusMap[row.status] || row.status,
+      // tripDate đã là string "YYYY-MM-DD" từ DATE_FORMAT
     }));
 
-    callback(null, mappedRows);
+    console.log("✓ Trả về danh sách học sinh:", mappedRows[0]?.tripDate); // Debug
+    callback(null, { allCompleted: false, students: mappedRows });
+  });
+};
+
+// Hàm lấy tripID hiện tại
+const getCurrentTripID = (studentID, callback) => {
+  const sql = `
+    SELECT br.tripID 
+    FROM BoardingRecord br
+    JOIN Trip t ON br.tripID = t.tripID
+    WHERE br.studentID = ? 
+      AND t.tripDate = CURDATE()
+      AND t.status IN ('PLANNED', 'RUNNING')
+    LIMIT 1
+  `;
+  
+  db.query(sql, [studentID], (err, rows) => {
+    if (err) return callback(err);
+    if (!rows.length) return callback(new Error("Không tìm thấy chuyến cho học sinh này"));
+    callback(null, rows[0].tripID);
   });
 };
 
 // Cập nhật trạng thái học sinh + kiểm tra hoàn tất chuyến
-export const updateStudentStatusModel = (studentID, status, pickupTime, dropoffTime, callback) => {
+export const updateStudentStatusModel = (studentID, status, callback) => {
   const dbStatus = statusMap[status] || status;
 
-  const getTripQuery = `SELECT tripID FROM Trip WHERE tripDate = CURDATE() AND status IN ('PLANNED','RUNNING') LIMIT 1;`;
-
-  db.query(getTripQuery, (err, tripResult) => {
+  getCurrentTripID(studentID, (err, tripID) => {
     if (err) return callback(err);
-    if (!tripResult.length) return callback(new Error("Không tìm thấy chuyến hôm nay"));
 
-    const tripID = String(tripResult[0].tripID).trim();
+    // SỬA ĐỔI: Tạo datetime theo múi giờ LOCAL (không dùng UTC)
+    const now = new Date();
+    const mysqlDatetime = now.getFullYear() + '-' +
+      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getDate()).padStart(2, '0') + ' ' +
+      String(now.getHours()).padStart(2, '0') + ':' +
+      String(now.getMinutes()).padStart(2, '0') + ':' +
+      String(now.getSeconds()).padStart(2, '0');
 
-    const updateQuery = `
-      UPDATE BoardingRecord
-      SET status = ?, 
-          pickupTime = ?, 
-          dropoffTime = ?
-      WHERE studentID = ? AND tripID = ?;
-    `;
+    console.log(`✓ Thời gian cập nhật: ${mysqlDatetime}`); // Debug
 
-    db.query(updateQuery, [dbStatus, pickupTime, dropoffTime, studentID, tripID], (err, result) => {
-      if (err) return callback(err);
+    // Logic update
+    let updateQuery = '';
+    let queryParams = [];
 
-      // Kiểm tra xem tất cả học sinh đã được trả/chưa đón (bỏ qua vắng mặt)
+    if (dbStatus === "PICKED") {
+      updateQuery = `
+        UPDATE BoardingRecord
+        SET status = ?, pickupTime = ?
+        WHERE studentID = ? AND tripID = ?;
+      `;
+      queryParams = [dbStatus, mysqlDatetime, studentID, tripID];
+      
+    } else if (dbStatus === "DROPPED") {
+      updateQuery = `
+        UPDATE BoardingRecord
+        SET status = ?, dropoffTime = ?
+        WHERE studentID = ? AND tripID = ?;
+      `;
+      queryParams = [dbStatus, mysqlDatetime, studentID, tripID];
+      
+    } else {
+      updateQuery = `
+        UPDATE BoardingRecord
+        SET status = ?
+        WHERE studentID = ? AND tripID = ?;
+      `;
+      queryParams = [dbStatus, studentID, tripID];
+    }
+
+    db.query(updateQuery, queryParams, (err, result) => {
+      if (err) {
+        console.error("Lỗi cập nhật BoardingRecord:", err);
+        return callback(err);
+      }
+
+      console.log(`✓ Đã cập nhật student ${studentID} sang ${dbStatus}`);
+
+      // Kiểm tra hoàn thành chuyến
       const checkQuery = `
         SELECT COUNT(*) AS total,
-               SUM(CASE WHEN status IN ('dropped','absent') THEN 1 ELSE 0 END) AS doneCount
+               SUM(CASE WHEN status IN ('DROPPED','ABSENT') THEN 1 ELSE 0 END) AS doneCount
         FROM BoardingRecord
         WHERE tripID = ?;
       `;
@@ -101,11 +174,18 @@ export const updateStudentStatusModel = (studentID, status, pickupTime, dropoffT
         const isCompleted = total === doneCount;
 
         if (isCompleted) {
-          // Cập nhật trạng thái chuyến thành COMPLETED
-          const updateTrip = `UPDATE Trip SET status = 'COMPLETED' WHERE tripID = ?;`;
-          db.query(updateTrip, [tripID], (err2) => {
-            if (err2) return callback(err2);
-            console.log(`Chuyến ${tripID} đã hoàn tất.`);
+          const updateTrip = `
+            UPDATE Trip 
+            SET status = 'COMPLETED', 
+                endTime = TIME(?)
+            WHERE tripID = ?;
+          `;
+          db.query(updateTrip, [mysqlDatetime, tripID], (err2) => {
+            if (err2) {
+              console.error("Lỗi cập nhật Trip:", err2);
+              return callback(err2);
+            }
+            console.log(`✓ Chuyến ${tripID} hoàn tất lúc ${mysqlDatetime}`);
             callback(null, { ...result, tripCompleted: true });
           });
         } else {
