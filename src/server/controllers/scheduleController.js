@@ -1,4 +1,4 @@
-import { getAllTrips, createTrip, updateTrip, deleteTrip, getTripsByDriverID, updateTripStatus } from "../models/tripModel.js";
+import { getAllTrips, createTrip, updateTrip, deleteTrip, getTripsByDriverID, updateTripStatusWithTime, getTripStatus } from "../models/tripModel.js";
 
 export const getSchedules = (req, res) => {
   getAllTrips((err, result) => {
@@ -35,35 +35,70 @@ export const getSchedulesByDriverID = (req, res) => {
   });
 };
 
-// Hàm kiểm tra trạng thái chuyến xe 
+const getCurrentDatetime = () => {
+  const now = new Date();
+  return now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0') + ' ' +
+    String(now.getHours()).padStart(2, '0') + ':' +
+    String(now.getMinutes()).padStart(2, '0') + ':' +
+    String(now.getSeconds()).padStart(2, '0');
+};
+
+// Hàm bắt đầu chuyến
+export const startTrip = (req, res) => {
+  const { tripID } = req.params;
+  const datetime = getCurrentDatetime();
+  
+  // Kiểm tra trạng thái hiện tại
+  getTripStatus(tripID, (err, rows) => {
+    if (err || !rows.length) {
+      return res.status(404).json({ error: "Chuyến không tồn tại" });
+    }
+    
+    if (rows[0].status !== 'PLANNED') {
+      return res.status(400).json({ error: "Chuyến đã bắt đầu hoặc đã hoàn thành" });
+    }
+    
+    // Cập nhật sang RUNNING
+    updateTripStatusWithTime(tripID, 'RUNNING', datetime, (err) => {
+      if (err) {
+        console.error("Lỗi bắt đầu chuyến:", err);
+        return res.status(500).json({ error: "Không thể bắt đầu chuyến" });
+      }
+      
+      res.json({ message: "Đã bắt đầu chuyến thành công", tripID });
+    });
+  });
+};
+
+// Cập nhật trạng thái chuyến 
 export const checkTripStatus = (req, res) => {
   const { tripID } = req.params;
-  const body = req.body || {};  // trạng thái mới gửi từ frontend
-  const status = body.status;
+  const { status } = req.body || {};
+  const datetime = getCurrentDatetime();
   
   const statusMessages = {
     COMPLETED: "Chuyến xe đã hoàn tất",
-    RUNNING: "Chuyến xe vẫn đang diễn ra",
-    PLANNED: "Chuyến xe vẫn chưa bắt đầu",
+    RUNNING: "Chuyến xe đang chạy",
+    PLANNED: "Chuyến xe đã lên lịch",
     CANCELLED: "Chuyến xe đã bị hủy",
   };
 
   if (!statusMessages[status]) {
-    return res.status(400).json({ error: "Trạng thái chuyến xe không hợp lệ" });
+    return res.status(400).json({ error: "Trạng thái không hợp lệ" });
   }
 
-  // Gọi model để cập nhật trạng thái chuyến xe
-  updateTripStatus(tripID, status, (err, result) => {
+  updateTripStatusWithTime(tripID, status, datetime, (err) => {
     if (err) {
-      console.error("Lỗi khi cập nhật trạng thái chuyến xe:", err);
-      return res.status(500).json({ error: "Không thể cập nhật trạng thái chuyến xe" });
+      console.error("Lỗi cập nhật trạng thái:", err);
+      return res.status(500).json({ error: "Không thể cập nhật trạng thái" });
     }
 
-    const message = statusMessages[status];
     res.json({
       tripID,
       status,
-      message,
+      message: statusMessages[status],
       tripCompleted: status === "COMPLETED",
     });
   });

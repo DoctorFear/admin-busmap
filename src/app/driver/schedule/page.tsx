@@ -21,52 +21,66 @@ export default function DriverSchedulePage() {
   const [error, setError] = useState("");
   const driverID = 1;
 
+  const fetchSchedule = async () => {
+    try {
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/schedules/driver/${driverID}`);
+      if (!res.ok) throw new Error("Không thể kết nối máy chủ");
+
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("Dữ liệu trả về không hợp lệ");
+      setWeeklySchedule(data);
+
+      // So sánh ngày
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' + 
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
+      
+      const todayItems = data.filter((item) => item.date === todayStr);
+      setTodaySchedule(todayItems);
+    } catch (err: any) {
+      console.error("Lỗi fetch:", err);
+      setError("Không thể tải dữ liệu từ máy chủ.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        const res = await fetch(`http://localhost:${PORT_SERVER}/api/schedules/driver/${driverID}`);
-        if (!res.ok) throw new Error("Không thể kết nối máy chủ");
-
-        const data = await res.json();
-
-        if (!Array.isArray(data)) throw new Error("Dữ liệu trả về không hợp lệ");
-
-        console.log("Lịch tuần:", data); // Debug
-
-        setWeeklySchedule(data);
-
-        // So sánh ngày ĐÚNG (không dùng new Date)
-        const today = new Date();
-        const todayStr = today.getFullYear() + '-' + 
-          String(today.getMonth() + 1).padStart(2, '0') + '-' +
-          String(today.getDate()).padStart(2, '0');
-        
-        console.log("Hôm nay:", todayStr); // Debug
-        
-        const todayItems = data.filter((item) => item.date === todayStr);
-        
-        console.log("Chuyến hôm nay:", todayItems.length); // Debug
-        
-        setTodaySchedule(todayItems);
-      } catch (err: any) {
-        console.error("Lỗi fetch:", err);
-        setError("Không thể tải dữ liệu từ máy chủ.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSchedule();
   }, [driverID]);
+
+  // Hàm bắt đầu chuyến
+  const handleStartTrip = async (tripID: number) => {
+    if (!confirm("Xác nhận bắt đầu chuyến xe này?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/schedules/start/${tripID}`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Không thể bắt đầu chuyến");
+      }
+
+      const data = await res.json();
+      alert(`${data.message}`);
+      
+      // Reload lại lịch
+      await fetchSchedule();
+    } catch (err: any) {
+      console.error("Lỗi:", err);
+      alert(`${err.message}`);
+    }
+  };
 
   // Hàm format 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
-    // dateString là "YYYY-MM-DD"
     const [year, month, day] = dateString.split("-");
     return `${day}/${month}/${year}`;
   };
-
   const formatTime = (startTime: string, endTime: string) => {
     const formatHour = (time: string) => {
       if (!time) return "";
@@ -79,8 +93,8 @@ export default function DriverSchedulePage() {
     return `${formatHour(startTime)} - ${formatHour(endTime)}`;
   };
 
-  if (loading) return <p>⏳ Đang tải dữ liệu...</p>;
-  if (error) return <p className={styles.error}> {error}</p>;
+  if (loading) return <p>Đang tải dữ liệu...</p>;
+  if (error) return <p className={styles.error}>{error}</p>;
 
   return (
     <div className={styles.driverContainer}>
@@ -117,14 +131,23 @@ export default function DriverSchedulePage() {
         {todaySchedule.length > 0 ? (
           <>
             {todaySchedule.map((schedule, index) => (
-              <div key={schedule.tripID} style={{ marginBottom: "1rem", padding: "0.5rem", background: "#f3f4f6", borderRadius: "8px" }}>
+              <div 
+                key={schedule.tripID} 
+                style={{ 
+                  marginBottom: "1rem", 
+                  padding: "1rem", 
+                  background: schedule.status === 'RUNNING' ? '#eff6ff' : '#f3f4f6',
+                  borderRadius: "8px",
+                  border: schedule.status === 'RUNNING' ? '2px solid #3b82f6' : '1px solid #e5e7eb'
+                }}
+              >
                 <p><strong>Chuyến {index + 1}:</strong> {schedule.route}</p>
                 <p>
                   <strong>Thời gian:</strong>{" "}
                   {formatTime(schedule.startTime, schedule.endTime)},{" "}
                   {formatDate(schedule.date)}
                 </p>
-                <p>
+                <p style={{ marginBottom: "0.5rem" }}>
                   <strong>Trạng thái:</strong>{" "}
                   <span style={{ 
                     color: schedule.status === 'COMPLETED' ? '#22c55e' : 
@@ -135,6 +158,28 @@ export default function DriverSchedulePage() {
                      schedule.status === 'RUNNING' ? 'Đang chạy' : 'Đã lên lịch'}
                   </span>
                 </p>
+                
+                {/* Button bắt đầu chuyến */}
+                {schedule.status === 'PLANNED' && (
+                  <button
+                    onClick={() => handleStartTrip(schedule.tripID)}
+                    style={{
+                      marginTop: "0.5rem",
+                      padding: "0.6rem 1.2rem",
+                      backgroundColor: "#3b82f6",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      fontSize: "0.95rem"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#3b82f6"}
+                  >
+                    Bắt đầu
+                  </button>
+                )}
               </div>
             ))}
           </>

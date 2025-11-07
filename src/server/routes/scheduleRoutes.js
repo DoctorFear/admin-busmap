@@ -5,7 +5,8 @@ import {
   editSchedule,
   removeSchedule,
   getSchedulesByDriverID,
-  checkTripStatus
+  checkTripStatus,
+  startTrip 
 } from "../controllers/scheduleController.js";
 
 const router = express.Router();
@@ -16,4 +17,5 @@ router.put("/:id", editSchedule);
 router.delete("/:id", removeSchedule);
 router.get("/driver/:driverID", getSchedulesByDriverID);
 router.put("/status/:tripID", checkTripStatus);
+router.post("/start/:tripID", startTrip); 
 export default router;

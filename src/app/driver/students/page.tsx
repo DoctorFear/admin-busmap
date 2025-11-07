@@ -24,10 +24,8 @@ export default function DriverStudentsPage() {
       if (!res.ok) throw new Error("Không thể kết nối máy chủ");
       const data = await res.json();
       
-      console.log("Data từ server:", data); // Debug
-      
-      // Kiểm tra nếu đã hoàn thành tất cả chuyến
-      if (data.allCompleted) {
+      // Kiểm tra đúng thuộc tính allCompleted
+      if (data.allCompleted === true) {
         setAllCompleted(true);
         setStudentList([]);
         setTripInfo(null);
@@ -37,18 +35,16 @@ export default function DriverStudentsPage() {
       }
       
       // Tách thông tin chuyến xe và danh sách học sinh
-      if (data.length > 0) {
+      if (Array.isArray(data) && data.length > 0) {
         const firstStudent = data[0];
         const tripData = {
           tripID: firstStudent.tripID,
-          tripDate: firstStudent.tripDate, // Đã là "YYYY-MM-DD" từ backend
+          tripDate: firstStudent.tripDate,
           tripStartTime: firstStudent.tripStartTime,
           tripEndTime: firstStudent.tripEndTime,
           routeName: firstStudent.routeName,
           tripStatus: firstStudent.tripStatus
         };
-        
-        console.log("Trip date:", tripData.tripDate); // Debug
         
         setTripInfo(tripData);
         setStudentList(data);
@@ -59,6 +55,7 @@ export default function DriverStudentsPage() {
       
       setError(null);
     } catch (err: any) {
+      console.error("Lỗi fetch:", err);
       setError(err.message || "Lỗi không xác định");
     } finally {
       setLoading(false);
@@ -76,7 +73,8 @@ export default function DriverStudentsPage() {
     const newIndex = statusOrder.indexOf(newStatus);
     
     if (newStatus === "vang-mat") return true;
-    if (currentStatus === "vang-mat") return false;
+    if (currentStatus === "vang-mat" || currentStatus === "da-tra") return false;
+    if (currentStatus === "chua-don" && newStatus === "da-tra") return false;
     
     return newIndex > currentIndex;
   };
@@ -100,14 +98,15 @@ export default function DriverStudentsPage() {
 
       if (!res.ok) throw new Error("Server error");
       const data = await res.json();
-      console.log("✅ Server phản hồi:", data);
+      console.log("Server phản hồi:", data);
 
-      // Kiểm tra chuyến đã hoàn thành
-      if (data.tripCompleted) {
-        alert("✅ Chuyến xe đã hoàn thành! Đang chuyển sang chuyến tiếp theo...");
+      // Kiểm tra đúng thuộc tính tripCompleted
+      if (data.tripCompleted === true) {
+        alert("Chuyến xe đã hoàn thành! Đang chuyển sang chuyến tiếp theo...");
+        // Reload để lấy chuyến mới
         await fetchStudents();
       } else {
-        // Cập nhật UI
+        // Chỉ cập nhật UI nếu chuyến chưa hoàn thành
         setStudentList((prev) =>
           prev.map((s) =>
             s.studentID === studentID ? { ...s, status: newStatus } : s
@@ -133,30 +132,29 @@ export default function DriverStudentsPage() {
   // Format ngày và giờ
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
-    // dateStr dạng "YYYY-MM-DD" 
     const [year, month, day] = dateStr.split('-');
-    return `${day}-${month}`; // Hiển thị DD-MM
+    return `${day}-${month}`;
   };
 
   const formatTime = (timeStr: string) => {
     if (!timeStr) return "";
-    return timeStr.substring(0, 5); // HH:MM
+    return timeStr.substring(0, 5);
   };
 
-  if (loading) return <p>⏳ Đang tải dữ liệu...</p>;
-  if (error) return <p style={{ color: "red" }}>❌ Lỗi: {error}</p>;
+  if (loading) return <p>Đang tải dữ liệu...</p>;
+  if (error) return <p style={{ color: "red" }}>Lỗi: {error}</p>;
   
   // Hiển thị khi đã hoàn thành tất cả chuyến
   if (allCompleted) {
     return (
       <div className={styles.driverContainer}>
         <div className={styles.studentList}>
-          <h3>🎉 Đã hoàn thành tất cả chuyến trong ngày</h3>
+          <h3>Đã hoàn thành tất cả chuyến trong ngày</h3>
           <p style={{ color: "#22c55e", fontSize: "1.2rem", marginTop: "2rem" }}>
             Bạn đã hoàn thành xuất sắc công việc hôm nay!
           </p>
           <p style={{ marginTop: "1rem" }}>
-            <a href="/driver/schedule">📅 Xem lịch làm việc tuần này</a>
+            <a href="/driver/schedule">Xem lịch làm việc tuần này</a>
           </p>
         </div>
       </div>
@@ -167,7 +165,7 @@ export default function DriverStudentsPage() {
   if (!tripInfo) {
     return (
       <div className={styles.driverContainer}>
-        <p>📭 Không có chuyến xe nào hôm nay.</p>
+        <p>Không có chuyến xe nào hôm nay.</p>
       </div>
     );
   }

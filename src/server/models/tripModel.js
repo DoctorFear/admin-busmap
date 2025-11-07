@@ -58,7 +58,7 @@ export const deleteTrip = (id, callback) => {
   db.query(sql, [id], callback);
 };
 
-// Lấy lịch trình theo ID Tài xế (tuần + hôm nay)
+// Lấy lịch trình theo ID Tài xế
 export const getTripsByDriverID = (driverID, callback) => {
   const sql = `
     SELECT 
@@ -75,17 +75,30 @@ export const getTripsByDriverID = (driverID, callback) => {
     ORDER BY t.tripDate ASC, t.startTime ASC
   `;
 
-  db.query(sql, [driverID], (err, rows) => {
-    if (err) {
-      console.error("Lỗi truy vấn:", err);
-      return callback(err, null);
-    }
-    callback(null, rows);
-  });
+  db.query(sql, [driverID], callback);
 };
 
-// Cập nhật trạng thái chuyến xe
-export const updateTripStatus = (tripID, status, callback) => {
-  const sql = `UPDATE Trip SET status = ? WHERE tripID = ?`;
-  db.query(sql, [status, tripID], callback);
+// Lấy trạng thái của Trip
+export const getTripStatus = (tripID, callback) => {
+  const sql = `SELECT status FROM Trip WHERE tripID = ?`;
+  db.query(sql, [tripID], callback);
+};
+
+// Cập nhật trạng thái Trip kèm thời gian
+export const updateTripStatusWithTime = (tripID, status, datetime, callback) => {
+  let sql = '';
+  let params = [];
+
+  if (status === 'RUNNING') {
+    sql = `UPDATE Trip SET status = 'RUNNING', startTime = TIME(?) WHERE tripID = ?`;
+    params = [datetime, tripID];
+  } else if (status === 'COMPLETED') {
+    sql = `UPDATE Trip SET status = 'COMPLETED', endTime = TIME(?) WHERE tripID = ?`;
+    params = [datetime, tripID];
+  } else {
+    sql = `UPDATE Trip SET status = ? WHERE tripID = ?`;
+    params = [status, tripID];
+  }
+
+  db.query(sql, params, callback);
 };
