@@ -9,10 +9,18 @@ import busRoutes from './routes/busRoutes.js'
 import scheduleRoutes from "./routes/scheduleRoutes.js"
 import studentsRoutes from "./routes/studentsRoutes.js"
 import cors from "cors";
+import authRoutes from "./routes/authRoutes.js";
+import cookieParser from "cookie-parser";
 
 // 2. Tạo object, ứng dụng Express, thực hiện route, mIddleware,..
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 // 3. Cấu hình port để server lister
 // - Có thể đặt cố định (8888) hoặc dùng biến môi trường: 
 //          const PORT = process.env.PORT || 8888;
@@ -24,6 +32,7 @@ const PORT = 8888;
 // - Khi client gửi request POST/PUT với header `Content-Type: application/json`, middleware này sẽ parse JSON
 //   và gán kết quả vào req.body (vd: req.body = { name: "A" }).
 // - Middleware chạy BEFORE các route để mọi route sau đó có thể sử dụng req.body.
+app.use(cookieParser());
 app.use(express.json())
 // 4.1 Add route API for buses
 app.use('/api/buses', busRoutes)
@@ -31,6 +40,7 @@ app.use('/api/buses', busRoutes)
 app.use("/api/schedules", scheduleRoutes)
 // 4.3 Add route API for students
 app.use("/api/students", studentsRoutes)
+app.use("/api/auth", authRoutes);
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)
 //    endpoint: GET - /api/students -> Lấy danh sách học sinh 

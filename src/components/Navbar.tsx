@@ -4,6 +4,8 @@ import Link from "next/link"; //  Điều hướng nội bộ
 import Image from "next/image";  // Hình ảnh
 import { usePathname } from "next/navigation"; // Lấy đường dẫn hiện tại thường làm menu
 import styles from "../styles/Navbar.module.css";
+import { useRouter } from "next/navigation";
+
 import {
   LayoutDashboard,
   CalendarDays,
@@ -16,7 +18,7 @@ import {
 
 export default function Navbar() {
   const pathname = usePathname(); // Lấy đường dẫn hiện tại
-
+  const router = useRouter();
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
       {/* Logo */}
@@ -82,14 +84,12 @@ export default function Navbar() {
             <MessageCircle size={18} /> Liên hệ
           </Link>
         </li>
+        <li>
+          <Link href="/logout" className={styles.logout}>
+            <LogOut size={20} />
+          </Link>
+        </li>
       </ul>
-
-      {/* Nút đăng xuất */}
-      <div className={styles.logoutBtn}>
-        <button type="button" className={styles.logout}>
-          <LogOut size={20} />
-        </button>
-      </div>
     </nav>
   );
 }
