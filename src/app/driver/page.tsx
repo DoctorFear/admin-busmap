@@ -57,9 +57,7 @@ export default function DriverPage() {
           <h3>Lịch làm việc hôm nay</h3>
           <p><strong>Tuyến đường:</strong> Tuyến A - Trường DEF</p>
           <p><strong>Thời gian:</strong> 6:30 AM - 8:00 AM, 19/09/2025</p>
-          <p className={styles.contactLinks}>
-            <a href="mailto:manager@ssb1.0.edu.vn">Liên hệ quản lý</a>
-          </p>
+
         </div>
       </div>
 
@@ -127,9 +125,7 @@ export default function DriverPage() {
           <div key={index} className={styles.alertItem}>{alert}</div>
         ))}
         
-        <p className={styles.contactLinks}>
-          <a href="mailto:support@ssb1.0.edu.vn">Liên hệ hỗ trợ</a>
-        </p>
+
       </div>
     </div>
   );

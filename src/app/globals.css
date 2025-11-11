@@ -15,7 +15,7 @@ body {
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: #faf7ff;
   font-family: Arial, Helvetica, "Montserrat", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
