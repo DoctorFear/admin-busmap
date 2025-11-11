@@ -8,6 +8,7 @@ import initTrackingSocket from "./sockets/trackingSocket.js";
 import busRoutes from './routes/busRoutes.js'
 import scheduleRoutes from "./routes/scheduleRoutes.js"
 import studentsRoutes from "./routes/studentsRoutes.js"
+import routeRoutes from "./routes/routeRoutes.js"
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
@@ -40,6 +41,8 @@ app.use('/api/buses', busRoutes)
 app.use("/api/schedules", scheduleRoutes)
 // 4.3 Add route API for students
 app.use("/api/students", studentsRoutes)
+// 4.4 Add route API for routes (tuyến đường)
+app.use("/api/routes", routeRoutes)
 app.use("/api/auth", authRoutes);
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)

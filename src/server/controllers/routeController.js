@@ -1,4 +1,5 @@
 import { getBusStopsByRoute } from "../models/busStopModel.js";
+import { getAllRoutes } from "../models/routeModel.js";
 
 export const getRouteStops = (req, res) => {
   const routeID = req.params.id;
@@ -29,5 +30,20 @@ export const getRouteStops = (req, res) => {
     }));
 
     res.json(stops);
+  });
+};
+
+export const getRoutes = (_req, res) => {
+  getAllRoutes((err, results) => {
+    if (err) {
+      console.error("❌ Lỗi khi truy vấn routes:", err);
+      return res.status(500).json({ error: "Lỗi server khi lấy tuyến đường" });
+    }
+    const routes = (results || []).map((r) => ({
+      routeID: r.routeID,
+      routeName: r.routeName,
+      estimatedTime: r.estimatedTime,
+    }));
+    res.json(routes);
   });
 };

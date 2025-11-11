@@ -9,13 +9,16 @@ const PORT_SERVER = 8888;
  *  - Dễ mở rộng về sau cho nhiều bus
  */
 import { useState, useEffect } from 'react';
-import BusMap from '@/components/BusMap';
+// import BusMap from '@/components/BusMap';
 import BusInfoPanel from '@/components/BusInfoPanel';
 import { mockBuses, Bus } from '@/lib/data_buses';
 import styles from './page.module.css';
 // Add socket.io-client for client
 import { io } from 'socket.io-client';
 import MapRealtime from '@/components/MapRealtime';
+import BusMap_GG from '@/components/BusMap_GG';
+
+// import MapForm from '@/components/MapForm';
 
 
 
@@ -102,12 +105,17 @@ export default function TrackPage() {
 
       <div className={styles.layout}>
         <div className={styles.mapArea}>
-          <BusMap
-            buses={buses}
-            selectedBus={selectedBus}
-            onBusSelect={setSelectedBus}
-            onToggleTracking={toggleTracking}
-          />
+          {/* Google Maps render */}
+          <BusMap_GG buses={buses} />
+          {/* Tạm thời thay thế bản đồ SVG mock bằng Google Maps.
+              Khi cần, có thể phục hồi BusMap mock ở dưới: */}
+          {/* <BusMap
+              buses={buses}
+              selectedBus={selectedBus}
+              onBusSelect={setSelectedBus}
+              onToggleTracking={toggleTracking}
+            /> */}
+          {/* <MapForm roads={}/> */}
         </div>
         {/* Testing */}
         <div style={{ display: 'none' }}>

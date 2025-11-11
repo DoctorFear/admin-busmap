@@ -1,3 +1,92 @@
+// 'use client';
+
+// import { useEffect, useState, useCallback } from 'react';
+// import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
+// import { Bus } from '@/lib/data_buses';
+
+// interface BusMapProps {
+//   buses: Bus[];
+//   selectedBus: Bus | null;
+//   onBusSelect: (bus: Bus) => void;
+//   onToggleTracking: (id: string) => void;
+// }
+
+// // Kích thước map hiển thị
+// const containerStyle = {
+//   width: '100%',
+//   height: '100%',
+// };
+
+// // Vị trí trung tâm mặc định (TP.HCM)
+// const center = {
+//   lat: 10.762622,
+//   lng: 106.660172,
+// };
+
+// export default function BusMap({ buses, selectedBus, onBusSelect }: BusMapProps) {
+//   const [map, setMap] = useState<google.maps.Map | null>(null);
+
+//   const { isLoaded } = useJsApiLoader({
+//     googleMapsApiKey: process.env.NEXT_PUBLIC_GG_MAPS_KEY as string,
+//   });
+
+//   const onLoad = useCallback((map: google.maps.Map) => {
+//     setMap(map);
+//   }, []);
+
+//   const onUnmount = useCallback(() => {
+//     setMap(null);
+//   }, []);
+
+//   if (!isLoaded) return <p>🛰️ Đang tải bản đồ...</p>;
+
+//   return (
+//     <div style={{ width: '100%', height: '100%' }}>
+//       <GoogleMap
+//         mapContainerStyle={containerStyle}
+//         center={center}
+//         zoom={13}
+//         onLoad={onLoad}
+//         onUnmount={onUnmount}
+//       >
+//         {/* Hiển thị từng xe buýt */}
+//         {buses.map((bus) => (
+//           <Marker
+//             key={bus.id}
+//             position={{ lat: bus.lat, lng: bus.lng }}
+//             onClick={() => onBusSelect(bus)}
+//             icon={{
+//               url: '/bus-icon.png', // có thể thêm file icon riêng
+//               scaledSize: new google.maps.Size(35, 35),
+//             }}
+//           />
+//         ))}
+
+//         {/* Hiển thị popup thông tin khi chọn xe */}
+//         {selectedBus && (
+//           <InfoWindow
+//             position={{ lat: selectedBus.lat, lng: selectedBus.lng }}
+//             onCloseClick={() => onBusSelect(null)}
+//           >
+//             <div style={{ fontSize: '14px' }}>
+//               <strong>Xe buýt #{selectedBus.busNumber}</strong>
+//               <br />
+//               Trạng thái: {selectedBus.isOnline ? '🟢 Online' : '🔴 Offline'}
+//               <br />
+//               Tốc độ: {selectedBus.speed ?? 0} km/h
+//             </div>
+//           </InfoWindow>
+//         )}
+//       </GoogleMap>
+//     </div>
+//   );
+// }
+
+
+
+
+// ------------- OLD ------------ \\
+
 // components/BusMap.tsx
 'use client';
 
