@@ -24,6 +24,7 @@ export default function MapForm({ roads }: MapFormProps) {
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Get GG_MAPS_KEY from env.local
   const googleApiKey = process.env.NEXT_PUBLIC_GG_MAPS_KEY as string;
 
   /**
@@ -132,32 +133,31 @@ export default function MapForm({ roads }: MapFormProps) {
     <div className={styles.mapContainer}>
       <h3>Tuyến đường</h3>
 
-      <LoadScript googleMapsApiKey={googleApiKey}>
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "700px" }}
-          center={mapCenter}
-          zoom={13}
-        >
-          {!isRouteValid &&
-            coordinates.map((coord, i) => (
-              <Marker key={i} position={coord} />
-            ))}
+      {/* googleApiKey have loaded in app/layout.tsx */}
+      <GoogleMap
+        mapContainerStyle={{ width: "100%", height: "700px" }}
+        center={mapCenter}
+        zoom={13}
+      >
+        {!isRouteValid &&
+          coordinates.map((coord, i) => (
+            <Marker key={i} position={coord} />
+          ))}
 
-          {directions && (
-            <DirectionsRenderer
-              directions={directions}
-              options={{
-                polylineOptions: {
-                  strokeColor: "#edbe80",
-                  strokeWeight: 5,
-                  strokeOpacity: 0.9,
-                },
-                suppressMarkers: false,
-              }}
-            />
-          )}
-        </GoogleMap>
-      </LoadScript>
+        {directions && (
+          <DirectionsRenderer
+            directions={directions}
+            options={{
+              polylineOptions: {
+                strokeColor: "#1A73E8",
+                strokeWeight: 5,
+                strokeOpacity: 0.9,
+              },
+              suppressMarkers: false,
+            }}
+          />
+        )}
+      </GoogleMap>
 
       <div className={styles.validationStatus}>
         {loading ? (

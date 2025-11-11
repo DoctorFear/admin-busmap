@@ -4,16 +4,17 @@
 const PORT_SERVER = 8888;
 
 import { useEffect, useState } from 'react';
+import { ScheduleItem} from '@/lib/data_schedule';
+// Components
 import SearchBar from '@/components/SearchBar';
 import ScheduleForm from '@/components/ScheduleForm';
 import ScheduleTable from '@/components/ScheduleTable';
 import PaginationControl from '@/components/PaginationControl';
 import Notification from '@/components/Notification';
+// Style
 import styles from './page.module.css';
-// import { ScheduleItem, mockSchedules } from '@/lib/data_schedule';
-import { ScheduleItem} from '@/lib/data_schedule';
-
-import BusMap_GG from '@/components/BusMap_GG';
+// GG Map
+// import BusMap_GG from '@/components/BusMap_GG';
 
 export default function SchedulePage() {
   // const [schedules, setSchedules] = useState<ScheduleItem[]>(mockSchedules); // sử dụng dữ liệu mẫu
@@ -23,7 +24,7 @@ export default function SchedulePage() {
     fetch(`http://localhost:${PORT_SERVER}/api/schedules`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        console.log("[Schedule] - All route:\n", data);
         const normalized = data.map((item: any) => ({
           tripID: item.tripID,
           routeName: item.routeName,
@@ -44,7 +45,9 @@ export default function SchedulePage() {
   const [currentPage, setCurrentPage] = useState(1); // thêm trạng thái trang hiện tại
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | undefined>(); // thêm trạng thái lịch trình đang chỉnh sửa
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null); // thêm trạng thái thông báo
-  const itemsPerPage = 2; // số mục trên mỗi trang
+  
+  // Phân trang 
+  const itemsPerPage = 3; // số mục trên mỗi trang
 
   // Lọc lịch trình dựa trên từ khóa tìm kiếm
 
@@ -102,7 +105,7 @@ export default function SchedulePage() {
 
       {/* Google Maps */}
       <div className={styles.mapArea}>
-        <BusMap_GG buses={[]} /> 
+        {/* <BusMap_GG buses={[]} />  */}
         {/* truyền danh sách tuyến / bus */}
       </div>
 
