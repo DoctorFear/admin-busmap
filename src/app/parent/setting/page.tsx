@@ -60,11 +60,6 @@ export default function Setting(): JSX.Element {
           </button>
         </form>
 
-        <p className={styles.supportText}>
-          <a href="mailto:support@ssb1.0.edu.vn" className={styles.supportLink}>
-            Liên hệ hỗ trợ
-          </a>
-        </p>
       </div>
     </div>
   );

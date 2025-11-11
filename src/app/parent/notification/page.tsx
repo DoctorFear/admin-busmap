@@ -18,8 +18,9 @@ export default function ParentNotificationPage() {
             id="push-notifications"
             checked={enabled}
             onChange={() => setEnabled(!enabled)}
+            
           />
-          <label htmlFor="push-notifications">Bật thông báo đẩy</label>
+          <label htmlFor="push-notifications" style={{ marginLeft: "6px" }}>Bật thông báo đẩy</label>
         </div>
 
         {notifications.map((item: NotificationItem, index: number) => (
@@ -36,10 +37,6 @@ export default function ParentNotificationPage() {
           </div>
         ))}
 
-        <div className={styles.contactLinks}>
-          <a href="tel:0123456789">Liên hệ tài xế</a> |{" "}
-          <a href="mailto:manager@ssb1.0.edu.vn">Liên hệ quản lý</a>
-        </div>
       </div>
     </div>
   );

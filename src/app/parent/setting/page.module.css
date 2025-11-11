@@ -15,6 +15,7 @@
   max-width: 700px;
   width: 100%;
   border: 1px solid #e5e7eb;
+  margin-top: 88px;
 }
 
 .title {
@@ -64,7 +65,7 @@
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
-  text-align: right;
+  text-align: center;
 }
 
 .submitBtn {

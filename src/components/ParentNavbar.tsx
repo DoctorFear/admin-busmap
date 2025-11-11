@@ -20,9 +20,9 @@ export default function ParentNavbar() {
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Parent navigation">
       <div className={styles.logo}>
-        <Link href="/parent">
+        <Link href="/parent/journey">
           <Image
-            src="/twilight-logo-phuhuynh-icon.png"
+            src="/twilight-logo-parents-icon.png"
             alt="Twilight Logo"
             width={150}
             height={40}
@@ -32,14 +32,7 @@ export default function ParentNavbar() {
       </div>
 
       <ul className={styles.navLinks}>
-        <li>
-          <Link
-            href="/parent"
-            className={`${styles.link} ${pathname === "/parent" ? styles.active : ""}`}
-          >
-            <LayoutDashboard size={18} /> Trang chủ
-          </Link>
-        </li>
+
         <li>
           <Link
             href="/parent/journey"
@@ -48,14 +41,7 @@ export default function ParentNavbar() {
             <Route size={18} /> Theo dõi hành trình
           </Link>
         </li>
-        <li>
-          <Link
-            href="/parent/history"
-            className={`${styles.link} ${pathname === "/parent/history" ? styles.active : ""}`}
-          >
-            <History size={18} /> Lịch sử hành trình
-          </Link>
-        </li>
+
         <li>
           <Link
             href="/parent/notification"
