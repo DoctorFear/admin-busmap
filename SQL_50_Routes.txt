@@ -1,0 +1,368 @@
+-- =========================================
+-- XÓA DỮ LIỆU CŨ (nếu cần test lại)
+-- =========================================
+-- DELETE FROM BoardingRecord WHERE recordID > 0;
+-- DELETE FROM DriverAssignment WHERE assignmentID > 0;
+-- DELETE FROM Trip WHERE tripID > 0;
+-- DELETE FROM BusStop WHERE busStopID > 0;
+-- DELETE FROM Bus WHERE busID > 0;
+-- DELETE FROM Route WHERE routeID > 0;
+-- DELETE FROM Student WHERE studentID > 0;
+-- DELETE FROM Parent WHERE parentID > 15;
+-- DELETE FROM Users WHERE userID > 19;
+
+-- =========================================
+-- SINH 500 PHỤ HUYNH VỚI ĐỊA CHỈ ĐA DẠNG
+-- KHÔNG DÙNG STORED PROCEDURE
+-- =========================================
+
+-- Tạo bảng tạm để sinh số từ 16-515
+SET @row_number = 15;
+
+-- Sinh 500 phụ huynh với địa chỉ ngẫu nhiên
+INSERT INTO Users (fullName, username, passwordHash, email, phone, role)
+SELECT
+  CONCAT('Phụ huynh ', @row_number := @row_number + 1) AS fullName,
+  CONCAT('parent', LPAD(@row_number, 3, '0')) AS username,
+  'parent' AS passwordHash,
+  CONCAT('parent', @row_number, '@gmail.com') AS email,
+  CONCAT('090', LPAD(@row_number, 7, '0')) AS phone,
+  'parent' AS role
+FROM (
+  SELECT a.n + b.n * 10 + c.n * 100 AS num
+  FROM 
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) c
+  ORDER BY num
+  LIMIT 500
+) numbers;
+
+-- Sinh địa chỉ cho Parent
+SET @parent_id = 15;
+
+INSERT INTO Parent (parentID, address, workInfo)
+SELECT
+  @parent_id := @parent_id + 1 AS parentID,
+  CONCAT(
+    FLOOR(100 + RAND() * 900), ' ',
+    -- Chọn đường theo quận
+    CASE 
+      WHEN district_name = 'Quận 1' THEN 
+        ELT(FLOOR(1 + RAND() * 5), 'Nguyễn Huệ', 'Đồng Khởi', 'Lê Lợi', 'Lê Duẩn', 'Phạm Ngũ Lão')
+      WHEN district_name = 'Quận 5' THEN
+        ELT(FLOOR(1 + RAND() * 5), 'An Dương Vương', 'Hùng Vương', 'Nguyễn Trai', 'Châu Văn Liêm', 'Phùng Hưng')
+      WHEN district_name = 'Quận 3' THEN
+        ELT(FLOOR(1 + RAND() * 6), 'Nam Kỳ Khởi Nghĩa', 'Nguyễn Đình Chiểu', 'Lý Chính Thắng', 'Lê Văn Sỹ', 'Hai Bà Trưng', 'Điện Biên Phủ')
+      WHEN district_name = 'Quận 7' THEN
+        ELT(FLOOR(1 + RAND() * 3), 'Nguyễn Văn Linh', 'Huỳnh Tấn Phát', 'Nguyễn Tất Thành')
+      WHEN district_name = 'Quận 8' THEN
+        ELT(FLOOR(1 + RAND() * 6), 'Âu Dương Lân', 'Tạ Quang Bửu', 'Phạm Hùng', 'Cao Lỗ', 'Bến Bình Đông', 'Bông Sao')
+      WHEN district_name = 'Quận 10' THEN
+        ELT(FLOOR(1 + RAND() * 7), '3 Tháng 2', 'Nguyễn Chí Thanh', 'Sư Vạn Hạnh', 'Lê Hồng Phong', 'Lý Thường Kiệt', 'Hòa Hảo', 'Ngô Gia Tự')
+      WHEN district_name = 'Quận Tân Bình' THEN
+        ELT(FLOOR(1 + RAND() * 7), 'Trường Chinh', 'Cộng Hòa', 'Phổ Quang', 'Hoàng Hoa Thám', 'Út Tịch', 'Cách Mạng Tháng Tám', 'Lạc Long Quân')
+      WHEN district_name = 'Quận Phú Nhuận' THEN
+        ELT(FLOOR(1 + RAND() * 5), 'Lê Văn Sỹ', 'Nguyễn Văn Trỗi', 'Phan Xích Long', 'Hoàng Văn Thụ', 'Phan Đăng Lưu')
+      WHEN district_name = 'Quận Bình Thạnh' THEN
+        ELT(FLOOR(1 + RAND() * 8), 'Điện Biên Phủ', 'Phan Đăng Lưu', 'Nơ Trang Long', 'Nguyễn Công Hoan', 'Xô Viết Nghệ Tĩnh', 'Đinh Bộ Lĩnh', 'Bạch Đằng', 'Vạn Kiếp')
+      WHEN district_name = 'Quận Gò Vấp' THEN
+        ELT(FLOOR(1 + RAND() * 6), 'Quang Trung', 'Nguyễn Oanh', 'Phan Văn Trị', 'Lê Đức Thọ', 'Phạm Văn Đồng', 'Nguyễn Kiệm')
+      ELSE 'Đường A'
+    END,
+    ', Phường ', FLOOR(1 + RAND() * 15),
+    ', ', district_name,
+    ', Thành phố Hồ Chí Minh, Việt Nam'
+  ) AS address,
+  CONCAT('Công ty ', CHAR(65 + FLOOR(RAND() * 26))) AS workInfo
+FROM (
+  SELECT 
+    ELT(FLOOR(1 + RAND() * 10), 
+      'Quận 1', 'Quận 5', 'Quận 3', 'Quận 7', 'Quận 8', 
+      'Quận 10', 'Quận Tân Bình', 'Quận Phú Nhuận', 'Quận Bình Thạnh', 'Quận Gò Vấp'
+    ) AS district_name
+  FROM (
+    SELECT a.n + b.n * 10 + c.n * 100 AS num
+    FROM 
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b,
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) c
+    ORDER BY num
+    LIMIT 500
+  ) numbers
+) districts;
+
+-- =========================================
+-- TẠO 50 TUYẾN XE BUÝT
+-- =========================================
+SET @route_row = 0;
+
+INSERT INTO Route (routeName, description, estimatedTime)
+SELECT
+  CONCAT('Tuyến ', @route_row := @route_row + 1, ': Khu vực ', 
+    ELT(FLOOR(1 + RAND() * 10),
+      'Quận 1', 'Quận 5', 'Quận 3', 'Quận 7', 'Quận 8',
+      'Quận 10', 'Tân Bình', 'Phú Nhuận', 'Bình Thạnh', 'Gò Vấp'
+    )
+  ) AS routeName,
+  CONCAT('Tuyến xe đưa đón học sinh số ', @route_row) AS description,
+  FLOOR(20 + RAND() * 30) AS estimatedTime
+FROM (
+  SELECT a.n + b.n * 10 AS num
+  FROM 
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b
+  ORDER BY num
+  LIMIT 50
+) route_numbers;
+
+-- =========================================
+-- TẠO 50 XE BUÝT GẮNCHO 50 TUYẾN
+-- =========================================
+SET @bus_row = 0;
+
+INSERT INTO Bus (licensePlate, capacity, model, status, routeID)
+SELECT
+  CONCAT('51A-', LPAD(10000 + (@bus_row := @bus_row + 1), 5, '0')) AS licensePlate,
+  40 AS capacity,
+  ELT(FLOOR(1 + RAND() * 3), 'Thaco', 'Hyundai', 'Isuzu') AS model,
+  'active' AS status,
+  @bus_row AS routeID
+FROM (
+  SELECT a.n + b.n * 10 AS num
+  FROM 
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b
+  ORDER BY num
+  LIMIT 50
+) bus_numbers;
+
+-- =========================================
+-- TẠO 500 ĐIỂM DỪNG: MỖI TUYẾN 10 ĐIỂM
+-- Mỗi điểm dừng tương ứng với 1 phụ huynh (parentID)
+-- =========================================
+INSERT INTO BusStop (routeID, parentID, name, lat, lng, sequence, estimatedArrivalTime)
+SELECT
+  FLOOR((num - 1) / 10) + 1 AS routeID,
+  num + 15 AS parentID,
+  CONCAT('Điểm dừng ', ((num - 1) MOD 10) + 1, ' - Tuyến ', FLOOR((num - 1) / 10) + 1) AS name,
+  NULL AS lat,
+  NULL AS lng,
+  ((num - 1) MOD 10) + 1 AS sequence,
+  SEC_TO_TIME(24000 + (((num - 1) MOD 10) + 1) * 300) AS estimatedArrivalTime
+FROM (
+  SELECT @stop_row := @stop_row + 1 AS num
+  FROM 
+    (SELECT @stop_row := 0) init,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) c
+  LIMIT 500
+) stop_numbers;
+
+
+-- =========================================
+-- SINH DỮ LIỆU CHO ROUTEDETAIL VÀ TRIP
+-- =========================================
+
+-- =========================================
+-- 2. TẠO ROUTEDETAIL CHO 50 TUYẾN
+-- Mỗi tuyến có 5-8 đoạn đường (RouteDetail)
+-- =========================================
+
+SET @detail_id = 0;
+
+-- Tạo RouteDetail cho tuyến 1-50 (mỗi tuyến 6 đoạn)
+-- Sử dụng bảng tạm để tránh lỗi NULL
+CREATE TEMPORARY TABLE temp_streets (
+  id INT,
+  pos INT,
+  street_name VARCHAR(100)
+);
+
+INSERT INTO temp_streets VALUES
+(1, 1, 'Nguyễn Huệ'), (1, 2, 'Lê Lợi'), (1, 3, 'Hai Bà Trưng'), (1, 4, 'Trường Chinh'), (1, 5, 'Cộng Hòa'),
+(2, 1, 'Đồng Khởi'), (2, 2, 'Lê Duẩn'), (2, 3, 'Nguyễn Thị Minh Khai'), (2, 4, 'Cách Mạng Tháng 8'), (2, 5, 'Hoàng Văn Thụ'),
+(3, 1, 'Phạm Ngũ Lão'), (3, 2, 'Nam Kỳ Khởi Nghĩa'), (3, 3, 'Võ Văn Tần'), (3, 4, '3 Tháng 2'), (3, 5, 'Lê Văn Sỹ'),
+(4, 1, 'Tôn Đức Thắng'), (4, 2, 'Nguyễn Đình Chiểu'), (4, 3, 'Lý Thường Kiệt'), (4, 4, 'Nguyễn Chí Thanh'), (4, 5, 'Phan Xích Long'),
+(5, 1, 'Pasteur'), (5, 2, 'Lý Chính Thắng'), (5, 3, 'Sư Vạn Hạnh'), (5, 4, 'Nguyễn Văn Trỗi'), (5, 5, 'Bạch Đằng'),
+(6, 1, 'Trần Hưng Đạo'), (6, 2, 'Điện Biên Phủ'), (6, 3, 'Hòa Hảo'), (6, 4, 'Phổ Quang'), (6, 5, 'Xô Viết Nghệ Tĩnh');
+
+SET @detail_id = 0;
+
+INSERT INTO RouteDetail (routeID, orderNumber, streetName, note, lat, lng)
+SELECT
+  FLOOR(@detail_id / 6) + 1 AS routeID,
+  (@detail_id MOD 6) + 1 AS orderNumber,
+  COALESCE(ts.street_name, 'Đường chưa xác định') AS streetName,
+  CONCAT('Đoạn đường số ', (@detail_id MOD 6) + 1) AS note,
+  NULL AS lat,
+  NULL AS lng
+FROM (
+  SELECT (@detail_id := @detail_id + 1) - 1 AS row_num
+  FROM 
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4) c
+  LIMIT 300
+) numbers
+LEFT JOIN temp_streets ts ON ts.id = ((@detail_id - 1) MOD 6) + 1 
+  AND ts.pos = (FLOOR(RAND() * 5) + 1);
+
+DROP TEMPORARY TABLE temp_streets;
+
+-- =========================================
+-- 3. TẠO TRIP CHO 30 NGÀY (từ 11/11/2025 - 10/12/2025)
+-- Mỗi ngày: 50 tuyến x 2 chuyến (sáng + chiều) = 100 trips/ngày
+-- Tổng: 30 ngày x 100 = 3000 trips
+-- =========================================
+
+SET @trip_counter = 0;
+
+INSERT INTO Trip (routeID, tripDate, startTime, endTime, assignedBusID, assignedDriverID, status)
+SELECT
+  route_id,
+  trip_date,
+  start_time,
+  end_time,
+  bus.busID AS assignedBusID,
+  (FLOOR(RAND() * 3) + 1) AS assignedDriverID,
+  trip_status
+FROM (
+  SELECT
+    (((@trip_counter := @trip_counter + 1) - 1) MOD 50) + 1 AS route_id,
+    DATE_ADD('2025-11-11', INTERVAL FLOOR((@trip_counter - 1) / 100) DAY) AS trip_date,
+    CASE 
+      WHEN ((@trip_counter - 1) MOD 2) = 0 THEN '06:30:00'
+      ELSE '16:00:00'
+    END AS start_time,
+    CASE 
+      WHEN ((@trip_counter - 1) MOD 2) = 0 THEN '08:00:00'
+      ELSE '17:30:00'
+    END AS end_time,
+    CASE 
+      WHEN DATE_ADD('2025-11-11', INTERVAL FLOOR((@trip_counter - 1) / 100) DAY) < CURDATE() THEN 'COMPLETED'
+      WHEN DATE_ADD('2025-11-11', INTERVAL FLOOR((@trip_counter - 1) / 100) DAY) = CURDATE() THEN 'RUNNING'
+      ELSE 'PLANNED'
+    END AS trip_status
+  FROM (
+    SELECT a.n + b.n * 10 + c.n * 100 + d.n * 1000 AS num
+    FROM 
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b,
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) c,
+      (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+       UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) d
+    LIMIT 3000
+  ) trip_numbers
+) trips
+INNER JOIN Bus bus ON bus.routeID = trips.route_id;
+
+-- =========================================
+-- 4. TẠO DRIVERASSIGNMENT CHO 30 NGÀY
+-- Mỗi ngày: 50 tuyến được phân công tài xế
+-- =========================================
+SET @assignment_counter = 0;
+
+INSERT INTO DriverAssignment (driverID, busID, routeID, assignmentDate, note)
+SELECT
+  (FLOOR(RAND() * 3) + 1) AS driverID,
+  bus.busID,
+  bus.routeID,
+  DATE_ADD('2025-11-11', INTERVAL FLOOR((@assignment_counter := @assignment_counter + 1 - 1) / 50) DAY) AS assignmentDate,
+  CONCAT('Ca sáng và chiều - Tuyến ', bus.routeID) AS note
+FROM Bus AS bus
+JOIN (
+  SELECT a.n + b.n * 10 + c.n * 100 AS num
+  FROM 
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b,
+    (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
+     UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) c
+  LIMIT 3000
+) nums;
+
+
+
+
+-- =========================================
+-- KIỂM TRA KẾT QUẢ
+-- =========================================
+SELECT COUNT(*) AS total_parents FROM Parent WHERE parentID >= 16;
+SELECT COUNT(*) AS total_routes FROM Route;
+SELECT COUNT(*) AS total_buses FROM Bus;
+SELECT COUNT(*) AS total_busstops FROM BusStop;
+
+-- Xem mẫu địa chỉ phụ huynh
+SELECT p.parentID, u.fullName, p.address 
+FROM Parent p
+JOIN Users u ON p.parentID = u.userID
+WHERE p.parentID BETWEEN 16 AND 25
+ORDER BY p.parentID;
+
+-- Xem điểm dừng của tuyến 1
+SELECT bs.busStopID, bs.name, bs.sequence, bs.parentID, p.address
+FROM BusStop bs
+JOIN Parent p ON bs.parentID = p.parentID
+WHERE bs.routeID = 1
+ORDER BY bs.sequence;
+
+
+-- Số lượng RouteDetail
+SELECT COUNT(*) AS total_routedetails FROM RouteDetail;
+
+-- Số lượng Trip
+SELECT COUNT(*) AS total_trips FROM Trip;
+
+-- Số lượng DriverAssignment
+SELECT COUNT(*) AS total_assignments FROM DriverAssignment;
+
+-- Xem RouteDetail của tuyến 1
+SELECT * FROM RouteDetail WHERE routeID = 1 ORDER BY orderNumber;
+
+-- Xem Trip của ngày hôm nay
+SELECT t.tripID, t.routeID, r.routeName, t.tripDate, t.startTime, t.endTime, 
+       t.assignedBusID, b.licensePlate, t.assignedDriverID, d.fullName AS driverName, t.status
+FROM Trip t
+JOIN Route r ON t.routeID = r.routeID
+JOIN Bus b ON t.assignedBusID = b.busID
+LEFT JOIN Driver d ON t.assignedDriverID = d.driverID
+WHERE t.tripDate = CURDATE()
+ORDER BY t.routeID, t.startTime
+LIMIT 20;
+
+-- Thống kê Trip theo trạng thái
+SELECT status, COUNT(*) AS total
+FROM Trip
+GROUP BY status;
+
+-- Xem lịch phân công tài xế hôm nay
+SELECT da.assignmentID, da.driverID, d.fullName AS driverName, 
+       da.busID, b.licensePlate, da.routeID, r.routeName, da.assignmentDate
+FROM DriverAssignment da
+JOIN Driver d ON da.driverID = d.driverID
+JOIN Bus b ON da.busID = b.busID
+JOIN Route r ON da.routeID = r.routeID
+WHERE da.assignmentDate = CURDATE()
+ORDER BY da.routeID
+LIMIT 20;

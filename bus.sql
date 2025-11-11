@@ -348,6 +348,20 @@ CREATE INDEX idx_vehiclelocation_time ON VehicleLocation(recordedAt);
 CREATE INDEX idx_notification_sentat ON Notification(sentAt);
 
 -- =================================================
+-- BỔ SUNG: 
+-- Thêm cột parentID vào table BusStop để biết được điểm dừng này là nhà của phụ huynh nào
+-- =================================================
+
+ALTER TABLE BusStop
+ADD COLUMN parentID INT NULL AFTER routeID,
+ADD CONSTRAINT fk_busstop_parent
+  FOREIGN KEY (parentID)
+  REFERENCES Parent(parentID)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+
+-- =================================================
 -- DỮ LIỆU MẪU 
 -- =================================================
 

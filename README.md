@@ -154,6 +154,8 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 
 ### 5. cookie-parser: `npm install cookie-parser`
 
+### 6. axios dotenv: `npm install axios dotenv`
+
 ### Utils
 
 1. To kill port: `npx kill-port [PORT]`
