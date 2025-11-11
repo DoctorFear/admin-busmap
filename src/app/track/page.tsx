@@ -48,12 +48,12 @@ export default function TrackPage() {
     const socket = io(`http://localhost:${PORT_SERVER}`);
 
     socket.on("connect", () => {
-      console.log("✅ Kết nối Socket.IO thành công:", socket.id);
+      console.log("- Kết nối Socket.IO thành công:", socket.id);
     });
 
     // Khi nhận được vị trí bus cập nhật từ server
     socket.on("updateBusLocation", (data) => {
-      console.log("📡 Nhận dữ liệu realtime từ server:", data);
+      console.log("- Nhận dữ liệu realtime từ server:", data);
 
       // Cập nhật bus tương ứng trong danh sách mockBuses
       setBuses((prevBuses) =>
@@ -72,7 +72,7 @@ export default function TrackPage() {
     });
 
     socket.on("disconnect", () => {
-      console.warn("⚠️ Mất kết nối Socket.IO");
+      console.warn("- Mất kết nối Socket.IO");
     });
 
     return () => { 
@@ -118,9 +118,9 @@ export default function TrackPage() {
           {/* <MapForm roads={}/> */}
         </div>
         {/* Testing */}
-        <div style={{ display: 'none' }}>
+        {/* <div style={{ display: 'none' }}>
           <MapRealtime />
-        </div>
+        </div> */}
         <div className={styles.panelArea}>
           <BusInfoPanel
             bus={selectedBus}
