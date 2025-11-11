@@ -96,6 +96,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
 
   return (
     <div className={styles.formWrapper}>
+      {/*LEFT:  From tạo/chỉnh sửa lịch trình */}
       <div className={styles.formContainer}>
         <h2 className={styles.h2css}>{initialData ? 'Chỉnh sửa lịch trình' : 'Tạo lịch trình mới'}</h2>
         <div className={styles.formGroup}>
@@ -179,7 +180,10 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
           </button>
         </div>
       </div>
+
+      {/*RIGHT: GG Map */}
       <MapForm roads={formData.roads} />
+
     </div>
   );
 }

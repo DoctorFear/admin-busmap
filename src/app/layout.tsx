@@ -1,8 +1,11 @@
-// app/layout.tsx
+// server component
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import LayoutWrapper from '../components/LayoutWrapper';
+import { LoadScript } from '@react-google-maps/api';
+// GLOBAL: Load GG Map 
+import GoogleMapsProvider from '@/components/GoogleMapsProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -27,7 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <LayoutWrapper>{children}</LayoutWrapper>
+        
+        {/* Wrap app by provider client, load GG Maps SDK one time for all page (project) */}
+        <GoogleMapsProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </GoogleMapsProvider>
+      
       </body>
     </html>
   );
