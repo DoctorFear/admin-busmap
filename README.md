@@ -2,6 +2,13 @@
 
 ---
 
+## Run (from `root` directory of project, e.g: ~/Documents/Busmap_admin)
+
+```
+npm run dev
+npm run server
+```
+
 ## SERVER (BE)
 
 ---
@@ -144,6 +151,8 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 `npm install socket.io-client`
 
 ### 4. Google Maps API: `npm install react-google-maps/api`
+
+### 5. cookie-parser: `npm install cookie-parser`
 
 ### Utils
 

@@ -1,13 +1,27 @@
 // server/routes/authRoutes.js
-import express from "express";
-import db from "../db.js";
+
+// 1. Import 
+import db from "../db.js"
+import express from "express";      // Nếu Node chưa cấu hình, có thể dùng: const express = require('express')
+import { createServer } from "http";
+import { Server } from "socket.io";
+import initTrackingSocket from "../sockets/trackingSocket.js";
+// Login
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+// Route:
+import busRoutes from '../routes/busRoutes.js'
+import scheduleRoutes from "../routes/scheduleRoutes.js"
+import studentsRoutes from "../routes/studentsRoutes.js"
+import cors from "cors";
+import authRoutes from "../routes/authRoutes.js";
+import cookieParser from "cookie-parser";
 
 const router = express.Router();
 
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
+  console.log("[Login] - User in login page", email, password)
   if (!email || !password)
     return res.status(400).json({ msg: "Thiếu email hoặc mật khẩu" });
 
