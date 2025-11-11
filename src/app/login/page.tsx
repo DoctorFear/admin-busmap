@@ -1,11 +1,14 @@
+// app/login/page.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./page.module.css";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(""); // ← Đổi thành username
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,7 @@ export default function LoginPage() {
       const res = await fetch("http://localhost:8888/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }), // ← Gửi username
       });
       const data = await res.json();
       if (!res.ok) {
@@ -48,18 +51,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", justifyContent: "center", alignItems: "center" }}>
-      <form onSubmit={handleSubmit} style={{ width: 300, border: "1px solid #ddd", padding: 20, borderRadius: 8 }}>
-        <h2>Đăng nhập</h2>
-        <label>Email:</label>
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={{ width: "100%", marginBottom: 10 }} />
-        <label>Mật khẩu:</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: "100%", marginBottom: 10 }} />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ width: "100%", padding: 8 }}>
-          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-        </button>
-      </form>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Đăng nhập</h2>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Tên đăng nhập</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className={styles.input}
+              placeholder="ph_lan, tai_le"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Mật khẩu</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={styles.input}
+              placeholder="••••••••"
+            />
+          </div>
+
+          {error && <p className={styles.error}>{error}</p>}
+
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? (
+              <span className={styles.loadingText}>
+                <div className={styles.spinner}></div>
+                Đang đăng nhập...
+              </span>
+            ) : (
+              "Đăng nhập"
+            )}
+          </button>
+        </form>
+
+        <Link href="/register" className={styles.registerLink}>
+          Đăng ký
+        </Link>
+      </div>
     </div>
   );
 }
