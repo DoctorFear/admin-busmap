@@ -13,7 +13,7 @@ export default function DriverStudentsPage() {
   const driverID = 1;
   const PORT_SERVER = 8888;
 
-  // Fetch danh sách học sinh
+  // Lấy danh sách học sinh của tài xế
   const fetchStudents = async () => {
     try {
       setLoading(true);
@@ -22,9 +22,10 @@ export default function DriverStudentsPage() {
         { cache: "no-store" }
       );
       if (!res.ok) throw new Error("Không thể kết nối máy chủ");
+
       const data = await res.json();
-      
-      // Kiểm tra đúng thuộc tính allCompleted
+
+      // Kiểm tra nếu chuyến xe đã hoàn thành hết
       if (data.allCompleted === true) {
         setAllCompleted(true);
         setStudentList([]);
@@ -33,7 +34,7 @@ export default function DriverStudentsPage() {
         setLoading(false);
         return;
       }
-      
+
       // Tách thông tin chuyến xe và danh sách học sinh
       if (Array.isArray(data) && data.length > 0) {
         const firstStudent = data[0];
@@ -43,16 +44,15 @@ export default function DriverStudentsPage() {
           tripStartTime: firstStudent.tripStartTime,
           tripEndTime: firstStudent.tripEndTime,
           routeName: firstStudent.routeName,
-          tripStatus: firstStudent.tripStatus
+          tripStatus: firstStudent.tripStatus,
         };
-        
         setTripInfo(tripData);
         setStudentList(data);
         setAllCompleted(false);
       } else {
         setAllCompleted(true);
       }
-      
+
       setError(null);
     } catch (err: any) {
       console.error("Lỗi fetch:", err);
@@ -66,29 +66,31 @@ export default function DriverStudentsPage() {
     fetchStudents();
   }, []);
 
-  // Kiểm tra trạng thái có được phép chuyển không
+  // Kiểm tra trạng thái có thể chuyển đổi hợp lệ hay không
   const canChangeStatus = (currentStatus: string, newStatus: string): boolean => {
     const statusOrder = ["chua-don", "da-don", "da-tra", "vang-mat"];
     const currentIndex = statusOrder.indexOf(currentStatus);
     const newIndex = statusOrder.indexOf(newStatus);
-    
-    if (newStatus === "vang-mat") return true;
+
     if (currentStatus === "vang-mat" || currentStatus === "da-tra") return false;
     if (currentStatus === "chua-don" && newStatus === "da-tra") return false;
-    
+    if (currentStatus === "da-don" && newStatus === "vang-mat") return false;
     return newIndex > currentIndex;
   };
 
   // Cập nhật trạng thái học sinh
-  const updateStudentStatus = async (studentID: number, currentStatus: string, newStatus: string) => {
+  const updateStudentStatus = async (
+    studentID: number,
+    currentStatus: string,
+    newStatus: string
+  ) => {
     if (!canChangeStatus(currentStatus, newStatus)) {
-      alert("Không thể quay lại trạng thái trước đó!");
+      alert("Trạng thái được chọn không hợp lệ!");
       return;
     }
 
     try {
-      const res = await fetch(
-        `http://localhost:${PORT_SERVER}/api/students/status/${studentID}`,
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/students/status/${studentID}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -97,16 +99,16 @@ export default function DriverStudentsPage() {
       );
 
       if (!res.ok) throw new Error("Server error");
+
       const data = await res.json();
       console.log("Server phản hồi:", data);
 
-      // Kiểm tra đúng thuộc tính tripCompleted
+      // Nếu chuyến xe đã hoàn thành
       if (data.tripCompleted === true) {
         alert("Chuyến xe đã hoàn thành! Đang chuyển sang chuyến tiếp theo...");
-        // Reload để lấy chuyến mới
         await fetchStudents();
       } else {
-        // Chỉ cập nhật UI nếu chuyến chưa hoàn thành
+        // Cập nhật giao diện nếu chuyến chưa hoàn thành
         setStudentList((prev) =>
           prev.map((s) =>
             s.studentID === studentID ? { ...s, status: newStatus } : s
@@ -119,6 +121,7 @@ export default function DriverStudentsPage() {
     }
   };
 
+  // Trả về màu sắc dựa theo trạng thái
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
       "chua-don": "#6b7280",
@@ -132,7 +135,7 @@ export default function DriverStudentsPage() {
   // Format ngày và giờ
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
-    const [year, month, day] = dateStr.split('-');
+    const [year, month, day] = dateStr.split("-");
     return `${day}-${month}`;
   };
 
@@ -141,16 +144,25 @@ export default function DriverStudentsPage() {
     return timeStr.substring(0, 5);
   };
 
+  // Hiển thị khi đang tải
   if (loading) return <p>Đang tải dữ liệu...</p>;
+
+  // Hiển thị lỗi nếu có
   if (error) return <p style={{ color: "red" }}>Lỗi: {error}</p>;
-  
-  // Hiển thị khi đã hoàn thành tất cả chuyến
+
+  // Khi đã hoàn thành tất cả chuyến
   if (allCompleted) {
     return (
       <div className={styles.driverContainer}>
         <div className={styles.studentList}>
           <h3>Đã hoàn thành tất cả chuyến trong ngày</h3>
-          <p style={{ color: "#22c55e", fontSize: "1.2rem", marginTop: "2rem" }}>
+          <p
+            style={{
+              color: "#22c55e",
+              fontSize: "1.2rem",
+              marginTop: "2rem",
+            }}
+          >
             Bạn đã hoàn thành xuất sắc công việc hôm nay!
           </p>
           <p style={{ marginTop: "1rem" }}>
@@ -160,8 +172,8 @@ export default function DriverStudentsPage() {
       </div>
     );
   }
-  
-  // Kiểm tra không có chuyến xe
+
+  // Khi không có chuyến xe nào trong ngày
   if (!tripInfo) {
     return (
       <div className={styles.driverContainer}>
@@ -170,6 +182,7 @@ export default function DriverStudentsPage() {
     );
   }
 
+  // Tính số học sinh đã đón và vắng mặt
   const completedStudents = studentList.filter(
     (s) => s.status === "da-don" || s.status === "da-tra"
   ).length;
@@ -177,15 +190,19 @@ export default function DriverStudentsPage() {
     (s) => s.status === "vang-mat"
   ).length;
 
-  return ( 
-    <div className={styles.driverContainer}>
+  // Hiển thị danh sách học sinh
+  return (<div className={styles.driverContainer}>
       <div className={styles.studentList}>
         <h3>
-          Danh sách học sinh ngày {formatDate(tripInfo.tripDate)} ({formatTime(tripInfo.tripStartTime)} - {formatTime(tripInfo.tripEndTime)})
+          Danh sách học sinh ngày {formatDate(tripInfo.tripDate)} (
+          {formatTime(tripInfo.tripStartTime)} -{" "}
+          {formatTime(tripInfo.tripEndTime)})
         </h3>
+
         <p style={{ marginBottom: "0.5rem", color: "#374151" }}>
           <strong>Tuyến:</strong> {tripInfo.routeName}
         </p>
+
         <p style={{ marginBottom: "1rem", color: "#374151" }}>
           <strong>Trạng thái:</strong> Đã đón {completedStudents}/
           {studentList.length} học sinh, {absentStudents} vắng mặt
@@ -196,14 +213,19 @@ export default function DriverStudentsPage() {
             <p>
               {student.studentName} – Lớp: {student.grade}
             </p>
+
             <select
               value={student.status}
               onChange={(e) =>
-                updateStudentStatus(student.studentID, student.status, e.target.value)
+                updateStudentStatus(
+                  student.studentID,
+                  student.status,
+                  e.target.value
+                )
               }
-              style={{ 
+              style={{
                 color: getStatusColor(student.status),
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               <option value="chua-don">Chưa đón</option>

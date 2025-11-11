@@ -37,7 +37,7 @@ export const getStudentsByDriverID = (driverID, callback) => {
         WHERE assignedDriverID = ?
           AND tripDate = CURDATE()
           AND status IN ('PLANNED', 'RUNNING')
-        ORDER BY startTime ASC
+        ORDER BY tripID ASC
         LIMIT 1
     ) AS next_trip
     JOIN BoardingRecord br ON next_trip.tripID = br.tripID
@@ -104,7 +104,7 @@ export const checkTripCompletion = (tripID, callback) => {
   const sql = `
     SELECT 
       COUNT(*) AS total,
-      SUM(CASE WHEN status IN ('DROPPED','ABSENT') THEN 1 ELSE 0 END) AS doneCount
+      COALESCE(SUM(CASE WHEN status IN ('DROPPED','ABSENT') THEN 1 ELSE 0 END), 0) AS doneCount
     FROM BoardingRecord
     WHERE tripID = ?
   `;

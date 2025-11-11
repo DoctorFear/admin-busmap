@@ -27,7 +27,7 @@ export const getStudentsByDriver = (req, res) => {
   });
 };
 
-// Hàm tạo datetime hiện tại định dạng MySQL
+// Hàm lấy thời gian hiện tại (YYYY-MM-DD HH:mm:ss)
 const getCurrentDatetime = () => {
   const now = new Date();
   return now.getFullYear() + '-' +
@@ -43,12 +43,14 @@ export const updateStudentStatusController = (req, res) => {
   const { studentID } = req.params;
   const { status } = req.body;
 
+  // Kiểm tra dữ liệu đầu vào
   if (!status) {
     return res.status(400).json({ error: "Thiếu trạng thái cần cập nhật" });
   }
 
   const datetime = getCurrentDatetime();
 
+  // Lấy tripID tương ứng với học sinh trong ngày hiện tại
   getTripIDByStudent(studentID, (err, rows) => {
     if (err || !rows.length) {
       return res.status(500).json({ error: "Không tìm thấy chuyến cho học sinh này" });
@@ -56,48 +58,66 @@ export const updateStudentStatusController = (req, res) => {
 
     const tripID = rows[0].tripID;
 
-    // Tự động chuyển Trip sang RUNNING nếu đang PLANNED
+    // Kiểm tra trạng thái hiện tại của chuyến
     getTripStatus(tripID, (err, statusRows) => {
-      if (!err && statusRows.length > 0 && statusRows[0].status === 'PLANNED') {
-        updateTripStatusWithTime(tripID, 'RUNNING', datetime, (err) => {
-          if (!err) console.log(`Tự động chuyển Trip ${tripID} sang RUNNING`);
-        });
+      if (err) {
+        return res.status(500).json({ error: "Lỗi kiểm tra trạng thái trip" });
       }
 
-      // Cập nhật trạng thái học sinh
-      updateStudentStatus(studentID, tripID, status, datetime, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Không thể cập nhật trạng thái" });
-        }
-        // Kiểm tra xem chuyến đã hoàn thành chưa
-        checkTripCompletion(tripID, (err, rows) => {
-          if (err) return res.status(500).json({ error: "Lỗi kiểm tra hoàn thành" });
+      const currentTripStatus = statusRows.length > 0 ? statusRows[0].status : null;
 
-          const { total, doneCount } = rows[0];
-          const isCompleted = total === doneCount;
-
-          console.log(`Trip ${tripID}: ${doneCount}/${total} học sinh đã trả/vắng`);
-
-          if (isCompleted) {
-            // Cập nhật Trip sang COMPLETED
-            updateTripStatusWithTime(tripID, 'COMPLETED', datetime, (err) => {
-              if (err) {
-                return res.status(500).json({ error: "Không thể hoàn thành chuyến" });
-              }
-              
-              res.json({
-                message: "Chuyến xe đã hoàn thành",
-                tripCompleted: true
-              });
-            });
-          } else {
-            res.json({
-              message: "Cập nhật trạng thái thành công",
-              tripCompleted: false
-            });
+      // Hàm xử lý cập nhật học sinh và kiểm tra hoàn thành
+      const processStudentUpdate = () => {
+        updateStudentStatus(studentID, tripID, status, datetime, (err) => {
+          if (err) {
+            return res.status(500).json({ error: "Không thể cập nhật trạng thái học sinh" });
           }
+
+          // Sau khi cập nhật học sinh -> kiểm tra xem tất cả học sinh trong chuyến đã được trả/vắng chưa
+          checkTripCompletion(tripID, (err, rows) => {
+            if (err) {
+              return res.status(500).json({ error: "Lỗi kiểm tra hoàn thành chuyến" });
+            }
+
+            const total = Number(rows[0].total) || 0;
+            const doneCount = Number(rows[0].doneCount) || 0;
+            const isCompleted = total > 0 && doneCount === total;
+
+            if (isCompleted) {
+              // Nếu tất cả học sinh đã được trả/vắng mặt => cập nhật Trip sang COMPLETED
+              updateTripStatusWithTime(tripID, 'COMPLETED', datetime, (err) => {
+                if (err) {
+                  return res.status(500).json({ error: "Không thể cập nhật trạng thái chuyến sang COMPLETED" });
+                }
+
+                return res.json({
+                  message: "Cập nhật thành công - chuyến xe đã hoàn thành",
+                  tripCompleted: true
+                });
+              });
+            } else {
+              // Nếu chưa hoàn thành toàn bộ học sinh
+              return res.json({
+                message: "Cập nhật trạng thái học sinh thành công",
+                tripCompleted: false
+              });
+            }
+          });
         });
-      });
+      };
+
+      // Nếu chuyến vẫn đang ở trạng thái PLANNED thì chuyển sang RUNNING trước
+      if (currentTripStatus === 'PLANNED') {
+        updateTripStatusWithTime(tripID, 'RUNNING', datetime, (err) => {
+          if (err) {
+            return res.status(500).json({ error: "Không thể chuyển trạng thái chuyến sang RUNNING" });
+          }
+          processStudentUpdate();
+        });
+      } else {
+        // Nếu chuyến đã RUNNING hoặc COMPLETED thì chỉ cần cập nhật học sinh
+        processStudentUpdate();
+      }
     });
   });
 };

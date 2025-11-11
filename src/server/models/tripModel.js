@@ -72,7 +72,7 @@ export const getTripsByDriverID = (driverID, callback) => {
     JOIN Route r ON t.routeID = r.routeID
     WHERE t.assignedDriverID = ?
       AND t.tripDate BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 DAY)
-    ORDER BY t.tripDate ASC, t.startTime ASC
+    ORDER BY t.tripDate ASC, t.tripID ASC
   `;
 
   db.query(sql, [driverID], callback);
