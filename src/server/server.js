@@ -10,7 +10,7 @@ import scheduleRoutes from "./routes/scheduleRoutes.js"
 import studentsRoutes from "./routes/studentsRoutes.js"
 import cors from "cors";
 
-// 2. Tạo object, ứng dụng Express, thực hiện route, mIddleware,..
+// 2. Tạo object, ứng dụng Express, thực hiện route, middleware,..
 const app = express();
 app.use(cors());
 // 3. Cấu hình port để server lister
