@@ -450,44 +450,37 @@ VALUES
 /* 8) Trip: (driverID = 1) */
 INSERT INTO Trip (routeID, tripDate, startTime, endTime, assignedBusID, assignedDriverID, status)
 VALUES
--- Thứ 2 - 4/11/2025 (2 chuyến: sáng + chiều)
-(1, '2025-11-04', '06:30:00', '08:00:00', 1, 1, 'RUNNING'),  -- Sáng: Đưa đi học
-(1, '2025-11-04', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),  -- Chiều: Đón về
+-- Thứ 3 - 11/11/2025 (2 chuyến: sáng + chiều)
+(1, '2025-11-11', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),  -- Sáng: Đưa đi học
+(1, '2025-11-11', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),  -- Chiều: Đón về
 
--- Thứ 3 - 5/11/2025 (2 chuyến)
-(1, '2025-11-05', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
-(1, '2025-11-05', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
+-- Thứ 4 - 12/11/2025 (2 chuyến)
+(1, '2025-11-12', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+(1, '2025-11-12', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
 
--- Thứ 4 - 6/11/2025 (1 chuyến: chỉ sáng)
-(1, '2025-11-06', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+-- Thứ 5 - 13/11/2025 (1 chuyến: chỉ sáng)
+(1, '2025-11-13', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
 
--- Thứ 5 - 7/11/2025 (2 chuyến)
-(1, '2025-11-07', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
-(1, '2025-11-07', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
+-- Thứ 7 - 15/11/2025 (2 chuyến)
+(1, '2025-11-15', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
+(1, '2025-11-15', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
 
--- Thứ 6 - 8/11/2025 (2 chuyến)
-(1, '2025-11-08', '06:30:00', '08:00:00', 1, 1, 'PLANNED'),
-(1, '2025-11-08', '16:00:00', '17:30:00', 1, 1, 'PLANNED'),
+-- Thứ CN - 16/11/2025 (1 chuyến: chỉ sáng) 
+(1, '2025-11-16', '06:30:00', '08:00:00', 1, 1, 'PLANNED');   -- Đang chạy
 
--- Thứ 7 - 9/11/2025 (1 chuyến: chỉ sáng) 
-(1, '2025-11-09', '06:30:00', '08:00:00', 1, 1, 'PLANNED');   -- Đang chạy
-
-/* 9) DriverAssignment: LỊCH PHÂN CÔNG 3/11 - 9/11 */
+/* 9) DriverAssignment: LỊCH PHÂN CÔNG 11/11 - 16/11 */
 INSERT INTO DriverAssignment (driverID, busID, routeID, assignmentDate, note)
 VALUES
 
--- Thứ 3-7: 4/11 đến 8/11
-(1, 1, 1, '2025-11-04', 'Ca sáng và chiều - Tuyến 1'),
-(1, 1, 1, '2025-11-05', 'Ca sáng và chiều - Tuyến 1'),
-(1, 1, 1, '2025-11-06', 'Chỉ ca sáng - Tuyến 1'),
-(1, 1, 1, '2025-11-07', 'Ca sáng và chiều - Tuyến 1'),
-(1, 1, 1, '2025-11-08', 'Ca sáng và chiều - Tuyến 1'),
-
--- Thứ 7: 9/11 
-(1, 1, 1, '2025-11-09', 'Ca sáng - Tuyến 1');
+-- Thứ 3-CN: 11/11 đến 16/11
+(1, 1, 1, '2025-11-11', 'Ca sáng và chiều - Tuyến 1'),
+(1, 1, 1, '2025-11-12', 'Ca sáng và chiều - Tuyến 1'),
+(1, 1, 1, '2025-11-13', 'Chỉ ca sáng - Tuyến 1'),
+(1, 1, 1, '2025-11-15', 'Ca sáng và chiều - Tuyến 1'),
+(1, 1, 1, '2025-11-16', 'Chỉ ca sáng - Tuyến 1');
 
 /* 10) BoardingRecord: Danh sách học sinh cho mỗi chuyến */
--- Thứ 3 - 4/11 SÁNG (tripID = 1)
+-- Thứ 3 - 11/11 SÁNG (tripID = 1) - 8 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (1, 1, 1, NULL, NULL, 'NOT_PICKED', 16),
@@ -499,7 +492,7 @@ VALUES
 (1, 11, 1, NULL, NULL, 'NOT_PICKED', 16),
 (1, 13, 2, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 3 - 4/11 CHIỀU (tripID = 2)
+-- Thứ 3 - 11/11 CHIỀU (tripID = 2) - 7 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (2, 1, NULL, NULL, NULL, 'NOT_PICKED', 16),
@@ -510,7 +503,7 @@ VALUES
 (2, 11, NULL, NULL, NULL, 'NOT_PICKED', 16),
 (2, 13, NULL, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 4 - 5/11 SÁNG (tripID = 3)
+-- Thứ 4 - 12/11 SÁNG (tripID = 3) - 10 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (3, 1, 1, NULL, NULL, 'NOT_PICKED', 16),
@@ -524,7 +517,7 @@ VALUES
 (3, 13, 2, NULL, NULL, 'NOT_PICKED', 16),
 (3, 15, 1, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 4 - 5/11 CHIỀU (tripID = 4)
+-- Thứ 4 - 12/11 CHIỀU (tripID = 4) - 9 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (4, 1, NULL, NULL, NULL, 'NOT_PICKED', 16),
@@ -537,7 +530,7 @@ VALUES
 (4, 13, NULL, NULL, NULL, 'NOT_PICKED', 16),
 (4, 15, NULL, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 5 - 6/11 SÁNG (tripID = 5)
+-- Thứ 5 - 13/11 SÁNG (tripID = 5) - 7 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (5, 1, 1, NULL, NULL, 'NOT_PICKED', 16),
@@ -548,7 +541,7 @@ VALUES
 (5, 9, 2, NULL, NULL, 'NOT_PICKED', 16),
 (5, 11, 1, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 6 - 7/11 SÁNG (tripID = 6)
+-- Thứ 7 - 15/11 SÁNG (tripID = 6) - 10 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (6, 1, 1, NULL, NULL, 'NOT_PICKED', 16),
@@ -562,7 +555,7 @@ VALUES
 (6, 11, 1, NULL, NULL, 'NOT_PICKED', 16),
 (6, 13, 2, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 6 - 7/11 CHIỀU (tripID = 7)
+-- Thứ 7 - 15/11 CHIỀU (tripID = 7) - 9 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (7, 1, NULL, NULL, NULL, 'NOT_PICKED', 16),
@@ -575,7 +568,7 @@ VALUES
 (7, 11, NULL, NULL, NULL, 'NOT_PICKED', 16),
 (7, 13, NULL, NULL, NULL, 'NOT_PICKED', 16);
 
--- Thứ 7 - 8/11 SÁNG (tripID = 8)
+-- Thứ CN - 16/11 SÁNG (tripID = 8) - 10 HS
 INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
 VALUES
 (8, 1, 1, NULL, NULL, 'NOT_PICKED', 16),
@@ -588,35 +581,6 @@ VALUES
 (8, 9, 2, NULL, NULL, 'NOT_PICKED', 16),
 (8, 11, 1, NULL, NULL, 'NOT_PICKED', 16),
 (8, 12, 2, NULL, NULL, 'NOT_PICKED', 16);
-
--- Thứ 7 - 8/11 CHIỀU (tripID = 9)
-INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
-VALUES
-(9, 1, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 2, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 3, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 4, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 6, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 7, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 9, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 11, NULL, NULL, NULL, 'NOT_PICKED', 16),
-(9, 12, NULL, NULL, NULL, 'NOT_PICKED', 16);
-
--- CN - 9/11 SÁNG (tripID = 10) 
-INSERT INTO BoardingRecord (tripID, studentID, busStopID, pickupTime, dropoffTime, status, reportedBy)
-VALUES
-(10, 1, 1, NULL, NULL, 'NOT_PICKED', 16),  
-(10, 2, 1, NULL, NULL, 'NOT_PICKED', 16),
-(10, 3, 2, NULL, NULL, 'NOT_PICKED', 16),
-(10, 4, 1, NULL, NULL, 'NOT_PICKED', 16),
-(10, 5, 2, NULL, NULL, 'NOT_PICKED', 16),
-(10, 6, 1, NULL, NULL, 'NOT_PICKED', 16),  -- Vắng hôm nay
-(10, 7, 1, NULL, NULL, 'NOT_PICKED', 16),
-(10, 9, 2, NULL, NULL, 'NOT_PICKED', 16),
-(10, 11, 1, NULL, NULL, 'NOT_PICKED', 16),
-(10, 12, 2, NULL, NULL, 'NOT_PICKED', 16),
-(10, 13, 2, NULL, NULL, 'NOT_PICKED', 16),
-(10, 15, 1, '2025-11-09 06:47:00', NULL, 'NOT_PICKED', 16);
 
 /* 11) Device */
 INSERT INTO Device (busID, userID, deviceType, fcmToken)

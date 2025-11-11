@@ -80,13 +80,13 @@ export default function ParentNavbar() {
             <Settings size={18} /> Cài đặt
           </Link>
         </li>
+        <li>
+          <Link href="/logout" className={styles.logout}>
+            <LogOut size={20} />
+          </Link>
+        </li>
       </ul>
 
-      <div className={styles.logoutBtn}>
-        <button type="button" className={styles.logout}>
-          <LogOut size={20} />
-        </button>
-      </div>
     </nav>
   );
 }
