@@ -16,6 +16,7 @@ import cookieParser from "cookie-parser";
 
 import parentRoutes from './routes/parentRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
+import assignmentRoutes from './routes/assignmentRoutes.js';
 
 
 // TESTING:
@@ -56,6 +57,7 @@ app.use("/api/auth", authRoutes);
 
 app.use('/api/parents', parentRoutes);
 app.use('/api/drivers', driverRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 
 // Testing
@@ -111,7 +113,3 @@ httpServer.listen(PORT, () => {
     console.log(`\n🖥 Server + Socket: running at http://localhost:${PORT}`);
 })
 
-
-console.log('API đã đăng ký:');
-console.log('  GET /api/parents    → Danh sách phụ huynh');
-console.log('  GET /api/drivers    → Danh sách tài xế');

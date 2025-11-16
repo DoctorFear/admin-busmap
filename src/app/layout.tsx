@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Twilight Admin | Busmap',
+  title: 'Twilight | Busmap Assignment',
   description: 'A simple Next.js project with CSS Modules',
 };
 

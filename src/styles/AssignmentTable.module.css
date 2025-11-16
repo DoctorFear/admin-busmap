@@ -62,3 +62,65 @@
   color: #666;
   padding: 1rem;
 }
+
+
+.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.actionButtons {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.editBtn, .deleteBtn {
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.editBtn:hover {
+  background: #bfdbfe;
+}
+
+.deleteBtn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.deleteBtn:hover {
+  background: #fecaca;
+}
+
+
+/* styles/ParentDriverTable.module.css */
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
