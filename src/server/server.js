@@ -13,6 +13,9 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 
+import parentRoutes from './routes/parentRoutes.js';
+import driverRoutes from './routes/driverRoutes.js';
+
 // 2. Tạo object, ứng dụng Express, thực hiện route, middleware,..
 const app = express();
 app.use(cors({
@@ -44,6 +47,9 @@ app.use("/api/students", studentsRoutes)
 // 4.4 Add route API for routes (tuyến đường)
 app.use("/api/routes", routeRoutes)
 app.use("/api/auth", authRoutes);
+
+app.use('/api/parents', parentRoutes);
+app.use('/api/drivers', driverRoutes);
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)
 //    endpoint: GET - /api/students -> Lấy danh sách học sinh 
@@ -96,3 +102,6 @@ httpServer.listen(PORT, () => {
 })
 
 
+console.log('API đã đăng ký:');
+console.log('  GET /api/parents    → Danh sách phụ huynh');
+console.log('  GET /api/drivers    → Danh sách tài xế');

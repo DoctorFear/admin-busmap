@@ -27,7 +27,7 @@ src/server/
 │   ├── routeDetailModel.js
 │   └── tripModel.js
 ├── routes/
-│   ├── scheduleRoutes.js   // quản lý lịch trình 
+│   ├── scheduleRoutes.js   // quản lý lịch trình
 │   ├── busRoutes.js        // quản lý xe buýt
 │   ├── driverRoutes.js     // quản lý tài xế
 │   └── trackingRoutes.js   // theo dõi vị trí
@@ -36,8 +36,9 @@ src/server/
 ```
 
 - Operation of socket:
+
 ```
-Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent) 
+Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/Parent)
     |                           |                                    |
     | -- socket.connect() --->  |                                    |
     |                           |  (connection established)           |
@@ -56,7 +57,6 @@ Driver(Client)           Server(Node + Socket.IO)           OtherClients (Admin/
     | <--- optional ACK --------|                                    |
     |                           |                                    |
 ```
-
 
 ## UI
 
@@ -129,7 +129,6 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 
 ## INSTALL AND UTILS
 
-
 ### 1. Expresss: [Install express](https://www.npmjs.com/package/express), in path with contain package.json:
 
 `npm install express`
@@ -166,7 +165,9 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 - FE: 3000
 
 ---
+
 ---
+
 ---
 
 ## Documents of NextJS
