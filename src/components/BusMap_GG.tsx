@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { GoogleMap, Marker, Polyline, useJsApiLoader } from "@react-google-maps/api";
 
 const containerStyle = { width: "100%", height: "700px" };
-const center = { lat: 10.762622, lng: 106.660172 };
+// Center: SGU
+const center = { lat: 10.759983082120561, lng: 106.68225725256899 };
 const API_BASE = "http://localhost:8888";
 const NUMBER_TRACKING_ROUTES = 2; // Số tuyến theo dõi mặc định
 // Fix reload warning: libraries const should be stable

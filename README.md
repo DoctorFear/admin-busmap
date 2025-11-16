@@ -13,6 +13,22 @@ npm run server
 
 ---
 
+### New: Python + NodeJS
+
+&rarr; Phân cụm cho 500 địa chỉ
+&rarr; Tìm tuyến tối ưu cho từng cụm
+
+1. Install: (at path: busmap_admin/)
+
+1.1 Create ssb-optimizer_python (i have created)
+1.2 Go to: *busmap_admin/ssb-optimizer_python*, create virtual environment (venv), create venv_ssb (environment for python):
+
+- [Linux] `sudo apt install python3-full`
+- Create venv: venv_ssb: `python3 -m venv venv_ssb`
+- Activate venv_ssb: `source venv_ssb/bin/activate`
+  - Check: `echo "$VIRTUAL_ENV"` &rarr; */home/nii/Documents/Busmap_admin/ssb-optimizer_python/venv_ssb*
+- Install requirements for venv: `pip install -r requirements.txt`
+
 ### Structures
 
 ```

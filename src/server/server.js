@@ -13,6 +13,9 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 
+// TESTING:
+import routePythonService from "./routes/routePythonService.js"
+
 // 2. Tạo object, ứng dụng Express, thực hiện route, middleware,..
 const app = express();
 app.use(cors({
@@ -44,6 +47,9 @@ app.use("/api/students", studentsRoutes)
 // 4.4 Add route API for routes (tuyến đường)
 app.use("/api/routes", routeRoutes)
 app.use("/api/auth", authRoutes);
+
+// Testing
+app.use("/test-python", routePythonService);
 
 // 5. route: là đuòng dẫn API (e.g: /api/students), mỗi route gắn vơi một HTTP method (GET, POST, PUT, PATCH DELETE)
 //    endpoint: GET - /api/students -> Lấy danh sách học sinh 
