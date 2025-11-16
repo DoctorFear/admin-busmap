@@ -54,3 +54,44 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, .15);
     border: 1px solid rgb(233, 191, 141);
 }
+
+
+.currentPageInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currentPageInput {
+  width: 80px;
+  height: 48px;
+  background-color: #212222;
+  color: #ffffff;
+  border: 1px solid rgb(233, 191, 141);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  outline: none;
+  padding: 0 1.5rem;
+}
+
+.currentPageInput::placeholder {
+  color: #ffffff;
+}
+
+.currentPageInput:focus {
+  outline: 2px solid #edbe80;
+  outline-offset: 2px;
+}
+
+.totalPages {
+  position: absolute;
+  right: 12px;
+  color: #999;
+  font-size: 0.9rem;
+  pointer-events: none;
+  font-weight: 500;
+}
+
+

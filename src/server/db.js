@@ -3,9 +3,12 @@
 import mysql from 'mysql2';
 
 // const SQL_DATABASE_NAME = 'SchoolBusManagement';
+
 const SQL_DATABASE_NAME = 'SchoolBusManagement_VFinal';
 const SQL_USER = 'root';
 const SQL_PASSWORD = '';
+
+
 
 const db = mysql.createConnection({
     host: 'localhost',

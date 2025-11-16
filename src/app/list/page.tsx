@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import ParentDriverForm from '@/components/ParentDriverForm';
 import ParentDriverTable from '@/components/ParentDriverTable';
 import ParentDriverToggle from '@/components/ParentDriverToggle';
-import PaginationControl from '@/components/PaginationControl';
+import PaginationControlSimple from '@/components/PaginationControlSimple'; // ← Component mới chỉ 3 nút
 import Notification from '@/components/Notification';
 import SearchBar from '@/components/SearchBar';
 import styles from './page.module.css';
@@ -94,7 +94,6 @@ export default function ListPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // CREATE & UPDATE
   const handleSave = async (formData: any, isEditing: boolean) => {
     const endpoint = type === 'parent' ? '/api/parents' : '/api/drivers';
     const method = isEditing ? 'PUT' : 'POST';
@@ -123,7 +122,6 @@ export default function ListPage() {
     }
   };
 
-  // DELETE
   const handleDelete = async (id: number) => {
     if (!confirm('Xóa vĩnh viễn người này? Không thể khôi phục!')) return;
 
@@ -144,12 +142,15 @@ export default function ListPage() {
   return (
     <div className={styles.container}>
       {notification && (
-        <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
       )}
 
       <ParentDriverToggle selected={type} onToggle={setType} />
 
-      {/* FORM */}
       <ParentDriverForm
         type={type}
         editingItem={editingItem}
@@ -168,33 +169,37 @@ export default function ListPage() {
         <div className={styles.loading}>Đang tải...</div>
       ) : filteredData.length === 0 ? (
         <p style={{ textAlign: 'center', margin: '2rem 0', color: '#666' }}>
-          {searchTerm ? 'Không tìm thấy' : `Chưa có ${type === 'parent' ? 'phụ huynh' : 'tài xế'}`}
+          {searchTerm ? 'Không tìm thấy kết quả nào' : `Chưa có ${type === 'parent' ? 'phụ huynh' : 'tài xế'} nào`}
         </p>
       ) : (
         <>
-        <div className={styles.abc}>
+          <div className={styles.abc}>
+            <ParentDriverTable
+              data={paginatedData}
+              type={type}
+              showPassword={showPassword}
+              onTogglePassword={togglePassword}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
 
-          <ParentDriverTable
-            data={paginatedData}
-            type={type}
-            showPassword={showPassword}
-            onTogglePassword={togglePassword}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
-
+          {/* CHỈ 3 NÚT - ĐÚNG YÊU CẦU */}
           {totalPages > 1 && (
-            <PaginationControl currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            <PaginationControlSimple
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
-        </>
-        
-      )}
 
-      {!loading && filteredData.length > 0 && (
-        <div className={styles.summary}>
-          Hiển thị {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length)} / {filteredData.length}
-        </div>
+          {/* Thông tin tổng quát (tùy chọn) */}
+          <div className={styles.summary}>
+            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • 
+            Hiển thị {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length ) }  • 
+            Trong tổng số <strong>{filteredData.length}</strong> dữ liệu.
+          </div>
+        </>
       )}
     </div>
   );
