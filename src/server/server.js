@@ -13,6 +13,11 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 
+
+import parentRoutes from './routes/parentRoutes.js';
+import driverRoutes from './routes/driverRoutes.js';
+
+
 // TESTING:
 import routePythonService from "./routes/routePythonService.js"
 
@@ -47,6 +52,11 @@ app.use("/api/students", studentsRoutes)
 // 4.4 Add route API for routes (tuyến đường)
 app.use("/api/routes", routeRoutes)
 app.use("/api/auth", authRoutes);
+
+
+app.use('/api/parents', parentRoutes);
+app.use('/api/drivers', driverRoutes);
+
 
 // Testing
 app.use("/test-python", routePythonService);
@@ -102,3 +112,6 @@ httpServer.listen(PORT, () => {
 })
 
 
+console.log('API đã đăng ký:');
+console.log('  GET /api/parents    → Danh sách phụ huynh');
+console.log('  GET /api/drivers    → Danh sách tài xế');
