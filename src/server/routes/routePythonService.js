@@ -1,12 +1,12 @@
 // src/server/routes/routePythonService.js
 import express from "express";
-import { getTestPython } from "../controllers/testPythonController.js";
+import { sendListBusStopLatLngToPython } from "../controllers/testPythonController.js";
 
 const router = express.Router();
 
 // Call python service to get data
 // GET /test-python
-router.get("/", getTestPython);
+router.get("/", sendListBusStopLatLngToPython);
 
 
 export default router;
