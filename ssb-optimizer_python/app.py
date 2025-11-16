@@ -1,8 +1,14 @@
 # testing python service
 from flask import Flask, request, jsonify
 from cluster import cluster_busStop
+from tsp import solve_tsp_for_clusters
 import traceback
+
 PYTHON_SERVICE_PORT = 5111
+# const center = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
+SGU_LAT = 10.759983082120561
+SGU_LNG = 106.68225725256899
+
 
 app = Flask(__name__)
 
@@ -22,12 +28,26 @@ def optimize():
         print(f"--> Python nhận được {len(data)} bus stops")
 
         # Clustering: run model to clustering ~500 location to ~10 cluster (K-means)
-        result = cluster_busStop(data)
-        
-        if not result.get("success", False):
-            return jsonify(result), 500
+        clustering_result = cluster_busStop(data)
+        print(f"\n\n->_<- Clustering result:\n\n", clustering_result["clusters"])
 
-        return jsonify(result)
+
+        # ----------------------------------------------------
+        sgu_location = {"lat": SGU_LAT, "lng": SGU_LNG}
+        clusters = clustering_result["clusters"]
+        # Optimize
+        optimized_routes = solve_tsp_for_clusters(clusters=clusters, sgu_location=sgu_location)
+        # ----------------------------------------------------
+
+        print(f"\n\n->_<- Route result after optimized:\n\n", optimized_routes)
+        
+        if not optimized_routes.get("success", False):
+            return jsonify(optimized_routes), 500
+
+        return jsonify({
+            "success": True,
+            "optimizedRoutes": optimized_routes
+        })
         
     except Exception as e:
         print(f"!!! Lỗi trong optimize endpoint: {str(e)}")

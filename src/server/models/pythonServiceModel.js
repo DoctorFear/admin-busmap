@@ -4,7 +4,7 @@ import db from "../db.js"
 export const getBusStopAllLatLng = () => {
     return new Promise((resolve, reject) => {
         const sql = `
-            SELECT busStopID, parentID, lat, lng 
+            SELECT busStopID, parentID, routeID, lat, lng, sequence 
             FROM BusStop
             WHERE lat IS NOT NULL AND lng IS NOT NULL
         `;
@@ -15,6 +15,8 @@ export const getBusStopAllLatLng = () => {
             const res = results.map(row => ({
                 busStopID: row.busStopID,
                 parentID: row.parentID,
+                routeID: row.routeID,
+                sequence: row.sequence,
                 lat: parseFloat(row.lat),
                 lng: parseFloat(row.lng)
             }));
