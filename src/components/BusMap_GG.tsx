@@ -1,148 +1,327 @@
 // Client component: hiển thị Google Map + tuyến, điểm đón và icon bus
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { GoogleMap, Marker, Polyline, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+// import { Polyline } from "@react-google-maps/api"; // COMMENT: Tạm thời không dùng khi chưa vẽ route
 
-const containerStyle = { width: "100%", height: "700px" };
-// Center: SGU
-const center = { lat: 10.759983082120561, lng: 106.68225725256899 };
-const API_BASE = "http://localhost:8888";
-const NUMBER_TRACKING_ROUTES = 2; // Số tuyến theo dõi mặc định
-// Fix reload warning: libraries const should be stable
-const MAP_LIBRARIES: ("places")[] = ["places"];
 
+const API_BASE = "http://localhost:8888"; // API base URL
+const API_OPTIMIZER_CLUSTER_ROUTE = "http://localhost:5111"; // API optimizer cluster route URL
+const NUMBER_TRACKING_ROUTES = 2; // Number of tracking routes by default
+const MAP_LIBRARIES: ("places")[] = ["places"]; // Fix reload warning: libraries const should be stable
+const containerStyle = { width: "100%", height: "700px" };  // Map container style
+const center = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
+
+// Mảng màu cho các cluster (mỗi cụm một màu riêng biệt cho markers)
+const ROUTE_COLORS = [
+  "#f44336", // Đỏ
+  "#2196f3", // Xanh dương
+  "#4caf50", // Xanh lá
+  "#ff9800", // Cam
+  "#9c27b0", // Tím
+  "#00bcd4", // Cyan
+  "#ff5722", // Đỏ cam
+  "#795548", // Nâu
+  "#607d8b", // Xanh xám
+  "#e91e63", // Hồng
+];
+
+
+// Type định nghĩa cho Route (tuyến đường)
 type Route = { routeID: number; routeName: string; estimatedTime?: number | null };
+// Type định nghĩa cho Stop (điểm dừng)
 type Stop = { lat: number; lng: number; name: string; sequence: number };
+// Type cho dữ liệu cluster từ Python service
+type ClusterBusStop = { busStopID: number; lat: number; lng: number; parentID: number };
+
 
 export default function BusMap_GG({ buses }: { buses: any[] }) {
-  // State: danh sách tuyến, tuyến được chọn, danh sách điểm dừng của từng tuyến,
-  // và polyline đã vẽ theo đường (Directions)
+  // State: danh sách tuyến/cụm, tuyến được chọn, danh sách điểm dừng của từng cụm
   const [routes, setRoutes] = useState<Route[]>([]);
   const [selectedRouteIds, setSelectedRouteIds] = useState<number[]>([]);
   const [routeStops, setRouteStops] = useState<Record<number, Stop[]>>({});
-  const [directionsPaths, setDirectionsPaths] = useState<Record<number, { lat: number; lng: number }[]>>({});
+  
+  // VẼ ROUTE ĐƯỜNG ĐI
+  // const [directionsPaths, setDirectionsPaths] = useState<Record<number, { lat: number; lng: number }[]>>({});
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GG_MAPS_KEY as string,
     libraries: MAP_LIBRARIES,
   });
 
-  // 1) Lấy danh sách tuyến từ backend (chỉ chạy một lần)
+  // ====================================================================
+  // [1] LẤY DỮ LIỆU PHÂN CỤM TỪ PYTHON SERVICE VÀ CONVERT THÀNH ROUTES/STOPS
+  // ====================================================================
+  // Flow: Gọi NodeJS endpoint (/test-python) → NodeJS gọi Python service → Nhận clusters → Convert thành routes/stops
   useEffect(() => {
-    console.log("[1] Fetching routes from API ...");
-    fetch(`${API_BASE}/api/routes`)
-      .then((r) => r.json())
-      .then((data: Route[]) => {
-        console.log("[1] Fetch routes success:", data);
-        setRoutes(data);
+    console.log("[1] Đang fetch dữ liệu phân cụm từ Python service...");
+    
+    // Gọi endpoint NodeJS, NodeJS sẽ gọi Python service thay cho frontend
+    fetch(`${API_BASE}/test-python`)
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error(`HTTP error! status: ${r.status}`);
+        }
+        return r.json();
       })
-      .catch((e) => console.error("[1] Fetch routes failed:", e));
+      .then((res: any) => {
+        console.log("[1] Raw response từ server:", res);
+        
+        // Kiểm tra response có thành công không
+        if (!res.ok) {
+          console.error("[1] !X! Lỗi từ server:", res.error);
+          return;
+        }
+
+        // Lấy dữ liệu từ Python service (cấu trúc: {ok: true, pythonResponse: {...}})
+        const pythonResponse = res.pythonResponse;
+        
+        // Kiểm tra Python service có trả về success không
+        if (!pythonResponse || !pythonResponse.success) {
+          console.error("[1] !X! Python service trả về lỗi:", pythonResponse?.error);
+          console.error("[1] Full pythonResponse:", pythonResponse);
+          return;
+        }
+
+        // Lấy clusters dictionary từ Python service
+        // Format: { "0": [busStop1, busStop2, ...], "1": [...], ... }
+        const clusters = pythonResponse.clusters || {};
+        const stats = pythonResponse.stats || {};
+        
+        console.log("[1] ->_<- Nhận được clusters từ Python:", {
+          total_clusters: stats.total_clusters,
+          total_bus_stops: stats.total_bus_stops,
+          cluster_sizes: stats.cluster_sizes,
+          cluster_keys: Object.keys(clusters)
+        });
+
+        // ============================================================
+        // CONVERT CLUSTERS THÀNH ROUTES VÀ ROUTESTOPS
+        // ============================================================
+        // Mỗi cluster (key là string "0", "1", "2"...) sẽ trở thành một route
+        const routesList: Route[] = [];
+        const stopsMap: Record<number, Stop[]> = {};
+
+        // Duyệt qua từng cluster
+        Object.keys(clusters).forEach((clusterKey) => {
+          const clusterId = parseInt(clusterKey); // Convert "0" → 0, "1" → 1, ...
+          
+          // Validate clusterId
+          if (isNaN(clusterId)) {
+            console.warn(`[1] -_- Bỏ qua cluster key không hợp lệ: ${clusterKey}`);
+            return;
+          }
+          
+          const busStops: ClusterBusStop[] = clusters[clusterKey] || [];
+
+          if (busStops.length === 0) {
+            console.warn(`[1] -_- Cluster ${clusterId} rỗng, bỏ qua`);
+            return;
+          }
+
+          // Tạo route object cho cluster này
+          routesList.push({
+            routeID: clusterId,
+            routeName: `Tuyến ${clusterId + 1} (${busStops.length} điểm đón)`, // Tên tuyến: "Tuyến 1 (10 điểm đón)"
+          });
+
+          // Convert các bus stops trong cluster thành Stop[] với sequence
+          // Sequence = thứ tự trong cluster (1, 2, 3, ...)
+          // VALIDATE: Chỉ lấy stops có lat/lng hợp lệ (là số và không phải NaN)
+          const stops: Stop[] = busStops
+            .map((busStop, idx) => {
+              const lat = Number(busStop.lat);
+              const lng = Number(busStop.lng);
+              
+              // Validate lat/lng
+              if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                console.warn(`[1] -_- Bỏ qua bus stop có tọa độ không hợp lệ:`, busStop);
+                return null;
+              }
+              
+              return {
+                lat,
+                lng,
+                name: `Điểm đón ${idx + 1}`, // Tên điểm dừng
+                sequence: idx + 1, // Thứ tự trong tuyến (bắt đầu từ 1)
+              };
+            })
+            .filter((stop): stop is Stop => stop !== null); // Loại bỏ null
+
+          // Chỉ lưu stops nếu có ít nhất 1 điểm hợp lệ
+          if (stops.length > 0) {
+            stopsMap[clusterId] = stops;
+          } else {
+            console.warn(`[1] -_- Cluster ${clusterId} không có stops hợp lệ nào`);
+          }
+        });
+
+        // Sắp xếp routes theo routeID để hiển thị đẹp
+        routesList.sort((a, b) => a.routeID - b.routeID);
+
+        console.log("[1] ->_<- Đã convert thành công:", {
+          total_routes: routesList.length,
+          total_stops: Object.values(stopsMap).reduce((sum, stops) => sum + stops.length, 0),
+          routes: routesList.map(r => ({ id: r.routeID, name: r.routeName, stops: stopsMap[r.routeID]?.length || 0 }))
+        });
+
+        // Cập nhật state
+        setRoutes(routesList);
+        setRouteStops(stopsMap); // Lưu tất cả stops của tất cả routes vào state
+      })
+      .catch((e) => {
+        console.error("[1] !X! Lỗi khi fetch clusters:", e);
+        console.error("[1] Error details:", {
+          message: e.message,
+          stack: e.stack
+        });
+      });
   }, []);
 
-  // 2) Tự chọn NUMBER_TRACKING_ROUTES tuyến đầu để theo dõi khi đã có dữ liệu
+  // ====================================================================
+  // [2] TỰ ĐỘNG CHỌN MỘT SỐ TUYẾN ĐỂ HIỂN THỊ MẶC ĐỊNH
+  // ====================================================================
+  // Khi có routes, tự động chọn NUMBER_TRACKING_ROUTES tuyến đầu tiên để hiển thị
   useEffect(() => {
     if (routes.length > 0 && selectedRouteIds.length === 0) {
+      // Chọn NUMBER_TRACKING_ROUTES tuyến đầu tiên (mặc định là 2)
       const initial = routes.slice(0, NUMBER_TRACKING_ROUTES).map((r) => r.routeID);
       setSelectedRouteIds(initial);
-      console.log("[2] Auto-selected route IDs:", initial);
+      console.log("[2] ->_<- Đã tự động chọn các tuyến để hiển thị:", initial);
     }
   }, [routes, selectedRouteIds.length]);
 
-  // 3) Khi có tuyến được chọn: gọi API lấy BusStop cho tuyến đó
+
+  // ====================================================================
+  // [4] COMMENT: TẠM THỜI KHÔNG DÙNG - TẠO ĐƯỜNG ĐI (POLYLINE) THEO ĐƯỜNG PHỐ
+  // ====================================================================
+  // Phần này sẽ được dùng khi cần vẽ route đường đi giữa các điểm dừng
+  // Sử dụng Google DirectionsService để vẽ đường đi thực tế theo đường phố
+  // (không phải đường thẳng giữa các điểm)
+  /*
   useEffect(() => {
-    console.log("[3] Selected route IDs:", selectedRouteIds);
-    const missing = selectedRouteIds.filter((id) => !routeStops[id]);
-    if (missing.length === 0) return;
-    console.log("[3] Need to load stops for route IDs:", missing);
-
-    missing.forEach((id) => {
-      fetch(`${API_BASE}/api/routes/${id}/stops`)
-        .then((r) => r.json())
-        .then((stops: any[]) => {
-          // Chuẩn hoá: ép Number và loại bỏ toạ độ không hợp lệ (tránh InvalidValueError)
-          const normalized: Stop[] = (stops || [])
-            .map((s) => ({
-              lat: s.lat !== null && s.lat !== undefined ? Number(s.lat) : NaN,
-              lng: s.lng !== null && s.lng !== undefined ? Number(s.lng) : NaN,
-              name: s.name,
-              sequence: s.sequence,
-            }))
-            .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng))
-            .sort((a, b) => a.sequence - b.sequence);
-
-          setRouteStops((prev) => ({ ...prev, [id]: normalized }));
-          console.log(`[3] Loaded ${normalized.length} valid stops for route ${id}`);
-        })
-        .catch((e) => console.error(`[3] Fetch stops failed for route ${id}:`, e));
-    });
-  }, [selectedRouteIds, routeStops]);
-
-  // 4) Dùng DirectionsService để vẽ polyline theo đường phố giữa các điểm dừng
-  useEffect(() => {
+    // Chờ Google Maps API load xong
     if (!isLoaded) return;
+    
     const g = google as any;
     const service = new g.maps.DirectionsService();
 
+    // Tìm các route cần build Directions (chưa có trong directionsPaths và có ít nhất 2 stops)
     const idsToBuild = selectedRouteIds.filter(
       (id) => !directionsPaths[id] && (routeStops[id]?.length || 0) >= 2
     );
+    
     if (idsToBuild.length === 0) return;
-    console.log("[4] Building Directions for route IDs:", idsToBuild);
+    
+    console.log("[4] Đang tạo đường đi (Directions) cho các tuyến:", idsToBuild);
 
+    // Duyệt qua từng route cần build Directions
     idsToBuild.forEach((id) => {
       const stops = routeStops[id]!;
-      const origin = { lat: stops[0].lat, lng: stops[0].lng };
-      const destination = { lat: stops[stops.length - 1].lat, lng: stops[stops.length - 1].lng };
+      
+      // VALIDATE: Filter chỉ lấy stops có lat/lng hợp lệ
+      const validStops = stops.filter((s) => {
+        const lat = Number(s.lat);
+        const lng = Number(s.lng);
+        return Number.isFinite(lat) && Number.isFinite(lng);
+      });
+      
+      if (validStops.length < 2) {
+        console.warn(`[4] -_- Tuyến ${id} không đủ stops hợp lệ để tạo Directions`);
+        return;
+      }
+      
+      // Origin: điểm đầu tiên
+      const origin = { lat: Number(validStops[0].lat), lng: Number(validStops[0].lng) };
+      // Destination: điểm cuối cùng
+      const destination = { lat: Number(validStops[validStops.length - 1].lat), lng: Number(validStops[validStops.length - 1].lng) };
+      // Waypoints: các điểm giữa (nếu có nhiều hơn 2 điểm)
       const waypoints =
-        stops.length > 2
-          ? stops.slice(1, -1).map((s) => ({ location: { lat: s.lat, lng: s.lng }, stopover: true }))
+        validStops.length > 2
+          ? validStops.slice(1, -1).map((s) => ({ 
+              location: { lat: Number(s.lat), lng: Number(s.lng) }, 
+              stopover: true 
+            }))
           : [];
 
+      // Gọi DirectionsService để lấy đường đi
       service.route(
         {
           origin,
           destination,
           waypoints,
-          travelMode: g.maps.TravelMode.DRIVING,
-          optimizeWaypoints: false,
+          travelMode: g.maps.TravelMode.DRIVING, // Chế độ lái xe
+          optimizeWaypoints: false, // Không tối ưu thứ tự waypoints (giữ nguyên thứ tự trong cluster)
         },
         (result: any, status: string) => {
           if (status === "OK" && result?.routes?.[0]?.overview_path) {
+            // Thành công: lấy path từ Directions
             const path = result.routes[0].overview_path.map((p: any) => ({
               lat: p.lat(),
               lng: p.lng(),
             }));
             setDirectionsPaths((prev) => ({ ...prev, [id]: path }));
-            console.log(`[4] Directions OK for route ${id}, points:`, path.length);
+            console.log(`[4] ->_<- Directions OK cho tuyến ${id}, số điểm:`, path.length);
           } else {
-            // Fallback: không gọi được Directions → nối thẳng giữa các điểm dừng
-            const path = stops.map((s) => ({ lat: s.lat, lng: s.lng }));
+            // Fallback: nếu DirectionsService fail → nối thẳng giữa các điểm dừng
+            const path = validStops.map((s) => ({ lat: Number(s.lat), lng: Number(s.lng) }));
             setDirectionsPaths((prev) => ({ ...prev, [id]: path }));
-            console.warn("DirectionsService fallback for route", id, status, result);
+            console.warn(`[4] -_- DirectionsService fallback cho tuyến ${id}, status:`, status);
           }
         }
       );
     });
   }, [isLoaded, selectedRouteIds, routeStops, directionsPaths]);
+  */
 
+  // ====================================================================
+  // [5] COMMENT: TẠM THỜI KHÔNG DÙNG - TẠO POLYLINES CHO CÁC TUYẾN
+  // ====================================================================
+  // Phần này sẽ được dùng khi cần vẽ đường đi giữa các điểm dừng
+  // Mỗi cluster (route) sẽ có một màu riêng biệt cho polyline
+  /*
   const polylines = useMemo(() => {
-    // 5) Tạo polyline cho mỗi tuyến (ưu tiên path từ Directions)
+    // Tạo polyline cho mỗi tuyến được chọn
     const out = selectedRouteIds
       .map((id, idx) => {
-        const path =
-          directionsPaths[id] && directionsPaths[id]!.length >= 2
-            ? directionsPaths[id]!
-            : (routeStops[id] || []).map((s) => ({ lat: s.lat, lng: s.lng }));
-        if (!path || path.length < 2) return null;
-        // Choose a color per route
-        const colors = ["#f44336", "#2196f3", "#4caf50", "#ff9800", "#9c27b0"];
-        const color = colors[idx % colors.length];
+        // Ưu tiên dùng path từ Directions (đường phố thực tế)
+        // Nếu chưa có Directions → dùng path thẳng nối các điểm
+        let path: { lat: number; lng: number }[] | null = null;
+        
+        if (directionsPaths[id] && directionsPaths[id]!.length >= 2) {
+          // Dùng path từ Directions (đã validate rồi)
+          path = directionsPaths[id]!;
+        } else {
+          // Dùng stops trực tiếp (cần validate)
+          const stops = routeStops[id] || [];
+          const validStops = stops.filter((s) => {
+            const lat = Number(s.lat);
+            const lng = Number(s.lng);
+            return Number.isFinite(lat) && Number.isFinite(lng);
+          });
+          
+          if (validStops.length >= 2) {
+            path = validStops.map((s) => ({ lat: Number(s.lat), lng: Number(s.lng) }));
+          }
+        }
+        
+        // Bỏ qua nếu path không hợp lệ (< 2 điểm)
+        if (!path || path.length < 2) {
+          console.warn(`[5] -_- Tuyến ${id} không có path hợp lệ để vẽ polyline`);
+          return null;
+        }
+        
+        // Gán màu cho tuyến này (mỗi tuyến có màu riêng, dùng ROUTE_COLORS chung)
+        const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
+        
         return { id, path, color };
       })
       .filter(Boolean) as { id: number; path: { lat: number; lng: number }[]; color: string }[];
-    console.log("[5] Polylines recomputed:", out.length);
+    
+    console.log("[5] ->_<- Đã tạo polylines cho", out.length, "tuyến");
     return out;
   }, [selectedRouteIds, routeStops, directionsPaths]);
+  */
 
   const toggleRoute = (id: number) => {
     setSelectedRouteIds((prev) =>
@@ -157,71 +336,119 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
   return (
     <div style={{ position: "relative" }}>
       <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={13}>
-        {/* 6) Các marker xe buýt realtime (nếu có) */}
-        {(console.log("[6] Bus markers count:", buses?.length ?? 0), null)}
-        {buses.map((bus) => (
-          <Marker
-            key={bus.id}
-            position={{ lat: bus.lat, lng: bus.lng }}
-            label={bus.busNumber}
-          />
-        ))}
+        {/* ============================================================ */}
+        {/* [6] HIỂN THỊ MARKER XE BUÝT REALTIME (NẾU CÓ) */}
+        {/* ============================================================ */}
+        {/* Các marker này hiển thị vị trí realtime của các xe buýt */}
+        {(console.log("[6] Số lượng marker xe buýt:", buses?.length ?? 0), null)}
+        {buses
+          ?.filter((bus) => {
+            // VALIDATE: Chỉ render bus có lat/lng hợp lệ
+            const lat = Number(bus.lat);
+            const lng = Number(bus.lng);
+            const isValid = Number.isFinite(lat) && Number.isFinite(lng);
+            if (!isValid) {
+              console.warn("[6] -_- Bỏ qua bus có tọa độ không hợp lệ:", bus);
+            }
+            return isValid;
+          })
+          .map((bus) => {
+            const lat = Number(bus.lat);
+            const lng = Number(bus.lng);
+            return (
+              <Marker
+                key={bus.id || `${lat}-${lng}`}
+                position={{ lat, lng }}
+                label={bus.busNumber || ""}
+              />
+            );
+          })}
 
-        {/* 7) Vẽ polyline cho từng tuyến được chọn */}
-        {(console.log("[7] Rendering polylines:", polylines.length), null)}
+        {/* ============================================================ */}
+        {/* [7] COMMENT: TẠM THỜI KHÔNG DÙNG - VẼ POLYLINE (ĐƯỜNG ĐI) CHO MỖI TUYẾN/CỤM */}
+        {/* ============================================================ */}
+        {/* Phần này sẽ được dùng khi cần vẽ đường đi giữa các điểm dừng */}
+        {/* Mỗi cluster được vẽ bằng một polyline với màu riêng biệt */}
+        {/* 
+        {(console.log("[7] Đang render", polylines.length, "polylines"), null)}
         {polylines.map((pl) => (
           <Polyline
             key={pl.id}
             path={pl.path}
             options={{
-              strokeColor: pl.color,
-              strokeOpacity: 0.9,
-              strokeWeight: 4,
+              strokeColor: pl.color, // Màu riêng cho mỗi cluster
+              strokeOpacity: 0.9, // Độ trong suốt
+              strokeWeight: 4, // Độ dày đường
             }}
           />
         ))}
-      {/* 8) Hiển thị điểm đón (marker tròn + số thứ tự) và icon xe bus tại điểm đầu tuyến */}
-      {(console.log("[8] Rendering stop layers for route IDs:", selectedRouteIds), null)}
-      {selectedRouteIds.map((routeId, idx) => {
-        const stops = routeStops[routeId] || [];
-        if (stops.length === 0) return null;
-        const colors = ["#f44336", "#2196f3", "#4caf50", "#ff9800", "#9c27b0"];
-        const color = colors[idx % colors.length];
-        const first = stops[0];
+        */}
 
-        return (
-          <div key={`layer-${routeId}`}>
-            {/* Bus icon at first stop */}
-            <Marker
-              position={{ lat: first.lat, lng: first.lng }}
-              icon={{
-                url: "/bus.png",
-                scaledSize: new google.maps.Size(32, 32),
-              }}
-            />
-            {/* Pickup points for this route */}
-            {stops.map((s) => (
-              <Marker
-                key={`${routeId}-${s.sequence}`}
-                position={{ lat: s.lat, lng: s.lng }}
-                label={{
-                  text: String(s.sequence),
-                  color: "#111",
-                  fontSize: "12px",
-                }}
-                icon={{
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 6,
-                  fillColor: color,
-                  fillOpacity: 1,
-                  strokeColor: "#ffffff",
-                  strokeWeight: 2,
-                }}
-              />
-            ))}
-          </div>
-        );
-      })}
+        {/* ============================================================ */}
+        {/* [8] HIỂN THỊ ĐIỂM ĐÓN (MARKER) CHO MỖI CỤM */}
+        {/* ============================================================ */}
+        {/* Mỗi cluster hiển thị:
+            - Các marker tròn với số thứ tự cho mỗi điểm đón
+            - Mỗi cụm có màu riêng biệt để dễ phân biệt */}
+        {(console.log("[8] Đang render điểm đón cho", selectedRouteIds.length, "cụm"), null)}
+        {selectedRouteIds.map((routeId, idx) => {
+          const stops = routeStops[routeId] || [];
+          
+          // VALIDATE: Bỏ qua nếu không có stops hoặc stops không hợp lệ
+          if (!stops || stops.length === 0) {
+            console.warn(`[8] -_- Cụm ${routeId} không có stops hợp lệ`);
+            return null;
+          }
+          
+          // VALIDATE: Filter chỉ lấy stops có lat/lng hợp lệ
+          const validStops = stops.filter((s) => {
+            const lat = Number(s.lat);
+            const lng = Number(s.lng);
+            const isValid = Number.isFinite(lat) && Number.isFinite(lng);
+            if (!isValid) {
+              console.warn(`[8] -_- Bỏ qua stop có tọa độ không hợp lệ:`, s);
+            }
+            return isValid;
+          });
+          
+          if (validStops.length === 0) {
+            console.warn(`[8] -_- Cụm ${routeId} không có stops hợp lệ nào sau khi filter`);
+            return null;
+          }
+          
+          // Màu cho cluster này (mỗi cụm có màu riêng biệt)
+          const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
+
+          return (
+            <div key={`layer-${routeId}`}>
+              {/* Các điểm đón (pickup points) - marker tròn với số thứ tự */}
+              {/* Mỗi điểm đón được đánh dấu bằng marker tròn với màu của cụm */}
+              {validStops.map((s) => {
+                const lat = Number(s.lat);
+                const lng = Number(s.lng);
+                return (
+                  <Marker
+                    key={`${routeId}-${s.sequence}`}
+                    position={{ lat, lng }}
+                    label={{
+                      text: String(s.sequence), // Hiển thị số thứ tự (1, 2, 3, ...)
+                      color: "#111",
+                      fontSize: "12px",
+                    }}
+                    icon={{
+                      path: google.maps.SymbolPath.CIRCLE, // Marker hình tròn
+                      scale: 8, // Kích thước marker (tăng lên để dễ nhìn hơn)
+                      fillColor: color, // Màu fill theo cụm (mỗi cụm một màu)
+                      fillOpacity: 1,
+                      strokeColor: "#ffffff", // Viền trắng
+                      strokeWeight: 2,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
       </GoogleMap>
 
       {/* 

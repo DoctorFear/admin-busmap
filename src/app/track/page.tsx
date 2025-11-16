@@ -11,7 +11,8 @@ const PORT_SERVER = 8888;
 import { useState, useEffect } from 'react';
 // import BusMap from '@/components/BusMap';
 import BusInfoPanel from '@/components/BusInfoPanel';
-import { mockBuses, Bus } from '@/lib/data_buses';
+// import { mockBuses, Bus } from '@/lib/data_buses';
+import { Bus } from '@/lib/data_buses';
 import styles from './page.module.css';
 // Add socket.io-client for client
 import { io } from 'socket.io-client';
@@ -33,7 +34,9 @@ import BusMap_GG from '@/components/BusMap_GG';
 */
 
 export default function TrackPage() {
-  const [buses, setBuses] = useState<Bus[]>(mockBuses);
+  // Fetch buses from API not use mockBuses
+  
+  const [buses, setBuses] = useState<Bus[]>([]);
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
 
   // --- 1. Lắng nghe event custom (từ socket gửi ra) ---
