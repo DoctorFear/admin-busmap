@@ -2,7 +2,6 @@ import math
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 
 
-
 # --------------HAVERSINE DISTANCE FORMULA------------
 """      
 
@@ -88,16 +87,22 @@ def solve_tsp(distance_matrix):
 def solve_tsp_for_clusters(clusters, sgu_location):
     optimized = {}
     
+    print("\n--> Bắt đầu tối ưu tuyến cho từng cụm...\n")
+
     for cluster_id, stops in clusters.items():
+        print(f"\n-->{cluster_id}<-- Tối ưu cụm ---\n")
         # 1. Thêm sgu_location vào đầu danh sách
         stops_with_sgu = [sgu_location] + stops
+        print("--> Đã thêm SGU vào cụm.")
 
         # 2. Create distance matrix
         dist_matrix = build_distance_matrix(stops_with_sgu)
-        
+        print(f"--> Tạo distance matrix cho cụm.")
+
         # 3. Optimize <-- OR-Tools 
         route_order = solve_tsp(dist_matrix) # [0, 2, 5, 1, 4, 3, 0]
-
+        print(f"--> Đã tối ưu tuyến cho cụm: {route_order}")
+        
         # 4. Convert route index -> busStops
         ordered_stops = []
         for node_index in route_order:
@@ -109,5 +114,6 @@ def solve_tsp_for_clusters(clusters, sgu_location):
         # Save the ré and return 
         # mỗi cụm, các location được ordered vị trí lại
         optimized[cluster_id] = ordered_stops
+        print(f"--> Đã lưu kết quả tối ưu cho cụm.")
 
     return optimized

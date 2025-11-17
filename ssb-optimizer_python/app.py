@@ -27,7 +27,7 @@ def optimize():
         
         print(f"--> Python nhận được {len(data)} bus stops")
 
-        # Clustering: run model to clustering ~500 location to ~10 cluster (K-means)
+        # 2. Clustering: run model to clustering ~500 location to ~10 cluster (K-means)
         clustering_result = cluster_busStop(data)
         print(f"\n\n->_<- Clustering result:\n\n", clustering_result["clusters"])
 
@@ -41,13 +41,11 @@ def optimize():
 
         print(f"\n\n->_<- Route result after optimized:\n\n", optimized_routes)
         
-        if not optimized_routes.get("success", False):
-            return jsonify(optimized_routes), 500
-
+        # 3. Return JSON data to NodeJS with status code 200 (OK)
         return jsonify({
             "success": True,
             "optimizedRoutes": optimized_routes
-        })
+        }), 200
         
     except Exception as e:
         print(f"!!! Lỗi trong optimize endpoint: {str(e)}")
