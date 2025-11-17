@@ -25,7 +25,7 @@ export default function MapRealtime() {
     // Nhận cập nhật vị trí từ server
     socket.on("updateBusLocation", (data) => {
       console.log("📡 Vị trí xe cập nhật:", data);
-      // TODO:...
+      // TODO: update marker Leaflet ở đây
     });
 
     return () => {

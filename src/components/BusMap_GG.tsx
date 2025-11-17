@@ -134,7 +134,15 @@ type Stop = {
 type ClusterBusStop = { busStopID: number; lat: number; lng: number; parentID: number };
 
 
-export default function BusMap_GG({ buses }: { buses: any[] }) {
+export default function BusMap_GG({ 
+  buses, 
+  onBusSelect,
+  isMoving = false,
+}: { 
+  buses: any[];
+  onBusSelect?: (bus: any) => void;
+  isMoving?: boolean;
+}) {
   // State: danh sách tuyến/cụm, tuyến được chọn, danh sách điểm dừng của từng cụm
   const [routes, setRoutes] = useState<Route[]>([]);
   const [selectedRouteIds, setSelectedRouteIds] = useState<number[]>([]);
@@ -142,6 +150,17 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
   
   // VẼ ROUTE ĐƯỜNG ĐI
   const [directionsPaths, setDirectionsPaths] = useState<Record<number, { lat: number; lng: number }[]>>({});
+  
+  // ====================================================================
+  // STATE: XE BUS ĐƯỢC CHỌN (ĐỂ HIGHLIGHT VÀ HIỂN THỊ THÔNG TIN)
+  // ====================================================================
+  const [selectedBusId, setSelectedBusId] = useState<string | null>(null);
+  
+  // ====================================================================
+  // STATE: BUSES TỰ ĐỘNG TẠO CHO MỖI ROUTE
+  // ====================================================================
+  // Mỗi route được chọn → tạo 1 bus ở điểm bắt đầu (SGU)
+  const [routeBuses, setRouteBuses] = useState<Record<number, any>>({});
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GG_MAPS_KEY as string,
@@ -282,22 +301,165 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
   }, []);
 
   // ====================================================================
-  // [2] TỰ ĐỘNG CHỌN TUYẾN ĐẦU TIÊN ĐỂ HIỂN THỊ MẶC ĐỊNH
+  // [2] TỰ ĐỘNG TẠO BUS CHO MỖI ROUTE ĐƯỢC CHỌN
   // ====================================================================
-  // Khi có routes, tự động chọn tuyến đầu tiên để hiển thị
-  // Điều này giúp user thấy kết quả ngay khi load page
-  // useEffect(() => {
-  //   if (routes.length > 0 && selectedRouteIds.length === 0) {
-  //     // Chọn tuyến đầu tiên (index 0)
-  //     const initial = [1];
-  //     setSelectedRouteIds(initial);
-  //     console.log("[2] ->_<- Đã tự động chọn tuyến để hiển thị:", initial);
-  //   }
-  // }, [routes, selectedRouteIds.length]);
+  // Khi chọn route → tạo bus ở điểm bắt đầu (SGU)
+  // Mỗi route có 1 bus riêng
+  useEffect(() => {
+    console.log("[2] Kiểm tra buses cho routes:", selectedRouteIds);
+    
+    selectedRouteIds.forEach((routeId) => {
+      // Nếu route này chưa có bus → tạo mới
+      if (!routeBuses[routeId]) {
+        const newBus = {
+          id: `route-${routeId}`,
+          busNumber: `Bus Tuyến ${routeId + 1}`,
+          driverName: `Tài xế ${routeId + 1}`,
+          route: routes.find(r => r.routeID === routeId)?.routeName || `Tuyến ${routeId + 1}`,
+          status: 'stopped' as const,
+          lat: SGU_LAT_LNG.lat,
+          lng: SGU_LAT_LNG.lng,
+          lastUpdate: new Date(),
+          isOnline: true,
+          isTracking: true,
+          routeId, // Lưu routeId để biết bus thuộc tuyến nào
+          currentPathIndex: 0, // Vị trí hiện tại trên path
+        };
+        
+        setRouteBuses(prev => ({ ...prev, [routeId]: newBus }));
+        console.log(`[2] Tạo bus mới cho tuyến ${routeId}:`, newBus);
+      }
+    });
+    
+    // Xóa buses của routes không còn được chọn
+    Object.keys(routeBuses).forEach((routeIdStr) => {
+      const routeId = parseInt(routeIdStr);
+      if (!selectedRouteIds.includes(routeId)) {
+        setRouteBuses(prev => {
+          const newBuses = { ...prev };
+          delete newBuses[routeId];
+          return newBuses;
+        });
+        console.log(`[2] Xóa bus của tuyến ${routeId}`);
+      }
+    });
+  }, [selectedRouteIds, routes]);
 
 
   // ====================================================================
-  // [4] TẠO ĐƯỜNG ĐI (POLYLINE) THEO ĐƯỜNG PHỐ THỰC TẾ
+  // [3] DI CHUYỂN BUS THEO POLYLINE
+  // ====================================================================
+  // Khi isMoving = true, buses sẽ di chuyển theo path của route
+  // Mỗi 1s, cập nhật vị trí bus và gửi qua socket
+  useEffect(() => {
+    if (!isMoving) {
+      console.log("[3] Di chuyển đã dừng");
+      return;
+    }
+    
+    console.log("[3] Bắt đầu di chuyển buses...");
+    
+    // Tạo socket connection để gửi vị trí
+    const io = require('socket.io-client');
+    const socket = io('http://localhost:8888');
+    
+    // Interval để cập nhật vị trí mỗi 1s
+    const interval = setInterval(() => {
+      setRouteBuses(prev => {
+        const updated = { ...prev };
+        let hasUpdate = false;
+        
+        // Duyệt qua từng bus
+        Object.keys(updated).forEach(routeIdStr => {
+          const routeId = parseInt(routeIdStr);
+          const bus = updated[routeId];
+          const path = directionsPaths[routeId];
+          
+          // Nếu route chưa có path → skip
+          if (!path || path.length === 0) {
+            console.log(`[3] Route ${routeId} chưa có path, skip`);
+            return;
+          }
+          
+          // Lấy index hiện tại
+          const currentIndex = bus.currentPathIndex || 0;
+          
+          // Nếu đã đến cuối path → reset về đầu
+          if (currentIndex >= path.length - 1) {
+            console.log(`[3] Bus route ${routeId} đã đến cuối, reset về đầu`);
+            const newBus = {
+              ...bus,
+              currentPathIndex: 0,
+              lat: path[0].lat,
+              lng: path[0].lng,
+              status: 'moving' as const,
+              lastUpdate: new Date(),
+            };
+            updated[routeId] = newBus;
+            hasUpdate = true;
+            
+            // Gửi vị trí qua socket
+            socket.emit('busLocation', {
+              busID: routeId,
+              lat: path[0].lat,
+              lng: path[0].lng,
+              speed: 30,
+            });
+            
+            // ===================================================================
+            // CẬP NHẬT PANEL: Nếu bus này đang được chọn → update panel
+            // ===================================================================
+            if (onBusSelect && selectedBusId === `route-${routeId}`) {
+              onBusSelect(newBus);
+            }
+            
+            return;
+          }
+          
+          // Tiến tới điểm tiếp theo
+          const nextIndex = currentIndex + 1;
+          const nextPoint = path[nextIndex];
+          
+          const newBus = {
+            ...bus,
+            currentPathIndex: nextIndex,
+            lat: nextPoint.lat,
+            lng: nextPoint.lng,
+            status: 'moving' as const,
+            lastUpdate: new Date(),
+          };
+          updated[routeId] = newBus;
+          hasUpdate = true;
+          
+          console.log(`[3] Bus route ${routeId}: di chuyển từ index ${currentIndex} → ${nextIndex} (${Math.round(nextIndex / path.length * 100)}%)`);
+          
+          // Gửi vị trí qua socket
+          socket.emit('busLocation', {
+            busID: routeId,
+            lat: nextPoint.lat,
+            lng: nextPoint.lng,
+            speed: 30 + Math.random() * 10, // 30-40 km/h
+          });
+          
+          // ===================================================================
+          // CẬP NHẬT PANEL: Nếu bus này đang được chọn → update panel
+          // ===================================================================
+          if (onBusSelect && selectedBusId === `route-${routeId}`) {
+            onBusSelect(newBus);
+          }
+        });
+        
+        return hasUpdate ? updated : prev;
+      });
+    }, 1000); // Cập nhật mỗi 1s
+    
+    // Cleanup
+    return () => {
+      clearInterval(interval);
+      socket.disconnect();
+      console.log("[3] Dừng di chuyển và ngắt socket");
+    };
+  }, [isMoving, directionsPaths, routeBuses, selectedBusId, onBusSelect]);
   // ====================================================================
   // Sử dụng Google Directions API để vẽ đường đi theo đường phố thực tế
   // Không phải đường thẳng (chim bay) giữa các điểm
@@ -601,15 +763,23 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
     <div style={{ position: "relative" }}>
       <GoogleMap mapContainerStyle={containerStyle} center={SGU_LAT_LNG} zoom={12}>
         {/* ============================================================ */}
-        {/* [6] HIỂN THỊ MARKER XE BUÝT REALTIME (NẾU CÓ) */}
+        {/* [6] HIỂN THỊ MARKER XE BUÝT REALTIME */}
         {/* ============================================================ */}
-        {/* Các marker này hiển thị vị trí realtime của các xe buýt */}
+        {/* 
+        TÍNH NĂNG:
+        - Hiển thị icon xe bus cho mỗi route được chọn
+        - Bus bắt đầu ở SGU (điểm đầu route)
+        - Click vào bus để xem thông tin chi tiết
+        - Highlight bus đang được chọn (scale lớn hơn)
+        - Animation khi di chuyển (smooth transition)
+        */}
         {
-          (console.log("[6] Số lượng marker xe buýt:", buses?.length ?? 0), null)
+          (console.log("[6] Số lượng route buses:", Object.keys(routeBuses).length), null)
         }
         {
-          buses
-            ?.filter((bus) => {
+          // Render buses của các routes
+          Object.values(routeBuses)
+            .filter((bus: any) => {
               // VALIDATE: Chỉ render bus có lat/lng hợp lệ
               const lat = Number(bus.lat);
               const lng = Number(bus.lng);
@@ -619,14 +789,74 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
               }
               return isValid;
             })
+            .map((bus: any) => {
+              const lat = Number(bus.lat);
+              const lng = Number(bus.lng);
+              const isSelected = selectedBusId === bus.id;
+              
+              return (
+                <Marker
+                  key={bus.id}
+                  position={{ lat, lng }}
+                  // ICON: Sử dụng custom icon xe bus
+                  icon={{
+                    url: "/bus.png", // Icon từ public/bus.png
+                    scaledSize: isSelected 
+                      ? new google.maps.Size(50, 50)  // Lớn hơn khi được chọn
+                      : new google.maps.Size(40, 40), // Kích thước bình thường
+                    anchor: new google.maps.Point(20, 20), // Center icon
+                  }}
+                  // ANIMATION: Bounce khi được chọn
+                  animation={isSelected ? google.maps.Animation.BOUNCE : undefined}
+                  // CLICK: Chọn bus để xem thông tin
+                  onClick={() => {
+                    console.log(`[6] Click vào bus ${bus.id}:`, bus);
+                    setSelectedBusId(bus.id);
+                    // Gọi callback để cập nhật panel bên ngoài
+                    if (onBusSelect) {
+                      onBusSelect(bus);
+                    }
+                  }}
+                  // Z-INDEX: Bus được chọn hiển thị trên cùng
+                  zIndex={isSelected ? 1000 : 100}
+                />
+              );
+            })
+        }
+        
+        {/* Render thêm buses từ props (từ socket realtime) nếu có */}
+        {
+          buses
+            ?.filter((bus) => {
+              const lat = Number(bus.lat);
+              const lng = Number(bus.lng);
+              return Number.isFinite(lat) && Number.isFinite(lng);
+            })
             .map((bus) => {
               const lat = Number(bus.lat);
               const lng = Number(bus.lng);
+              const isSelected = selectedBusId === bus.id;
+              
               return (
                 <Marker
-                  key={bus.id || `${lat}-${lng}`}
+                  key={`external-${bus.id}`}
                   position={{ lat, lng }}
-                  label={bus.busNumber || ""}
+                  icon={{
+                    url: "/bus.png",
+                    scaledSize: isSelected 
+                      ? new google.maps.Size(50, 50)
+                      : new google.maps.Size(40, 40),
+                    anchor: new google.maps.Point(20, 20),
+                  }}
+                  animation={isSelected ? google.maps.Animation.BOUNCE : undefined}
+                  onClick={() => {
+                    console.log(`[6] Click vào external bus ${bus.id}:`, bus);
+                    setSelectedBusId(bus.id);
+                    if (onBusSelect) {
+                      onBusSelect(bus);
+                    }
+                  }}
+                  zIndex={isSelected ? 1000 : 100}
                 />
               );
             })

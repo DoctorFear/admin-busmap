@@ -8,6 +8,8 @@ export interface Bus {
   eta: string;
   x: number; // % trên bản đồ (0-100)
   y: number;
+  lat?: number; // Latitude cho Google Maps
+  lng?: number; // Longitude cho Google Maps
   lastUpdate: Date;
   isTracking: boolean;
   isOnline: boolean;
