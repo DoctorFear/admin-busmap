@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# venv 
+/ssb-optimizer_python/venv_ssb
+/ssb-optimizer_python/__pycache__
