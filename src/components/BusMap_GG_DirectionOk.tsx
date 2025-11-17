@@ -83,26 +83,23 @@
 //
 // ================================================================================
 
-
 import { useEffect, useMemo, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { Polyline } from "@react-google-maps/api"; // Import Polyline để vẽ đường đi
 
 // Lấy data read address từ realAddressLocation.json
-const realAddressLocation_testing = require("./realAddressLocation.json");
+const realAddressLocation = require("./realAddressLocation.json");
 // ==========================
 // Thử nghiệm với realAddressLocation.json
 // ==========================
 
-// Start và end point đều là SGU
-const SGU_ADDRESS = "Trường Đại học Sài Gòn, 273 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh 700000, Việt Nam";
-const SGU_LAT_LNG = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
 
 const API_BASE = "http://localhost:8888"; // API base URL
 const API_OPTIMIZER_CLUSTER_ROUTE = "http://localhost:5111"; // API optimizer cluster route URL
 const NUMBER_TRACKING_ROUTES = 2; // Number of tracking routes by default
 const MAP_LIBRARIES: ("places")[] = ["places"]; // Fix reload warning: libraries const should be stable
 const containerStyle = { width: "100%", height: "700px" };  // Map container style
+const center = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
 
 // Mảng màu cho các cluster (mỗi cụm một màu riêng biệt cho markers)
 const ROUTE_COLORS = [
@@ -185,7 +182,7 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
         // Lấy clusters dictionary từ Python service
         // Format: { "0": [busStop1, busStop2, ...], "1": [...], ... }
 
-        // const clusters = realAddressLocation_testing || {};
+        // const clusters = realAddressLocation || {};
         const clusters = pythonResponse.optimizedRoutes || {};
         const stats = pythonResponse.stats || {};
         
@@ -357,21 +354,17 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
       // ========================================================================
       
       // Origin: điểm đầu tiên (ưu tiên dùng realAddress, fallback về lat/lng)
-      // Điểm bắt đầu là SGU_ADDRESS
-      const origin = validStops[0].realAddress || SGU_ADDRESS;
-        // { lat: Number(validStops[0].lat), lng: Number(validStops[0].lng) };
+      const origin = validStops[0].realAddress || 
+        { lat: Number(validStops[0].lat), lng: Number(validStops[0].lng) };
       
       // Destination: điểm cuối cùng (ưu tiên dùng realAddress, fallback về lat/lng)
-      // Điểm kết thúc là SGU_ADDRESS
-      const destination = validStops[validStops.length - 1].realAddress || SGU_ADDRESS;
-        // { lat: Number(validStops[validStops.length - 1].lat), lng: Number(validStops[validStops.length - 1].lng) };
+      const destination = validStops[validStops.length - 1].realAddress || 
+        { lat: Number(validStops[validStops.length - 1].lat), lng: Number(validStops[validStops.length - 1].lng) };
       
       // Waypoints: các điểm giữa (ưu tiên dùng realAddress)
       const waypoints =
         validStops.length > 2
-          // ? validStops.slice(1, -1).map((s) => ({
-          // Vì điểm đầu và cuối đều là SGU_ADDRESS nên lấy toàn bộ validStops làm waypoints 
-          ? validStops.slice(0, validStops.length).map((s) => ({   
+          ? validStops.slice(1, -1).map((s) => ({ 
               location: s.realAddress || { lat: Number(s.lat), lng: Number(s.lng) },
               stopover: true // true = dừng tại điểm này, false = chỉ đi qua
             }))
@@ -500,97 +493,66 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
   // [5] TẠO POLYLINES CHO CÁC TUYẾN ĐỂ RENDER TRÊN MAP
   // ====================================================================
   // 
-  // CHIẾN LƯỢC ĐƠN GIẢN:
-  // - Render TẤT CẢ polylines có trong directionsPaths
-  // - Nếu tuyến ĐƯỢC CHỌN (trong selectedRouteIds) → dùng màu thường
-  // - Nếu tuyến KHÔNG ĐƯỢC CHỌN (bỏ chọn) → đổi sang màu XÁM
+  // MỤC ĐÍCH:
+  // Tạo danh sách polylines để vẽ đường đi trên map
   // 
   // FLOW:
-  // 1. Duyệt qua TẤT CẢ routes có path trong directionsPaths
-  // 2. Kiểm tra route đó có được chọn không (trong selectedRouteIds)
-  // 3. Nếu ĐƯỢC CHỌN → màu bình thường (đỏ, xanh, ...)
-  //    Nếu BỎ CHỌN → màu xám (#999999)
-  // 4. Render polyline với màu tương ứng
+  // 1. Duyệt qua các tuyến được chọn (selectedRouteIds)
+  // 2. Kiểm tra xem tuyến đó đã có path từ Directions API chưa (directionsPaths)
+  // 3. Nếu ĐÃ CÓ → tạo polyline object với path từ API (đường phố thực tế)
+  // 4. Nếu CHƯA CÓ → bỏ qua (đợi Directions API trả về)
+  // 5. Gán màu riêng cho mỗi tuyến
+  // 
+  // QUAN TRỌNG:
+  // - CHỈ tạo polyline khi đã có directionsPaths (từ Directions API)
+  // - KHÔNG dùng fallback (đường thẳng) để tránh duplicate polylines
+  // - Khi Directions API hoàn thành → directionsPaths update → useMemo chạy lại → tạo polyline mới
   //
   const polylines = useMemo(() => {
     console.log("[5] Bắt đầu tạo polylines...", {
       selectedRouteIds,
-      selectedCount: selectedRouteIds.length,
       availableDirections: Object.keys(directionsPaths),
-      totalPaths: Object.keys(directionsPaths).length,
     });
 
-    // Duyệt qua TẤT CẢ routes có path (không chỉ selectedRouteIds)
-    const out = Object.keys(directionsPaths)
-      .map((idStr) => {
-        const id = parseInt(idStr);
+    // Duyệt qua các tuyến được chọn và tạo polyline
+    const out = selectedRouteIds
+      .map((id, idx) => {
+        // ====================================================================
+        // CHỈ TẠO POLYLINE NẾU ĐÃ CÓ PATH TỪ DIRECTIONS API
+        // ====================================================================
+        // Kiểm tra: tuyến này đã có path từ Directions API chưa?
         const path = directionsPaths[id];
         
-        // Validate path
+        // Nếu CHƯA CÓ path hoặc path không hợp lệ → BỎ QUA
         if (!path || path.length < 2) {
-          console.log(`[5] -_- Tuyến ${id}: Path không hợp lệ, bỏ qua`);
-          return null;
+          console.log(`[5] -_- Tuyến ${id}: Chưa có Directions path, bỏ qua`);
+          return null; // Không tạo polyline, đợi Directions API
         }
         
-        // ====================================================================
-        // KIỂM TRA: Tuyến này có được chọn không?
-        // ====================================================================
-        const isSelected = selectedRouteIds.includes(id);
+        // ĐÃ CÓ path từ Directions API → TẠO POLYLINE
+        console.log(`[5] ->_<- Tuyến ${id}: Dùng Directions path (${path.length} điểm)`);
         
-        // ====================================================================
-        // GÁN MÀU:
-        // - Nếu ĐƯỢC CHỌN → dùng màu từ ROUTE_COLORS (đỏ, xanh, lục, ...)
-        // - Nếu BỎ CHỌN → dùng màu XÁM (#999999)
-        // ====================================================================
-        let color: string;
-        
-        if (isSelected) {
-          // Tuyến được chọn → màu bình thường
-          const selectedIndex = selectedRouteIds.indexOf(id);
-          color = ROUTE_COLORS[selectedIndex % ROUTE_COLORS.length];
-        } else {
-          // Tuyến bỏ chọn → màu xám
-          color = "#ffffffff"; // Màu trắng
-          // color = "#999999"; // Màu xám
-        }
-        
-        console.log(`[5] ->_<- Tuyến ${id}: ${path.length} điểm, ${isSelected ? 'CHỌN' : 'BỎ CHỌN'} → màu ${color}`);
+        // Gán màu cho tuyến này (mỗi tuyến có màu riêng)
+        // ROUTE_COLORS = ["#f44336", "#2196f3", "#4caf50", ...]
+        const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
         
         // Trả về object chứa thông tin polyline
         return { 
           id,           // ID của tuyến
-          path,         // Array of {lat, lng} từ Directions API
-          color,        // Màu của polyline (bình thường hoặc xám)
-          isSelected,   // Trạng thái chọn/bỏ chọn (để log)
+          path,         // Array of {lat, lng} từ Directions API (100+ điểm)
+          color         // Màu của polyline
         };
       })
-      .filter(Boolean) as { id: number; path: { lat: number; lng: number }[]; color: string; isSelected: boolean }[];
+      .filter(Boolean) as { id: number; path: { lat: number; lng: number }[]; color: string }[];
     
-    console.log("[5] ->_<- Đã tạo", out.length, "polylines:", 
-      out.map(p => `ID=${p.id} ${p.isSelected ? 'CHỌN' : 'XÁM'}`));
+    console.log("[5] ->_<- Đã tạo", out.length, "polylines");
     return out;
-  }, [selectedRouteIds, directionsPaths]);
+  }, [selectedRouteIds, directionsPaths]); // CHỈ phụ thuộc vào selectedRouteIds và directionsPaths
 
   const toggleRoute = (id: number) => {
-    setSelectedRouteIds((prev) => {
-      const isCurrentlySelected = prev.includes(id);
-      
-      if (isCurrentlySelected) {
-        // ====================================================================
-        // BỎ CHỌN: Remove ID khỏi selectedRouteIds
-        // ====================================================================
-        // useMemo [5] sẽ tự động đổi màu polyline sang XÁM (#999999)
-        console.log(`[Toggle] Bỏ chọn tuyến ${id} → đổi sang màu xám`);
-        return prev.filter((r) => r !== id);
-      } else {
-        // ====================================================================
-        // CHỌN: Add ID vào selectedRouteIds
-        // ====================================================================
-        // useMemo [5] sẽ tự động đổi màu polyline sang màu BÌNH THƯỜNG
-        console.log(`[Toggle] Chọn tuyến ${id} → đổi sang màu bình thường`);
-        return [...prev, id];
-      }
-    });
+    setSelectedRouteIds((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
   };
 
   if (!isLoaded) {
@@ -599,79 +561,76 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
 
   return (
     <div style={{ position: "relative" }}>
-      <GoogleMap mapContainerStyle={containerStyle} center={SGU_LAT_LNG} zoom={12}>
+      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={13}>
         {/* ============================================================ */}
         {/* [6] HIỂN THỊ MARKER XE BUÝT REALTIME (NẾU CÓ) */}
         {/* ============================================================ */}
         {/* Các marker này hiển thị vị trí realtime của các xe buýt */}
         {
-          (console.log("[6] Số lượng marker xe buýt:", buses?.length ?? 0), null)
+          // (console.log("[6] Số lượng marker xe buýt:", buses?.length ?? 0), null)
         }
         {
-          buses
-            ?.filter((bus) => {
-              // VALIDATE: Chỉ render bus có lat/lng hợp lệ
-              const lat = Number(bus.lat);
-              const lng = Number(bus.lng);
-              const isValid = Number.isFinite(lat) && Number.isFinite(lng);
-              if (!isValid) {
-                console.warn("[6] -_- Bỏ qua bus có tọa độ không hợp lệ:", bus);
-              }
-              return isValid;
-            })
-            .map((bus) => {
-              const lat = Number(bus.lat);
-              const lng = Number(bus.lng);
-              return (
-                <Marker
-                  key={bus.id || `${lat}-${lng}`}
-                  position={{ lat, lng }}
-                  label={bus.busNumber || ""}
-                />
-              );
-            })
+        // buses
+        //   ?.filter((bus) => {
+        //     // VALIDATE: Chỉ render bus có lat/lng hợp lệ
+        //     const lat = Number(bus.lat);
+        //     const lng = Number(bus.lng);
+        //     const isValid = Number.isFinite(lat) && Number.isFinite(lng);
+        //     if (!isValid) {
+        //       console.warn("[6] -_- Bỏ qua bus có tọa độ không hợp lệ:", bus);
+        //     }
+        //     return isValid;
+        //   })
+        //   .map((bus) => {
+        //     const lat = Number(bus.lat);
+        //     const lng = Number(bus.lng);
+        //     return (
+        //       <Marker
+        //         key={bus.id || `${lat}-${lng}`}
+        //         position={{ lat, lng }}
+        //         label={bus.busNumber || ""}
+        //       />
+        //     );
+        //   })
         }
 
         {/* ============================================================ */}
         {/* [7] VẼ POLYLINE (ĐƯỜNG ĐI) CHO MỖI TUYẾN */}
         {/* ============================================================ */}
         {/* 
-        CHIẾN LƯỢC ĐƠN GIẢN:
-        - Render TẤT CẢ polylines (cả được chọn và bỏ chọn)
-        - Nếu ĐƯỢC CHỌN → màu bình thường (đỏ, xanh, lục, ...)
-        - Nếu BỎ CHỌN → màu XÁM (#999999) để làm mờ đi
+        POLYLINE LÀ GÌ?
+        - Polyline = đường kẻ (line) trên map nối nhiều điểm với nhau
+        - Component từ @react-google-maps/api
         
         CÁCH HOẠT ĐỘNG:
-        1. Nhận polyline object từ useMemo [5]
-        2. polyline.color đã được tính sẵn:
-           - Tuyến được chọn → màu từ ROUTE_COLORS
-           - Tuyến bỏ chọn → màu xám (#999999)
-        3. Render Polyline với màu tương ứng
-        4. TẤT CẢ polylines đều LUÔN HIỆN, chỉ khác màu
+        1. Nhận prop "path" = array of {lat, lng} (100+ điểm)
+        2. Google Maps API tự động vẽ đường nối các điểm này
+        3. Đường được vẽ theo path từ Directions API (đã tối ưu theo đường phố)
         
         PROPS:
-        - key: ID duy nhất của polyline
-        - path: Array of {lat, lng} - đường đi từ Directions API
-        - options.strokeColor: Màu đường (bình thường hoặc xám)
-        - options.strokeOpacity: Độ trong suốt (0.8 = 80% đậm)
-        - options.strokeWeight: Độ dày đường (5px)
+        - key: ID duy nhất của polyline (để React track)
+        - path: Array of {lat, lng} - danh sách tọa độ để nối
+        - options.strokeColor: Màu của đường (hex color)
+        - options.strokeOpacity: Độ trong suốt (0 = trong suốt, 1 = đậm)
+        - options.strokeWeight: Độ dày của đường (pixels)
+        
+        LƯU Ý QUAN TRỌNG:
+        - Path từ Directions API có 100+ điểm → đường mượt theo đường phố
+        - KHÔNG phải chỉ 5 điểm stops → tránh đường chim bay
+        - Mỗi polyline có màu riêng để phân biệt các tuyến
         */}
-        {(console.log("[7] ->_<- Render", polylines.length, "polylines:", 
-          polylines.map(p => `ID=${p.id} màu=${p.color}`)), null)}
-        {polylines.map((pl) => {
-          console.log(`[7.1] Render polyline tuyến ${pl.id}: màu = ${pl.color} (${pl.isSelected ? 'CHỌN' : 'XÁM'})`);
-          return (
-            <Polyline
-              key={`polyline-${pl.id}`}
-              path={pl.path}
-              options={{
-                strokeColor: pl.color,     // Màu động: bình thường hoặc xám
-                strokeOpacity: 0.5,        // Độ trong suốt (80%)
-                strokeWeight: 5,           // Độ dày đường (5px)
-              }}
-            />
-          );
-        })}
+        {(console.log("[7] ->_<- Render", polylines.length, "polylines trên map"), null)}
+        {polylines.map((pl) => (
+          <Polyline
+            key={`polyline-${pl.id}`}
+            path={pl.path}
+            options={{
+              strokeColor: pl.color,    // Màu đường (vd: "#f44336" = đỏ)
+              strokeOpacity: 0.8,        // Độ trong suốt (0.8 = 80% đậm)
+              strokeWeight: 5,           // Độ dày đường (5px - dễ nhìn)
+            }}
+          />
+        ))}
 
         {/* ============================================================ */}
         {/* [8] HIỂN THỊ ĐIỂM ĐÓN (MARKER) CHO MỖI CỤM */}
@@ -680,74 +639,73 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
             - Các marker tròn với số thứ tự cho mỗi điểm đón
             - Mỗi cụm có màu riêng biệt để dễ phân biệt */}
         {
-          (console.log("[8] Đang render điểm đón cho", selectedRouteIds.length, "cụm"), null)
+          // (console.log("[8] Đang render điểm đón cho", selectedRouteIds.length, "cụm"), null)
         }
         {
-          selectedRouteIds.map((routeId, idx) => {
-            const stops = routeStops[routeId] || [];
+          // selectedRouteIds.map((routeId, idx) => {
+          //   const stops = routeStops[routeId] || [];
             
-            // VALIDATE: Bỏ qua nếu không có stops hoặc stops không hợp lệ
-            if (!stops || stops.length === 0) {
-              console.warn(`[8] -_- Cụm ${routeId} không có stops hợp lệ`);
-              return null;
-            }
+          //   // VALIDATE: Bỏ qua nếu không có stops hoặc stops không hợp lệ
+          //   if (!stops || stops.length === 0) {
+          //     console.warn(`[8] -_- Cụm ${routeId} không có stops hợp lệ`);
+          //     return null;
+          //   }
             
-            // VALIDATE: Filter chỉ lấy stops có lat/lng hợp lệ
-            const validStops = stops.filter((s) => {
-              const lat = Number(s.lat);
-              const lng = Number(s.lng);
-              const isValid = Number.isFinite(lat) && Number.isFinite(lng);
-              if (!isValid) {
-                console.warn(`[8] -_- Bỏ qua stop có tọa độ không hợp lệ:`, s);
-              }
-              return isValid;
-            });
+          //   // VALIDATE: Filter chỉ lấy stops có lat/lng hợp lệ
+          //   const validStops = stops.filter((s) => {
+          //     const lat = Number(s.lat);
+          //     const lng = Number(s.lng);
+          //     const isValid = Number.isFinite(lat) && Number.isFinite(lng);
+          //     if (!isValid) {
+          //       console.warn(`[8] -_- Bỏ qua stop có tọa độ không hợp lệ:`, s);
+          //     }
+          //     return isValid;
+          //   });
             
-            if (validStops.length === 0) {
-              console.warn(`[8] -_- Cụm ${routeId} không có stops hợp lệ nào sau khi filter`);
-              return null;
-            }
+          //   if (validStops.length === 0) {
+          //     console.warn(`[8] -_- Cụm ${routeId} không có stops hợp lệ nào sau khi filter`);
+          //     return null;
+          //   }
             
-            // Màu cho cluster này (mỗi cụm có màu riêng biệt)
-            const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
+          //   // Màu cho cluster này (mỗi cụm có màu riêng biệt)
+          //   const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
 
-            return (
-              <div key={`layer-${routeId}`}>
-                {/* Các điểm đón (pickup points) - marker tròn với số thứ tự */}
-                {/* Mỗi điểm đón được đánh dấu bằng marker tròn với màu của cụm */}
-                {validStops.map((s) => {
-                  const lat = Number(s.lat);
-                  const lng = Number(s.lng);
-                  return (
-                    <Marker
-                      key={`${routeId}-${s.sequence}`}
-                      position={{ lat, lng }}
-                      label={{
-                        text: String(s.sequence), // Hiển thị số thứ tự (1, 2, 3, ...)
-                        color: "#111",
-                        fontSize: "12px",
-                      }}
-                      icon={{
-                        path: google.maps.SymbolPath.CIRCLE, // Marker hình tròn
-                        scale: 8, // Kích thước marker (tăng lên để dễ nhìn hơn)
-                        fillColor: color, // Màu fill theo cụm (mỗi cụm một màu)
-                        fillOpacity: 1,
-                        strokeColor: "#ffffff", // Viền trắng
-                        strokeWeight: 2,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            );
-          })
+          //   return (
+          //     <div key={`layer-${routeId}`}>
+          //       {/* Các điểm đón (pickup points) - marker tròn với số thứ tự */}
+          //       {/* Mỗi điểm đón được đánh dấu bằng marker tròn với màu của cụm */}
+          //       {validStops.map((s) => {
+          //         const lat = Number(s.lat);
+          //         const lng = Number(s.lng);
+          //         return (
+          //           <Marker
+          //             key={`${routeId}-${s.sequence}`}
+          //             position={{ lat, lng }}
+          //             label={{
+          //               text: String(s.sequence), // Hiển thị số thứ tự (1, 2, 3, ...)
+          //               color: "#111",
+          //               fontSize: "12px",
+          //             }}
+          //             icon={{
+          //               path: google.maps.SymbolPath.CIRCLE, // Marker hình tròn
+          //               scale: 8, // Kích thước marker (tăng lên để dễ nhìn hơn)
+          //               fillColor: color, // Màu fill theo cụm (mỗi cụm một màu)
+          //               fillOpacity: 1,
+          //               strokeColor: "#ffffff", // Viền trắng
+          //               strokeWeight: 2,
+          //             }}
+          //           />
+          //         );
+          //       })}
+          //     </div>
+          //   );
+          // })
         }
       </GoogleMap>
 
       {/* 
       Overlay: Route list/selector 
       - Hiển thị danh sách tuyến đường và cho phép chọn/bỏ chọn
-      - Checkbox "All" để chọn/bỏ chọn tất cả tuyến đường cùng lúc
       - Khi chọn tuyến đường, hiển thị đường đi của tuyến đó trên bản đồ
       */}
       <div
@@ -769,70 +727,25 @@ export default function BusMap_GG({ buses }: { buses: any[] }) {
         {routes.length === 0 ? (
           <div style={{ color: "#666" }}>Không có dữ liệu tuyến</div>
         ) : (
-          <>
-            {/* ============================================ */}
-            {/* CHECKBOX "ALL" - CHỌN/BỎ CHỌN TẤT CẢ */}
-            {/* ============================================ */}
+          routes.map((r) => (
             <label
+              key={r.routeID}
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 padding: "6px 4px",
                 cursor: "pointer",
-                borderBottom: "1px solid #ddd", // Đường kẻ phân cách
-                marginBottom: 8,
-                fontWeight: 600, // In đậm để nổi bật
               }}
             >
               <input
                 type="checkbox"
-                // CHECKED: Chỉ khi TẤT CẢ routes đều được chọn
-                // UNCHECKED: Khi không có hoặc chỉ có MỘT SỐ routes được chọn
-                checked={routes.length > 0 && selectedRouteIds.length === routes.length}
-                onChange={(e) => {
-                  // Nếu đang checked (tất cả đã chọn) → BỎ CHỌN tất cả
-                  // Nếu đang unchecked (không có hoặc một số) → CHỌN tất cả
-                  if (e.target.checked) {
-                    // CHỌN TẤT CẢ: Lấy tất cả routeID
-                    const allRouteIds = routes.map((r) => r.routeID);
-                    setSelectedRouteIds(allRouteIds);
-                    console.log("[Toggle All] Chọn tất cả tuyến:", allRouteIds);
-                  } else {
-                    // BỎ CHỌN TẤT CẢ
-                    setSelectedRouteIds([]);
-                    console.log("[Toggle All] Bỏ chọn tất cả tuyến");
-                  }
-                }}
+                checked={selectedRouteIds.includes(r.routeID)}
+                onChange={() => toggleRoute(r.routeID)}
               />
-              <span>
-                Tất cả ({selectedRouteIds.length}/{routes.length})
-              </span>
+              <span>{r.routeName}</span>
             </label>
-
-            {/* ============================================ */}
-            {/* DANH SÁCH CÁC TUYẾN */}
-            {/* ============================================ */}
-            {routes.map((r) => (
-              <label
-                key={r.routeID}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "6px 4px",
-                  cursor: "pointer",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedRouteIds.includes(r.routeID)}
-                  onChange={() => toggleRoute(r.routeID)}
-                />
-                <span>{r.routeName}</span>
-              </label>
-            ))}
-          </>
+          ))
         )}
       </div>
     </div>
