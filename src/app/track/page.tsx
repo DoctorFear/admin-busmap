@@ -107,11 +107,11 @@ export default function TrackPage() {
       </div>
 
       <div className={styles.layout}>
+        
         <div className={styles.mapArea}>
           {/* Google Maps render */}
+          
           <BusMap_GG buses={buses} />
-          {/* Tạm thời thay thế bản đồ SVG mock bằng Google Maps.
-              Khi cần, có thể phục hồi BusMap mock ở dưới: */}
           {/* <BusMap
               buses={buses}
               selectedBus={selectedBus}
@@ -119,11 +119,14 @@ export default function TrackPage() {
               onToggleTracking={toggleTracking}
             /> */}
           {/* <MapForm roads={}/> */}
+
         </div>
+
         {/* Testing */}
         {/* <div style={{ display: 'none' }}>
           <MapRealtime />
         </div> */}
+
         <div className={styles.panelArea}>
           <BusInfoPanel
             bus={selectedBus}

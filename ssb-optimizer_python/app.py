@@ -89,10 +89,32 @@ def optimize(isReOptimize=False):
         
         print(f"\n\n->_<- Route result after optimized:\n\n", optimized_routes)
         
+
+        # // Lấy clusters dictionary từ Python service
+        # // Format: { "0": [busStop1, busStop2, ...], "1": [...], ... }
+        # const clusters = pythonResponse.clusters || {};
+        # const stats = pythonResponse.stats || {};
+        
+        # console.log("[1] ->_<- Nhận được clusters từ Python:", {
+        #   total_clusters: stats.total_clusters,
+        #   total_bus_stops: stats.total_bus_stops,
+        #   cluster_sizes: stats.cluster_sizes,
+        #   cluster_keys: Object.keys(clusters)
+        # });
+
+        # Thêm phần stats cho response (json)
+        stats = { 
+            "total_clusters": clustering_result["stats"]["total_clusters"],
+            "total_bus_stops": clustering_result["stats"]["total_bus_stops"],
+            "cluster_sizes": clustering_result["stats"]["cluster_sizes"]
+        }
+        print(f"--> Thống kê kết quả tối ưu: {stats}")
+
         # 3. Return JSON data to NodeJS with status code 200 (OK)
         return jsonify({
             "success": True,
-            "optimizedRoutes": optimized_routes_after_reindexed_sequence
+            "optimizedRoutes": optimized_routes_after_reindexed_sequence,
+            "stats": stats
         }), 200
         
     except Exception as e:

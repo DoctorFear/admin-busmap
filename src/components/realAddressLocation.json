@@ -1,0 +1,34 @@
+{
+    "0": [
+        {
+            "realAddress": "Trường Đại học Sài Gòn, 273 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh 700000, Việt Nam",
+            "lat": 10.760096272784983,
+            "lng": 106.68220465197952
+        },
+        {
+            "realAddress": "235 Nguyễn Văn Cừ, Phường Cầu Ông Lãnh, Quận 1, Thành phố Hồ Chí Minh 700000, Việt Nam",
+            "lat": 10.764384250609172, 
+            "lng": 106.6825652538271
+        },
+        {
+            "realAddress": "249 Nguyễn Thị Minh Khai, Phường Nguyễn Cư Trinh, Quận 1, Thành phố Hồ Chí Minh, Việt Nam",
+            "lat": 10.766742071755994, 
+            "lng": 106.6832381560005
+        },       
+        {
+            "realAddress": "226 Lý Thái Tổ, Phường 1, Quận 3, Thành phố Hồ Chí Minh 700000, Việt Nam",
+            "lat": 10.766982402682782, 
+            "lng":  106.67708888622273
+        },
+        {
+            "realAddress": "Chuẩn Linh Kiện, 261 Lê Hồng Phong, Phường 4, Quận 5, Thành phố Hồ Chí Minh, Việt Nam",
+            "lat": 10.760858715323453,
+            "lng": 106.67680149361861
+        },
+        {
+            "realAddress": "Trường Đại học Sài Gòn, 273 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh 700000, Việt Nam",
+            "lat": 10.760096272784983,
+            "lng": 106.68220465197952
+        }
+    ]
+}

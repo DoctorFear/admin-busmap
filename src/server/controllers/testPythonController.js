@@ -41,7 +41,7 @@ export const sendListBusStopLatLngToPython = async(req, res) => {
         }
         
         // 4. Trả về kết quả cho client
-        console.log("--> Nhận được kết quả từ Python:", {
+        console.log("--> Nhận được kết quả từ Python Service:", {
             total_clusters: response.data?.stats?.total_clusters,
             total_bus_stops: response.data?.stats?.total_bus_stops
         });
