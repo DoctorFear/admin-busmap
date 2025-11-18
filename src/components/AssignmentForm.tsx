@@ -4,15 +4,27 @@ import { useState, useEffect, useMemo } from 'react';
 import Select from 'react-select';
 import styles from '@/styles/AssignmentForm.module.css';
 
-// Interface cho danh mục (lấy từ API)
-interface Driver { userID: number; name: string; } 
-interface Bus { busID: number; licensePlate: string; }
-interface Route { routeID: number; routeName: string; }
+// CẬP NHẬT INTERFACE: Driver giờ phải có driverID (lấy từ backend đã sửa)
+interface Driver {
+  driverID: number;   // ← QUAN TRỌNG: Đây mới là ID dùng để lưu vào DriverAssignment
+  userID: number;
+  name: string;
+  // Các trường khác nếu cần (license, status,...)
+}
 
-// Interface cho một mục phân công (dùng cho form)
+interface Bus {
+  busID: number;
+  licensePlate: string;
+}
+
+interface Route {
+  routeID: number;
+  routeName: string;
+}
+
 interface AssignmentItem {
   id?: string;
-  driverID: number; 
+  driverID: number;
   driverName: string;
   busID: number;
   busName: string;
@@ -50,13 +62,12 @@ export default function AssignmentForm({
     busName: '',
     routeID: 0,
     routeName: '',
-    assignmentDate: initialData?.assignmentDate || today,
+    assignmentDate: today,
   });
-  
-  // Xác định chế độ hiện tại (Thêm mới / Chỉnh sửa)
+
   const isEditing = !!initialData;
 
-  // 1. TẢI DỮ LIỆU DANH MỤC (Tài xế, Xe, Tuyến)
+  // 1. TẢI DANH MỤC
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -66,13 +77,14 @@ export default function AssignmentForm({
           fetch(`http://localhost:${PORT_SERVER}/api/routes`),
         ]);
 
-        if (!dRes.ok || !bRes.ok || !rRes.ok) throw new Error();
+        if (!dRes.ok || !bRes.ok || !rRes.ok) throw new Error('Lỗi tải danh mục');
 
-        setDrivers(await dRes.json());
+        const driverData = await dRes.json();
+        setDrivers(driverData);
         setBuses(await bRes.json());
         setRoutes(await rRes.json());
-      } catch {
-        setNotification('Không tải được danh sách Tài xế, Xe, Tuyến!', 'error');
+      } catch (err) {
+        setNotification('Không tải được danh sách Tài xế/Xe/Tuyến!', 'error');
       } finally {
         setLoading(false);
       }
@@ -80,16 +92,11 @@ export default function AssignmentForm({
     fetchData();
   }, [setNotification]);
 
-  // 2. CẬP NHẬT FORM KHI BẤM SỬA (hoặc reset khi Thêm mới)
-  // Logic này chạy khi `initialData` thay đổi (bấm Sửa) hoặc khi `loading` (dữ liệu danh mục) hoàn tất
+  // 2. CẬP NHẬT FORM KHI CHỈNH SỬA HOẶC THÊM MỚI
   useEffect(() => {
-    // Chờ cho danh mục (drivers, buses, routes) tải xong
-    if (loading) return; 
-    
+    if (loading) return;
+
     if (initialData) {
-      // CHẾ ĐỘ CHỈNH SỬA:
-      console.log('🔄 Updating form with initialData:', initialData);
-      
       setFormData({
         driverID: initialData.driverID || 0,
         driverName: initialData.driverName || '',
@@ -100,8 +107,6 @@ export default function AssignmentForm({
         assignmentDate: initialData.assignmentDate || today,
       });
     } else {
-      // CHẾ ĐỘ THÊM MỚI: Reset form
-      console.log('🆕 Resetting form');
       setFormData({
         driverID: 0,
         driverName: '',
@@ -112,79 +117,60 @@ export default function AssignmentForm({
         assignmentDate: today,
       });
     }
-    // Phụ thuộc vào initialData, loading và độ dài của các mảng danh mục
-  }, [initialData, today, loading, drivers.length, buses.length, routes.length]); 
+  }, [initialData, loading, today]);
 
-  // 3. CHUYỂN ĐỔI DỮ LIỆU DANH MỤC CHO REACT-SELECT
-  const driverOptions = useMemo(() => 
-    drivers.map(d => ({ value: d.userID, label: d.name })), 
+  // 3. OPTIONS CHO REACT-SELECT (DÙNG driverID THẬT)
+  const driverOptions = useMemo(
+    () => drivers.map(d => ({ value: d.driverID, label: d.name })),
     [drivers]
   );
 
-  const busOptions = useMemo(() => 
-    buses.map(b => ({ value: b.busID, label: b.licensePlate })), 
+  const busOptions = useMemo(
+    () => buses.map(b => ({ value: b.busID, label: b.licensePlate })),
     [buses]
   );
 
-  const routeOptions = useMemo(() => 
-    routes.map(r => ({ value: r.routeID, label: r.routeName })), 
+  const routeOptions = useMemo(
+    () => routes.map(r => ({ value: r.routeID, label: r.routeName })),
     [routes]
   );
 
-  // 4. TÌM GIÁ TRỊ (OBJECT) ĐANG ĐƯỢC CHỌN CHO REACT-SELECT
-  const selectedDriver = useMemo(() => {
-    // Tìm trong driverOptions giá trị khớp với formData.driverID
-    const found = driverOptions.find(opt => opt.value === formData.driverID);
-    console.log('👤 Selected driver:', found, 'from driverID:', formData.driverID); // Debug log
-    return found || null;
-  }, [driverOptions, formData.driverID]);
+  // 4. SELECTED VALUES
+  const selectedDriver = driverOptions.find(o => o.value === formData.driverID) || null;
+  const selectedBus = busOptions.find(o => o.value === formData.busID) || null;
+  const selectedRoute = routeOptions.find(o => o.value === formData.routeID) || null;
 
-  const selectedBus = useMemo(() => {
-    const found = busOptions.find(opt => opt.value === formData.busID);
-    console.log('🚌 Selected bus:', found, 'from busID:', formData.busID); // Debug log
-    return found || null;
-  }, [busOptions, formData.busID]);
-
-  const selectedRoute = useMemo(() => {
-    const found = routeOptions.find(opt => opt.value === formData.routeID);
-    console.log('🛣️ Selected route:', found, 'from routeID:', formData.routeID); // Debug log
-    return found || null;
-  }, [routeOptions, formData.routeID]);
-
-  // 5. XỬ LÝ KHI SUBMIT FORM
+  // 5. SUBMIT
   const handleSubmit = () => {
     if (!formData.driverID || !formData.busID || !formData.routeID) {
-      setNotification('Vui lòng chọn đầy đủ thông tin Tài xế, Xe buýt và Tuyến đường!', 'error');
+      setNotification('Vui lòng chọn đầy đủ Tài xế, Xe buýt và Tuyến đường!', 'error');
       return;
     }
 
-    // Gửi dữ liệu (đã có ID và Name) lên component Cha (Page.tsx)
     onSubmit({
       id: initialData?.id,
-      driverID: formData.driverID,
+      driverID: formData.driverID,     // ← ĐÚNG: driverID thật (1,2,3...)
       driverName: formData.driverName,
       busID: formData.busID,
       busName: formData.busName,
       routeID: formData.routeID,
       routeName: formData.routeName,
-      assignmentDate: formData.assignmentDate || today, 
+      assignmentDate: today,
     });
   };
 
-  // Trạng thái chờ tải danh mục
-  if (loading || drivers.length === 0 || buses.length === 0 || routes.length === 0) {
-    return <div className={styles.loading}>Đang tải danh sách tài xế, xe, tuyến...</div>;
+  if (loading) {
+    return <div className={styles.loading}>Đang tải danh sách...</div>;
   }
 
-  // Tùy chỉnh style cho React-Select
   const customStyles = {
     control: (base: any) => ({
       ...base,
       minHeight: '42px',
-      borderColor: '#d1d5db', // Màu xám nhạt
-      borderRadius: '0.375rem', // rounded-md
-      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // shadow-sm
-      '&:hover': { borderColor: '#3b82f6' }, // blue-500
+      borderColor: '#d1d5db',
+      borderRadius: '0.375rem',
+      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      '&:hover': { borderColor: '#3b82f6' },
     }),
   };
 
@@ -201,13 +187,13 @@ export default function AssignmentForm({
             options={driverOptions}
             value={selectedDriver}
             onChange={(opt) => {
-              setFormData({ 
-                ...formData, 
-                driverID: opt?.value || 0, // value là userID
-                driverName: opt?.label || '' 
+              setFormData({
+                ...formData,
+                driverID: opt?.value || 0,      // ← driverID thật
+                driverName: opt?.label || '',
               });
             }}
-            placeholder="Tìm kiếm tài xế..."
+            placeholder="Chọn tài xế..."
             isSearchable
             isClearable
             styles={customStyles}
@@ -220,13 +206,13 @@ export default function AssignmentForm({
             options={busOptions}
             value={selectedBus}
             onChange={(opt) => {
-              setFormData({ 
-                ...formData, 
-                busID: opt?.value || 0, 
-                busName: opt?.label || '' 
+              setFormData({
+                ...formData,
+                busID: opt?.value || 0,
+                busName: opt?.label || '',
               });
             }}
-            placeholder="Tìm kiếm biển số..."
+            placeholder="Chọn xe buýt..."
             isSearchable
             isClearable
             styles={customStyles}
@@ -239,19 +225,18 @@ export default function AssignmentForm({
             options={routeOptions}
             value={selectedRoute}
             onChange={(opt) => {
-              setFormData({ 
-                ...formData, 
-                routeID: opt?.value || 0, 
-                routeName: opt?.label || '' 
+              setFormData({
+                ...formData,
+                routeID: opt?.value || 0,
+                routeName: opt?.label || '',
               });
             }}
-            placeholder="Tìm kiếm tuyến đường..."
+            placeholder="Chọn tuyến đường..."
             isSearchable
             isClearable
             styles={customStyles}
           />
         </div>
-        {/* Trường "Ngày phân công" đã được ẩn theo yêu cầu */}
       </div>
 
       <div className={styles.formActions}>
@@ -259,7 +244,9 @@ export default function AssignmentForm({
           {isEditing ? 'Cập nhật' : 'Lưu phân công'}
         </button>
         {isEditing && (
-          <button onClick={onCancel} className={styles.cancelButton}>Hủy</button>
+          <button onClick={onCancel} className={styles.cancelButton}>
+            Hủy
+          </button>
         )}
       </div>
     </div>

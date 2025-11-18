@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react';
 import ParentDriverForm from '@/components/ParentDriverForm';
 import ParentDriverTable from '@/components/ParentDriverTable';
 import ParentDriverToggle from '@/components/ParentDriverToggle';
-import PaginationControlSimple from '@/components/PaginationControlSimple'; // ← Component mới chỉ 3 nút
+import PaginationControlSimple from '@/components/PaginationControlSimple';
 import Notification from '@/components/Notification';
 import SearchBar from '@/components/SearchBar';
 import styles from './page.module.css';
 
 const PORT_SERVER = 8888;
 
+// Interface chung cho form (giữ nguyên như cũ)
 interface EditingItem {
-  id: number;
+  id: number;           // userID (dùng cho cả parent & driver)
   name: string;
   studentName?: string;
   address?: string;
@@ -44,12 +45,13 @@ export default function ListPage() {
 
       const res = await fetch(endpoint, { cache: 'no-store' });
       if (!res.ok) throw new Error('Lỗi tải dữ liệu');
+
       const data = await res.json();
 
       if (type === 'parent') setParents(data);
       else setDrivers(data);
-    } catch (err) {
-      setNotification({ message: 'Lỗi kết nối server!', type: 'error' });
+    } catch (err: any) {
+      setNotification({ message: err.message || 'Lỗi kết nối server!', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -59,6 +61,7 @@ export default function ListPage() {
     fetchData();
   }, [type]);
 
+  // Reset khi đổi tab
   useEffect(() => {
     setSearchTerm('');
     setCurrentPage(1);
@@ -66,12 +69,17 @@ export default function ListPage() {
   }, [type]);
 
   const data = type === 'parent' ? parents : drivers;
-  const filteredData = data.filter((item: any) =>
-    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.studentName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.license?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.phone?.includes(searchTerm)
-  );
+
+  const filteredData = data.filter((item: any) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(searchLower) ||
+      item.studentName?.toLowerCase().includes(searchLower) ||
+      item.license?.toLowerCase().includes(searchLower) ||
+      item.phone?.includes(searchTerm) ||
+      item.username?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -80,28 +88,28 @@ export default function ListPage() {
     setShowPassword(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  // QUAN TRỌNG: Dùng đúng ID (userID) cho cả Parent & Driver
   const handleEdit = (item: any) => {
     setEditingItem({
-      id: item.userID,
-      name: item.name,
+      id: item.userID,        // ← luôn dùng userID để edit/delete (backend dùng userID)
+      name: item.name || '',
       studentName: item.studentName,
       address: item.address,
       license: item.license,
-      phone: item.phone,
-      username: item.username,
-      password: item.password
+      phone: item.phone || '',
+      username: item.username || '',
+      password: ''            // để trống, chỉ nhập nếu muốn đổi mật khẩu
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSave = async (formData: any, isEditing: boolean) => {
     const endpoint = type === 'parent' ? '/api/parents' : '/api/drivers';
-    const method = isEditing ? 'PUT' : 'POST';
     const url = `http://localhost:${PORT_SERVER}${endpoint}${isEditing ? `/${editingItem?.id}` : ''}`;
 
     try {
       const res = await fetch(url, {
-        method,
+        method: isEditing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
@@ -112,28 +120,30 @@ export default function ListPage() {
       }
 
       setNotification({
-        message: isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!',
+        message: isEditing
+          ? `Cập nhật ${type === 'parent' ? 'phụ huynh' : 'tài xế'} thành công!`
+          : `Thêm ${type === 'parent' ? 'phụ huynh' : 'tài xế'} thành công!`,
         type: 'success'
       });
       setEditingItem(null);
       fetchData();
     } catch (err: any) {
-      setNotification({ message: err.message || 'Lỗi khi lưu!', type: 'error' });
+      setNotification({ message: err.message || 'Lưu thất bại!', type: 'error' });
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Xóa vĩnh viễn người này? Không thể khôi phục!')) return;
+    if (!confirm(`Xóa vĩnh viễn ${type === 'parent' ? 'phụ huynh' : 'tài xế'} này? Không thể khôi phục!`)) return;
 
     const endpoint = type === 'parent' ? `/api/parents/${id}` : `/api/drivers/${id}`;
     try {
       const res = await fetch(`http://localhost:${PORT_SERVER}${endpoint}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Xóa thất bại');
+      if (!res.ok) throw new Error(await res.text() || 'Xóa thất bại');
 
       setNotification({ message: 'Xóa thành công!', type: 'success' });
       fetchData();
     } catch (err: any) {
-      setNotification({ message: 'Lỗi khi xóa!', type: 'error' });
+      setNotification({ message: err.message || 'Xóa thất bại!', type: 'error' });
     }
   };
 
@@ -149,8 +159,10 @@ export default function ListPage() {
         />
       )}
 
+      {/* Vẫn giữ toggle để chuyển Parent ↔ Driver */}
       <ParentDriverToggle selected={type} onToggle={setType} />
 
+      {/* Form chung */}
       <ParentDriverForm
         type={type}
         editingItem={editingItem}
@@ -166,10 +178,12 @@ export default function ListPage() {
       </div>
 
       {loading ? (
-        <div className={styles.loading}>Đang tải...</div>
+        <div className={styles.loading}>Đang tải dữ liệu...</div>
       ) : filteredData.length === 0 ? (
-        <p style={{ textAlign: 'center', margin: '2rem 0', color: '#666' }}>
-          {searchTerm ? 'Không tìm thấy kết quả nào' : `Chưa có ${type === 'parent' ? 'phụ huynh' : 'tài xế'} nào`}
+        <p className="text-center py-10 text-gray-600">
+          {searchTerm
+            ? 'Không tìm thấy kết quả nào'
+            : `Chưa có ${type === 'parent' ? 'phụ huynh' : 'tài xế'} nào`}
         </p>
       ) : (
         <>
@@ -184,7 +198,6 @@ export default function ListPage() {
             />
           </div>
 
-          {/* CHỈ 3 NÚT - ĐÚNG YÊU CẦU */}
           {totalPages > 1 && (
             <PaginationControlSimple
               currentPage={currentPage}
@@ -193,11 +206,10 @@ export default function ListPage() {
             />
           )}
 
-          {/* Thông tin tổng quát (tùy chọn) */}
           <div className={styles.summary}>
             Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • 
-            Hiển thị {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length ) }  • 
-            Trong tổng số <strong>{filteredData.length}</strong> dữ liệu.
+            Hiển thị {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length)} • 
+            Tổng <strong>{filteredData.length}</strong> {type === 'parent' ? 'phụ huynh' : 'tài xế'}
           </div>
         </>
       )}

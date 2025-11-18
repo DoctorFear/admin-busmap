@@ -8,7 +8,6 @@ import PaginationControlSimple from '@/components/PaginationControlSimple';
 import Notification from '@/components/Notification';
 import styles from './page.module.css';
 
-// Định nghĩa giao diện AssignmentItem, bao gồm cả các ID cần thiết cho Form chỉnh sửa
 interface AssignmentItem {
   id: string;
   driverName: string;
@@ -23,12 +22,10 @@ interface AssignmentItem {
 const PORT_SERVER = 8888;
 const itemsPerPage = 5;
 
-// HÀM CHUẨN HÓA CHUỖI ĐỂ SO SÁNH (Case-Insensitive & Diacritic-Insensitive)
-// Sử dụng hàm này để đối chiếu tên/biển số từ dữ liệu Phân công với danh mục (Drivers, Buses, Routes)
+// Chuẩn hóa chuỗi để so sánh không phân biệt dấu, hoa thường
 const normalizeString = (str: string | undefined): string => {
   if (!str) return '';
-  // Chuyển về chữ thường, loại bỏ khoảng trắng và chuẩn hóa (loại bỏ dấu)
-  return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+  return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 };
 
 export default function AssignmentPage() {
@@ -42,7 +39,6 @@ export default function AssignmentPage() {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      // 1. Fetch tất cả dữ liệu cần thiết
       const [assignRes, driverRes, busRes, routeRes] = await Promise.all([
         fetch(`http://localhost:${PORT_SERVER}/api/assignments`, { cache: 'no-store' }),
         fetch(`http://localhost:${PORT_SERVER}/api/drivers`, { cache: 'no-store' }),
@@ -53,44 +49,37 @@ export default function AssignmentPage() {
       if (!assignRes.ok) throw new Error('Lỗi tải dữ liệu phân công');
 
       const assignData = await assignRes.json();
-      const drivers = await driverRes.json();
+      const drivers = await driverRes.json();   // ← BÂY GIỜ CÓ driverID
       const buses = await busRes.json();
       const routes = await routeRes.json();
-      
-      // 2. LOGIC LÀM GIÀU DỮ LIỆU (Enrichment):
-      // Ghép nối (join) để thêm các trường ID (driverID, busID, routeID) vào mỗi mục phân công.
+
+      // LÀM GIÀU DỮ LIỆU: thêm driverID, busID, routeID đúng chuẩn vào mỗi assignment
       const enrichedAssignments = assignData.map((item: any) => {
-        
         const normalizedDriverName = normalizeString(item.driverName);
         const normalizedBusName = normalizeString(item.busName);
         const normalizedRouteName = normalizeString(item.routeName);
 
-        // Tìm đối tượng khớp trong danh mục dựa trên tên/biển số
-        const driver = drivers.find((d: any) => 
+        const driver = drivers.find((d: any) =>
           normalizeString(d.name) === normalizedDriverName
         );
-        const bus = buses.find((b: any) => 
+        const bus = buses.find((b: any) =>
           normalizeString(b.licensePlate) === normalizedBusName
         );
-        const route = routes.find((r: any) => 
+        const route = routes.find((r: any) =>
           normalizeString(r.routeName) === normalizedRouteName
         );
-        
-        // Lấy userID/ID tương ứng từ đối tượng tìm được. userID của tài xế được dùng làm driverID
-        const actualDriverID = driver ? (driver as any).userID || 0 : 0; 
 
         return {
           ...item,
-          driverID: actualDriverID,
+          driverID: driver ? driver.driverID : 0,   // <<< SỬA CHỖ NÀY: dùng driverID thật
           busID: bus?.busID || 0,
           routeID: route?.routeID || 0,
-        } as AssignmentItem; 
+        } as AssignmentItem;
       });
 
       setAssignments(enrichedAssignments);
     } catch (err: any) {
       console.error('Lỗi fetchAssignments:', err);
-      // Hiển thị thông báo lỗi chi tiết
       setNotification({ message: err.message || 'Không kết nối được server!', type: 'error' });
     } finally {
       setLoading(false);
@@ -103,9 +92,9 @@ export default function AssignmentPage() {
 
   // Lọc + phân trang
   const filteredData = assignments.filter(item =>
-    item.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.busName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.routeName.toLowerCase().includes(searchTerm.toLowerCase())
+    normalizeString(item.driverName).includes(normalizeString(searchTerm)) ||
+    normalizeString(item.busName).includes(normalizeString(searchTerm)) ||
+    normalizeString(item.routeName).includes(normalizeString(searchTerm))
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -116,11 +105,14 @@ export default function AssignmentPage() {
   return (
     <div className={styles.container}>
       {notification && (
-        <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
       )}
 
       <AssignmentForm
-        // Truyền dữ liệu đã được làm giàu (có đủ ID) vào form chỉnh sửa
         initialData={editingAssignment}
         onSubmit={async (data) => {
           const endpoint = data.id
@@ -132,24 +124,24 @@ export default function AssignmentPage() {
             const res = await fetch(endpoint, {
               method,
               headers: { 'Content-Type': 'application/json' },
-              // Gửi các ID cần thiết + assignmentDate (ngày hiện tại)
               body: JSON.stringify({
-                driverID: data.driverID,
+                driverID: data.driverID,     // ← giờ là driverID thật (1,2,3...)
                 busID: data.busID,
                 routeID: data.routeID,
-                assignmentDate: new Date().toISOString().split('T')[0], // Luôn gửi ngày hiện tại
               }),
             });
 
             if (!res.ok) {
               const err = await res.text();
-              throw new Error(err || 'Lỗi lưu');
+              throw new Error(err || 'Lỗi lưu phân công');
             }
 
-            // Tải lại dữ liệu (bao gồm cả làm giàu ID)
-            await fetchAssignments(); 
+            await fetchAssignments();
             setEditingAssignment(undefined);
-            setNotification({ message: data.id ? 'Cập nhật thành công!' : 'Thêm thành công!', type: 'success' });
+            setNotification({
+              message: data.id ? 'Cập nhật phân công thành công!' : 'Thêm phân công thành công!',
+              type: 'success',
+            });
           } catch (err: any) {
             setNotification({ message: err.message || 'Lưu thất bại!', type: 'error' });
           }
@@ -176,27 +168,31 @@ export default function AssignmentPage() {
               onEdit={setEditingAssignment}
               onDelete={async (id) => {
                 try {
-                  const res = await fetch(`http://localhost:${PORT_SERVER}/api/assignments/${id}`, { method: 'DELETE' });
-                  if (!res.ok) {
-                    const err = await res.text();
-                    throw new Error(err || 'Lỗi xóa');
-                  }
+                  const res = await fetch(`http://localhost:${PORT_SERVER}/api/assignments/${id}`, {
+                    method: 'DELETE',
+                  });
+                  if (!res.ok) throw new Error(await res.text() || 'Lỗi xóa');
+
                   await fetchAssignments();
-                  setNotification({ message: 'Xóa thành công!', type: 'success' });
+                  setNotification({ message: 'Xóa phân công thành công!', type: 'success' });
                 } catch (err: any) {
-                  console.error('Lỗi xóa:', err);
-                  setNotification({ message: 'Xóa thất bại!', type: 'error' });
+                  setNotification({ message: err.message || 'Xóa thất bại!', type: 'error' });
                 }
               }}
             />
           </div>
 
           {totalPages > 1 && (
-            <PaginationControlSimple currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            <PaginationControlSimple
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
 
           <div className={styles.summary}>
-            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Hiển thị {startItem}-{endItem} / {filteredData.length}
+            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Hiển thị{' '}
+            {startItem}-{endItem} / {filteredData.length}
           </div>
         </>
       )}

@@ -1,71 +1,107 @@
 // src/server/models/driverModel.js
 import db from '../db.js';
 
+// ==================== LẤY DANH SÁCH TÀI XẾ (QUAN TRỌNG NHẤT) ====================
 export const getAllDrivers = (callback) => {
   const sql = `
     SELECT 
-      u.userID,
-      u.fullName AS name,
+      d.driverID,          -- <<< BẮT BUỘC PHẢI CÓ ĐỂ FRONTEND LẤY ĐÚNG ID KHI PHÂN CÔNG
+      d.userID,
+      u.fullName   AS name,
       u.username,
-      u.passwordHash AS password,
       u.phone,
-      d.driverLicense AS license
+      u.email,
+      d.driverLicense AS license,
+      d.phoneNumber,
+      d.status
     FROM Users u
     JOIN Driver d ON d.userID = u.userID
     WHERE u.role = 'driver'
-    ORDER BY u.fullName
+    ORDER BY u.fullName ASC
   `;
 
   db.query(sql, (err, results) => {
-    if (err) return callback(err, null);
+    if (err) {
+      console.error('Lỗi getAllDrivers:', err);
+      return callback(err, null);
+    }
     callback(null, results);
   });
 };
 
-// CREATE → Lưu mật khẩu dạng text
+// ==================== TẠO TÀI XẾ MỚI ====================
 export const createDriver = (data, callback) => {
-  const { name, license, phone, username, password } = data;
+  const { name, username, password, phone, license } = data;
 
-  const sqlUser = `INSERT INTO Users (fullName, username, passwordHash, phone, role) VALUES (?, ?, ?, ?, 'driver')`;
+  // 1. Tạo User trước (role = driver)
+  const sqlUser = `
+    INSERT INTO Users (fullName, username, passwordHash, phone, role)
+    VALUES (?, ?, ?, ?, 'driver')
+  `;
+
   db.query(sqlUser, [name, username, password, phone], (err, result) => {
     if (err) return callback(err);
 
     const userId = result.insertId;
-    const sqlDriver = `INSERT INTO Driver (userID, fullName, phoneNumber, driverLicense) VALUES (?, ?, ?, ?)`;
 
-    db.query(sqlDriver, [userId, name, phone, license], (err) => {
+    // 2. Tạo bản ghi trong bảng Driver
+    const sqlDriver = `
+      INSERT INTO Driver (userID, fullName, phoneNumber, driverLicense, status)
+      VALUES (?, ?, ?, ?, 'ACTIVE')
+    `;
+
+    db.query(sqlDriver, [userId, name, phone, license], (err, driverResult) => {
+      if (err) return callback(err);
+
+      // Trả về driverID để frontend có thể dùng ngay (nếu cần)
+      callback(null, { driverID: driverResult.insertId, userID: userId });
+    });
+  });
+};
+
+// ==================== CẬP NHẬT TÀI XẾ ====================
+export const updateDriver = (userId, data, callback) => {
+  const { name, phone, license, password } = data;
+
+  // Cập nhật bảng Users
+  let sqlUser = `UPDATE Users SET fullName = ?, phone = ?`;
+  let paramsUser = [name, phone];
+
+  if (password && password.trim() !== '') {
+    sqlUser += `, passwordHash = ?`;
+    paramsUser.push(password);
+  }
+
+  sqlUser += ` WHERE userID = ?`;
+  paramsUser.push(userId);
+
+  db.query(sqlUser, paramsUser, (err) => {
+    if (err) return callback(err);
+
+    // Cập nhật bảng Driver
+    const sqlDriver = `
+      UPDATE Driver 
+      SET fullName = ?, phoneNumber = ?, driverLicense = ?
+      WHERE userID = ?
+    `;
+
+    db.query(sqlDriver, [name, phone, license, userId], (err) => {
+      if (err) return callback(err);
+      callback(null, { message: 'Cập nhật thành công' });
+    });
+  });
+};
+
+// ==================== XÓA TÀI XẾ ====================
+export const deleteDriver = (userId, callback) => {
+  // Xóa cascade: Driver trước → Users sau (do FK ON DELETE CASCADE cũng được, nhưng an toàn hơn là xóa thủ công)
+  db.query(`DELETE FROM Driver WHERE userID = ?`, [userId], (err) => {
+    if (err) return callback(err);
+
+    db.query(`DELETE FROM Users WHERE userID = ? AND role = 'driver'`, [userId], (err, result) => {
       callback(err, result);
     });
   });
 };
 
-// UPDATE → Chỉ đổi mật khẩu nếu nhập mới
-export const updateDriver = (id, data, callback) => {
-  const { name, license, phone, password } = data;
-
-  let sql = `UPDATE Users SET fullName = ?, phone = ?`;
-  let params = [name, phone];
-
-  if (password && password.trim() !== '') {
-    sql += `, passwordHash = ?`;
-    params.push(password);
-  }
-
-  sql += ` WHERE userID = ?`;
-  params.push(id);
-
-  db.query(sql, params, (err) => {
-    if (err) return callback(err);
-
-    db.query(`UPDATE Driver SET driverLicense = ?, phoneNumber = ? WHERE userID = ?`, [license, phone, id], (err) => {
-      callback(err);
-    });
-  });
-};
-
-export const deleteDriver = (id, callback) => {
-  db.query(`DELETE FROM Driver WHERE userID = ?`, [id], (err) => {
-    if (err) return callback(err);
-    db.query(`DELETE FROM Users WHERE userID = ? AND role = 'driver'`, [id], callback);
-  });
-};
+// Nếu bạn có thêm các hàm khác (getById, v.v.) thì để ở dưới đây
