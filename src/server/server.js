@@ -17,7 +17,7 @@ import cookieParser from "cookie-parser";
 import parentRoutes from './routes/parentRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
 import assignmentRoutes from './routes/assignmentRoutes.js';
-
+import overviewRoutes from './routes/overviewRoutes.js';
 
 // TESTING:
 import routePythonService from "./routes/routePythonService.js"
@@ -58,6 +58,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/parents', parentRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/overview', overviewRoutes);
 
 
 // Testing
