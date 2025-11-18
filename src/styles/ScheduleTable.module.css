@@ -28,32 +28,35 @@
 .tr:hover {
   background-color: #fff9f1;
 }
+.actionButtons {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.editButton, .deleteButton {
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
 .editButton {
-  background-color: #3F51B5;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  padding: 0.3rem 0.7rem;
-  cursor: pointer;
-  margin-right: 0.5rem;
+  background: #dbeafe;
+  color: #1e40af;
 }
 
 .editButton:hover {
-  filter: brightness(140%);
+  background: #bfdbfe;
 }
 
 .deleteButton {
-  background-color: #F44336;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  padding: 0.3rem 0.7rem;
-  cursor: pointer;
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .deleteButton:hover {
-  filter: brightness(140%);
+  background: #fecaca;
 }
 
 .noResults {

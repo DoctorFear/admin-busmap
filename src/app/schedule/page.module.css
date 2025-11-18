@@ -67,3 +67,17 @@
     gap: 1rem;
   }
 }
+
+
+
+.summary {
+  color: #666;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 1.5rem;
+  font-weight: 500;
+}
+
+.summary strong {
+  color: #6e48aa;
+}

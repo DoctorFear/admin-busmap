@@ -9,7 +9,8 @@ import { ScheduleItem} from '@/lib/data_schedule';
 import SearchBar from '@/components/SearchBar';
 import ScheduleForm from '@/components/ScheduleForm';
 import ScheduleTable from '@/components/ScheduleTable';
-import PaginationControl from '@/components/PaginationControl';
+import PaginationControlSimple from '@/components/PaginationControlSimple'; 
+
 import Notification from '@/components/Notification';
 // Style
 import styles from './page.module.css';
@@ -47,19 +48,22 @@ export default function SchedulePage() {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null); // thêm trạng thái thông báo
   
   // Phân trang 
-  const itemsPerPage = 3; // số mục trên mỗi trang
+  const itemsPerPage = 5; // số mục trên mỗi trang
 
   // Lọc lịch trình dựa trên từ khóa tìm kiếm
 
-  const filteredSchedules = schedules.filter( // lọc lịch trình
-    (schedule) =>
-      schedule.routeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      schedule.roads.some((road) => road.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredSchedules = schedules.filter((schedule) =>
+    schedule.routeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    schedule.roads.some((road) => road.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredSchedules.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedSchedules = filteredSchedules.slice(startIndex, startIndex + itemsPerPage);
+
+  // TÍNH TOÁN ĐỂ HIỂN THỊ SUMMARY ĐẸP
+  const startItem = filteredSchedules.length > 0 ? startIndex + 1 : 0;
+  const endItem = Math.min(startIndex + itemsPerPage, filteredSchedules.length);
 
   // Xử lý thêm, sửa, xóa lịch trình
   const handleSubmit = (data: ScheduleItem) => { //   xử lý khi người dùng submit form
@@ -118,13 +122,19 @@ export default function SchedulePage() {
       <ScheduleTable data={paginatedSchedules} onEdit={handleEdit} onDelete={handleDelete} />
 
       {totalPages > 1 && (
-        <PaginationControl
+        <PaginationControlSimple
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
-          className={styles.paginationControls}
         />
       )}
+
+      {/* DÒNG SUMMARY ĐẸP – ĐÃ ĐƯỢC THÊM NHƯ YÊU CẦU */}
+      <div className={styles.summary}>
+        Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Hiển thị{' '}
+        <strong>{startItem}</strong> - <strong>{endItem}</strong> • Tổng{' '}
+        <strong>{filteredSchedules.length}</strong> lịch trình
+      </div>
     </div>
   );
 }

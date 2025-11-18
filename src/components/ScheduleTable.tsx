@@ -2,6 +2,7 @@
 'use client';
 
 import styles from '../styles/ScheduleTable.module.css';
+import { Edit2, Trash2 } from 'lucide-react';
 
 interface ScheduleItem {
   tripID: number;
@@ -61,18 +62,23 @@ export default function ScheduleTable({ data, onEdit, onDelete }: ScheduleTableP
                 </span>
               </td>
               <td className={styles.td}>
+                <div className={styles.actionButtons}>
                 <button
                   onClick={() => onEdit(schedule)}
                   className={styles.editButton}
-                >
-                  Sửa
+                      title="Sửa lịch trình"
+                    >
+                      <Edit2 size={16} />
                 </button>
                 <button
                   onClick={() => onDelete(schedule.tripID)}
                   className={styles.deleteButton}
-                >
-                  Xóa
+                      title="Xóa lịch trình"
+                    >
+                      <Trash2 size={16} />
                 </button>
+                </div>
+
               </td>
             </tr>
           ))
