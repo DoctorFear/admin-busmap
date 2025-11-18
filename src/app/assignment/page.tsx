@@ -191,8 +191,8 @@ export default function AssignmentPage() {
           )}
 
           <div className={styles.summary}>
-            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Hiển thị{' '}
-            {startItem}-{endItem} / {filteredData.length}
+            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Hiển thị{' '}  
+            {startItem} - {endItem}  • Tổng <strong>{filteredData.length}</strong> phân công
           </div>
         </>
       )}
