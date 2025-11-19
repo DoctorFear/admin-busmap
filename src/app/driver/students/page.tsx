@@ -211,7 +211,7 @@ export default function DriverStudentsPage() {
         {studentList.map((student) => (
           <div key={student.studentID} className={styles.studentItem}>
             <p>
-              {student.studentName} – Lớp: {student.grade}
+              {student.studentName}  –  {student.grade}  –  {student.address}
             </p>
 
             <select

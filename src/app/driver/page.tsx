@@ -44,7 +44,14 @@ export default function DriverPage() {
       const data: ScheduleItem[] = await res.json();
       setWeeklySchedule(data);
 
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const today = new Date();
+      const todayStr =
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0");
+
       const todayItems = data.filter(item => item.date === todayStr);
       setTodaySchedule(todayItems);
       setScheduleError("");

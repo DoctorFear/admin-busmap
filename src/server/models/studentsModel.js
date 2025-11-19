@@ -30,7 +30,9 @@ export const getStudentsByDriverID = (driverID, callback) => {
         TIME_FORMAT(t.startTime, '%H:%i:%s') AS tripStartTime,
         TIME_FORMAT(t.endTime, '%H:%i:%s') AS tripEndTime,
         t.status AS tripStatus,
-        r.routeName
+        r.routeName,
+        p.address AS address
+
     FROM (
         SELECT tripID, tripDate, startTime, endTime, routeID, status
         FROM Trip
@@ -40,8 +42,11 @@ export const getStudentsByDriverID = (driverID, callback) => {
         ORDER BY tripID ASC
         LIMIT 1
     ) AS next_trip
+
     JOIN BoardingRecord br ON next_trip.tripID = br.tripID
     JOIN Student s ON br.studentID = s.studentID
+    JOIN Parent p ON s.parentUserID = p.parentID
+
     JOIN Trip t ON next_trip.tripID = t.tripID
     JOIN Route r ON t.routeID = r.routeID
     ORDER BY s.fullName ASC
@@ -62,6 +67,7 @@ export const getStudentsByDriverID = (driverID, callback) => {
     callback(null, mappedRows);
   });
 };
+
 
 // Lấy tripID từ studentID
 export const getTripIDByStudent = (studentID, callback) => {
