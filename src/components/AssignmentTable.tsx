@@ -44,16 +44,16 @@ export default function AssignmentTable({ data, onEdit, onDelete }: AssignmentTa
             data.map((assignment) => (
               <tr key={assignment.id} className={styles.tr}>
                 <td className={styles.td}>
-                  <strong>{assignment.driverName}</strong>
+                  <strong>{assignment.driverName}</strong><a></a>
                 </td>
                 <td className={styles.td}>
-                  <span className={styles.busPlate}>{assignment.busName}</span>
+                  <span className={styles.busPlate}>{assignment.busName}</span><a></a>
                 </td>
-                <td className={styles.td}>{assignment.routeName}</td>
+                <td className={styles.td}>{assignment.routeName}<a></a></td>
                 <td className={styles.td}>
                   <span className={styles.dateBadge}>
                     {formatDate(assignment.assignmentDate)}
-                  </span>
+                  </span><a></a>
                 </td>
                 <td className={styles.td}>
                   <div className={styles.actionButtons}>
@@ -73,7 +73,7 @@ export default function AssignmentTable({ data, onEdit, onDelete }: AssignmentTa
                     >
                       <Trash2 size={16} />
                     </button>
-                  </div>
+                  </div><a></a>
                 </td>
               </tr>
             ))

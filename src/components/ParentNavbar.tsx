@@ -4,21 +4,44 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import styles from "../styles/Navbar.module.css";
+
+import { setLanguage, translateAll } from "@/lib/autoTranslate";
+
 import {
-  LayoutDashboard,
   Route,
-  History,
   Bell,
   UserPen,
   Settings,
   LogOut,
+  Globe,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function ParentNavbar() {
   const pathname = usePathname();
+  const [displayLang, setDisplayLang] = useState<"VI" | "EN">("VI");
+
+  // Khôi phục ngôn ngữ + dịch lần đầu
+  useEffect(() => {
+    const saved = localStorage.getItem("appLang");
+    if (saved === "en") setDisplayLang("EN");
+    setTimeout(translateAll, 150);
+  }, []);
+
+  // Dịch lại mỗi khi đổi ngôn ngữ
+  useEffect(() => {
+    translateAll();
+  }, [displayLang]);
+
+  const toggleLang = () => {
+    const newLang = displayLang === "VI" ? "en" : "vi";
+    setLanguage(newLang);
+    setDisplayLang(newLang === "vi" ? "VI" : "EN");
+  };
 
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Parent navigation">
+      {/* Logo */}
       <div className={styles.logo}>
         <Link href="/parent/journey">
           <Image
@@ -32,11 +55,10 @@ export default function ParentNavbar() {
       </div>
 
       <ul className={styles.navLinks}>
-
         <li>
           <Link
             href="/parent/journey"
-            className={`${styles.link} ${pathname === "/parent/journey" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/parent/journey") ? styles.active : ""}`}
           >
             <Route size={18} /> Theo dõi hành trình
           </Link>
@@ -45,34 +67,50 @@ export default function ParentNavbar() {
         <li>
           <Link
             href="/parent/notification"
-            className={`${styles.link} ${pathname === "/parent/notification" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/parent/notification") ? styles.active : ""}`}
           >
             <Bell size={18} /> Thông báo
           </Link>
         </li>
-                <li>
+
+        <li>
           <Link
             href="/parent/information"
-            className={`${styles.link} ${pathname === "/parent/information" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/parent/information") ? styles.active : ""}`}
           >
             <UserPen size={18} /> Thông tin học sinh
           </Link>
         </li>
+
         <li>
           <Link
             href="/parent/setting"
-            className={`${styles.link} ${pathname === "/parent/setting" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/parent/setting") ? styles.active : ""}`}
           >
             <Settings size={18} /> Cài đặt
           </Link>
         </li>
+
+        {/* Nút đổi ngôn ngữ – đẩy sang phải */}
+        <li style={{ marginLeft: "auto"}}>
+          <button
+            data-no-translate
+            onClick={toggleLang}
+            className={styles.langButton}
+            aria-label="Change language"
+          >
+            <Globe size={20} />
+            {displayLang}
+          </button>
+        </li>
+
+        {/* Logout */}
         <li>
           <Link href="/logout" className={styles.logout}>
             <LogOut size={20} />
           </Link>
         </li>
       </ul>
-
     </nav>
   );
 }

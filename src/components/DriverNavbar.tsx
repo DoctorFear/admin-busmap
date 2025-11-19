@@ -4,19 +4,44 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import styles from "../styles/Navbar.module.css";
+
+import { setLanguage, translateAll } from "@/lib/autoTranslate";
+
 import {
   LayoutDashboard,
   CalendarDays,
   Users,
   AlertTriangle,
   LogOut,
+  Globe,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function DriverNavbar() {
   const pathname = usePathname();
+  const [displayLang, setDisplayLang] = useState<"VI" | "EN">("VI");
+
+  // Khôi phục ngôn ngữ + dịch lần đầu
+  useEffect(() => {
+    const saved = localStorage.getItem("appLang");
+    if (saved === "en") setDisplayLang("EN");
+    setTimeout(translateAll, 150);
+  }, []);
+
+  // Dịch lại mỗi khi đổi ngôn ngữ
+  useEffect(() => {
+    translateAll();
+  }, [displayLang]);
+
+  const toggleLang = () => {
+    const newLang = displayLang === "VI" ? "en" : "vi";
+    setLanguage(newLang);
+    setDisplayLang(newLang === "vi" ? "VI" : "EN");
+  };
 
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Driver navigation">
+      {/* Logo */}
       <div className={styles.logo}>
         <Link href="/driver">
           <Image
@@ -29,6 +54,7 @@ export default function DriverNavbar() {
         </Link>
       </div>
 
+      {/* Menu chính */}
       <ul className={styles.navLinks}>
         <li>
           <Link
@@ -41,7 +67,7 @@ export default function DriverNavbar() {
         <li>
           <Link
             href="/driver/schedule"
-            className={`${styles.link} ${pathname === "/driver/schedule" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/driver/schedule") ? styles.active : ""}`}
           >
             <CalendarDays size={18} /> Lịch làm việc
           </Link>
@@ -49,7 +75,7 @@ export default function DriverNavbar() {
         <li>
           <Link
             href="/driver/students"
-            className={`${styles.link} ${pathname === "/driver/students" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/driver/students") ? styles.active : ""}`}
           >
             <Users size={18} /> Danh sách học sinh
           </Link>
@@ -57,15 +83,29 @@ export default function DriverNavbar() {
         <li>
           <Link
             href="/driver/alerts"
-            className={`${styles.link} ${pathname === "/driver/alerts" ? styles.active : ""}`}
+            className={`${styles.link} ${pathname.startsWith("/driver/alerts") ? styles.active : ""}`}
           >
             <AlertTriangle size={18} /> Cảnh báo
           </Link>
         </li>
+
+        {/* Nút đổi ngôn ngữ – đẩy sang phải */}
+        <li style={{ marginLeft: "auto", marginRight: "20px"}}>
+          <button
+            data-no-translate
+            onClick={toggleLang}
+            className={styles.langButton}
+            aria-label="Đổi ngôn ngữ"
+          >
+            <Globe size={20} />
+            {displayLang}
+          </button>
+        </li>
       </ul>
 
+      {/* Nút Logout */}
       <div className={styles.logoutBtn}>
-        <button type="button" className={styles.logout}>
+        <button type="button" className={styles.logout} onClick={() => {/* TODO: xử lý logout */}}>
           <LogOut size={20} />
         </button>
       </div>

@@ -47,10 +47,10 @@ export default function OverviewTable({ data }: OverviewTableProps) {
           {data.length > 0 ? (
             data.map((item) => (
               <tr key={item.id} className={styles.tr}>
-                <td className={styles.td}>{item.student}</td>
-                <td className={styles.td}>{item.driver}</td>
-                <td className={styles.td}>{item.bus}</td>
-                <td className={styles.td}>{item.route}</td>
+                <td className={styles.td}>{item.student}<a></a></td>
+                <td className={styles.td}>{item.driver}<a></a></td>
+                <td className={styles.td}>{item.bus}<a></a></td>
+                <td className={styles.td}>{item.route}<a></a></td>
                 <td className={styles.td}>
                   <span className={`${styles.statusBadge} ${getStatusClass(item.status)}`}>
                     {item.status}

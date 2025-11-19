@@ -49,7 +49,7 @@ export default function ParentDriverTable({
             data.map((item) => (
               <tr key={item.userID} className={styles.tr}>
                 <td className={styles.td}>
-                  <strong>{item.name}</strong>
+                  <strong>{item.name}</strong><a></a>
                 </td>
 
                 {/* Cột phụ thuộc loại */}
@@ -65,18 +65,18 @@ export default function ParentDriverTable({
                         </span>
                       ) : (
                         <em style={{color: '#999'}}>Chưa cập nhật</em>
-                      )}
+                      )}<a></a>
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className={styles.td}>{item.license || '-'}</td>
+                    <td className={styles.td}>{item.license || '-'}<a></a></td>
                     {/* BỎ CỘT TRẠNG THÁI → KHÔNG CÓ TD NÀO Ở ĐÂY */}
                   </>
                 )}
 
-                <td className={styles.td}>{item.phone}</td>
-                <td className={styles.td}>{item.username || '-'}</td>
+                <td className={styles.td}>{item.phone}<a></a></td>
+                <td className={styles.td}>{item.username || '-'}<a></a></td>
 
                 {/* Mật khẩu */}
                 <td className={styles.td}>
@@ -89,7 +89,7 @@ export default function ParentDriverTable({
                     >
                       {showPassword[item.userID] ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
-                  </div>
+                  </div><a></a>
                 </td>
 
                 {/* Hành động */}
@@ -101,7 +101,7 @@ export default function ParentDriverTable({
                     <button onClick={() => onDelete(item.userID)} className={styles.deleteBtn} title="Xóa">
                       <Trash2 size={16} />
                     </button>
-                  </div>
+                  </div><a></a>
                 </td>
               </tr>
             ))
@@ -112,7 +112,7 @@ export default function ParentDriverTable({
                 className={styles.noResults}
               >
                 Không có dữ liệu
-              </td>
+              <a></a></td>
             </tr>
           )}
         </tbody>

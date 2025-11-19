@@ -103,6 +103,8 @@
   font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
 }
 
 .logout:hover {
@@ -151,3 +153,45 @@
 .logo img:hover {
   transform: scale(1.05);
 }
+
+
+/* Nút ngôn ngữ đẹp hiện đại */
+.languageToggle {
+  margin-left: 12px;
+}
+
+.langButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: var(--text-primary, #fff);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.langButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+
+}
+
+.langText {
+  min-width: 20px;
+}
+
+/* Khi active thì đổi màu nhẹ */
+.navLinks li a.active .langText {
+  color: #a78bfa; /* màu tím nhẹ giống theme twilight */
+}
+
+.navLinks li:first-child{
+  margin-left: auto;
+}
+
+
+

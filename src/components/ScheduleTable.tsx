@@ -26,7 +26,7 @@ export default function ScheduleTable({ data, onEdit, onDelete }: ScheduleTableP
     <table className={styles.table}>
       <thead>
         <tr>
-          <th className={styles.th}>Tuyến</th>
+          <th className={styles.th}>Tuyến đường</th>
           <th className={styles.th}>Ngày chạy</th>
           <th className={styles.th}>Giờ hoạt động</th>
           <th className={styles.th}>Xe buýt</th>
@@ -39,15 +39,15 @@ export default function ScheduleTable({ data, onEdit, onDelete }: ScheduleTableP
         {data.length > 0 ? (
           data.map((schedule) => (
             <tr key={schedule.tripID} className={styles.tr}>
-              <td className={styles.td}>{schedule.routeName}</td>
+              <td className={styles.td}>{schedule.routeName}<a></a></td>
               <td className={styles.td}>
-                {new Date(schedule.tripDate).toLocaleDateString('vi-VN')}
+                {new Date(schedule.tripDate).toLocaleDateString('vi-VN')}<a></a>
               </td>
               <td className={styles.td}>
-                {schedule.startTime} - {schedule.endTime}
+                {schedule.startTime} - {schedule.endTime}<a></a>
               </td>
-              <td className={styles.td}>{schedule.licensePlate || '—'}</td>
-              <td className={styles.td}>{schedule.driverName || '—'}</td>
+              <td className={styles.td}>{schedule.licensePlate || '—'}<a></a></td>
+              <td className={styles.td}>{schedule.driverName || '—'}<a></a></td>
               <td className={styles.td}>
                 <span
                   className={`${styles.status} ${
@@ -59,7 +59,7 @@ export default function ScheduleTable({ data, onEdit, onDelete }: ScheduleTableP
                   }`}
                 >
                   {schedule.status}
-                </span>
+                </span><a></a>
               </td>
               <td className={styles.td}>
                 <div className={styles.actionButtons}>
@@ -77,7 +77,7 @@ export default function ScheduleTable({ data, onEdit, onDelete }: ScheduleTableP
                     >
                       <Trash2 size={16} />
                 </button>
-                </div>
+                </div><a></a>
 
               </td>
             </tr>
