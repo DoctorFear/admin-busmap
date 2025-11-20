@@ -14,16 +14,16 @@ interface AssignmentItem {
   busName: string;
   routeName: string;
   assignmentDate: string;
+  createdAt?: string;
   driverID: number;
   busID: number;
-  routeID: number;
+  routeID?: number | null;
 }
 
 const PORT_SERVER = 8888;
 const itemsPerPage = 5;
 
-// Chuẩn hóa chuỗi để so sánh không phân biệt dấu, hoa thường
-const normalizeString = (str: string | undefined): string => {
+const normalizeString = (str?: string): string => {
   if (!str) return '';
   return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 };
@@ -36,50 +36,23 @@ export default function AssignmentPage() {
   const [editingAssignment, setEditingAssignment] = useState<AssignmentItem | undefined>();
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // Ngày hiện tại (yyyy-MM-dd)
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  // Ngày mai (dùng để kiểm tra điều kiện sửa/xóa)
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const [assignRes, driverRes, busRes, routeRes] = await Promise.all([
-        fetch(`http://localhost:${PORT_SERVER}/api/assignments`, { cache: 'no-store' }),
-        fetch(`http://localhost:${PORT_SERVER}/api/drivers`, { cache: 'no-store' }),
-        fetch(`http://localhost:${PORT_SERVER}/api/buses`, { cache: 'no-store' }),
-        fetch(`http://localhost:${PORT_SERVER}/api/routes`, { cache: 'no-store' }),
-      ]);
-
-      if (!assignRes.ok) throw new Error('Lỗi tải dữ liệu phân công');
-
-      const assignData = await assignRes.json();
-      const drivers = await driverRes.json();   // ← BÂY GIỜ CÓ driverID
-      const buses = await busRes.json();
-      const routes = await routeRes.json();
-
-      // LÀM GIÀU DỮ LIỆU: thêm driverID, busID, routeID đúng chuẩn vào mỗi assignment
-      const enrichedAssignments = assignData.map((item: any) => {
-        const normalizedDriverName = normalizeString(item.driverName);
-        const normalizedBusName = normalizeString(item.busName);
-        const normalizedRouteName = normalizeString(item.routeName);
-
-        const driver = drivers.find((d: any) =>
-          normalizeString(d.name) === normalizedDriverName
-        );
-        const bus = buses.find((b: any) =>
-          normalizeString(b.licensePlate) === normalizedBusName
-        );
-        const route = routes.find((r: any) =>
-          normalizeString(r.routeName) === normalizedRouteName
-        );
-
-        return {
-          ...item,
-          driverID: driver ? driver.driverID : 0,   // <<< SỬA CHỖ NÀY: dùng driverID thật
-          busID: bus?.busID || 0,
-          routeID: route?.routeID || 0,
-        } as AssignmentItem;
-      });
-
-      setAssignments(enrichedAssignments);
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/assignments`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Lỗi tải dữ liệu phân công');
+      const data: AssignmentItem[] = await res.json();
+      setAssignments(data);
     } catch (err: any) {
-      console.error('Lỗi fetchAssignments:', err);
       setNotification({ message: err.message || 'Không kết nối được server!', type: 'error' });
     } finally {
       setLoading(false);
@@ -90,7 +63,6 @@ export default function AssignmentPage() {
     fetchAssignments();
   }, []);
 
-  // Lọc + phân trang
   const filteredData = assignments.filter(item =>
     normalizeString(item.driverName).includes(normalizeString(searchTerm)) ||
     normalizeString(item.busName).includes(normalizeString(searchTerm)) ||
@@ -99,22 +71,30 @@ export default function AssignmentPage() {
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, filteredData.length);
 
   return (
     <div className={styles.container}>
       {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification(null)}
-        />
+        <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />
       )}
 
       <AssignmentForm
         initialData={editingAssignment}
-        onSubmit={async (data) => {
+        onSubmit={async (data: any) => {
+          const isEditing = !!data.id;
+
+          // 1. Thêm mới: Không cho chọn ngày quá khứ
+          if (!isEditing && data.assignmentDate < todayStr) {
+            setNotification({ message: 'Không thể thêm phân công cho ngày đã qua!', type: 'error' });
+            return;
+          }
+
+          // 2. Chỉnh sửa: Chỉ cho phép nếu ngày phân công >= ngày mai
+          if (isEditing && data.assignmentDate < tomorrowStr) {
+            setNotification({ message: 'Không thể chỉnh sửa phân công đã qua hoặc đang diễn ra!', type: 'error' });
+            return;
+          }
+
           const endpoint = data.id
             ? `http://localhost:${PORT_SERVER}/api/assignments/${data.id}`
             : `http://localhost:${PORT_SERVER}/api/assignments`;
@@ -125,21 +105,22 @@ export default function AssignmentPage() {
               method,
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                driverID: data.driverID,     // ← giờ là driverID thật (1,2,3...)
+                driverID: data.driverID,
                 busID: data.busID,
-                routeID: data.routeID,
+                routeID: data.routeID || null,
+                assignmentDate: data.assignmentDate,
               }),
             });
 
             if (!res.ok) {
-              const err = await res.text();
-              throw new Error(err || 'Lỗi lưu phân công');
+              const errText = await res.text();
+              throw new Error(errText || 'Lỗi lưu phân công');
             }
 
             await fetchAssignments();
             setEditingAssignment(undefined);
             setNotification({
-              message: data.id ? 'Cập nhật phân công thành công!' : 'Thêm phân công thành công!',
+              message: isEditing ? 'Cập nhật phân công thành công!' : 'Thêm phân công thành công!',
               type: 'success',
             });
           } catch (err: any) {
@@ -147,7 +128,7 @@ export default function AssignmentPage() {
           }
         }}
         onCancel={() => setEditingAssignment(undefined)}
-        setNotification={(msg, type) => setNotification({ message: msg, type })}
+        setNotification={(msg: string, type: 'success' | 'error') => setNotification({ message: msg, type })}
       />
 
       <div className={styles.headerRow}>
@@ -165,13 +146,28 @@ export default function AssignmentPage() {
           <div className={styles.abc}>
             <AssignmentTable
               data={paginatedData}
-              onEdit={setEditingAssignment}
+              onEdit={(assignment) => {
+                // CHỈ CHO PHÉP SỬA NẾU NGÀY >= NGÀY MAI
+                if (assignment.assignmentDate < tomorrowStr) {
+                  setNotification({ message: 'Không thể chỉnh sửa phân công đã qua hoặc đang diễn ra!', type: 'error' });
+                  return;
+                }
+                setEditingAssignment(assignment);
+              }}
               onDelete={async (id) => {
+                const assignment = assignments.find(a => a.id === id);
+
+                // CHỈ CHO PHÉP XÓA NẾU NGÀY >= NGÀY MAI
+                if (!assignment || assignment.assignmentDate < tomorrowStr) {
+                  setNotification({ message: 'Không thể xóa phân công đã qua hoặc đang diễn ra!', type: 'error' });
+                  return;
+                }
+
+                if (!confirm('Xóa phân công này?')) return;
+
                 try {
-                  const res = await fetch(`http://localhost:${PORT_SERVER}/api/assignments/${id}`, {
-                    method: 'DELETE',
-                  });
-                  if (!res.ok) throw new Error(await res.text() || 'Lỗi xóa');
+                  const res = await fetch(`http://localhost:${PORT_SERVER}/api/assignments/${id}`, { method: 'DELETE' });
+                  if (!res.ok) throw new Error(await res.text());
 
                   await fetchAssignments();
                   setNotification({ message: 'Xóa phân công thành công!', type: 'success' });
@@ -183,16 +179,11 @@ export default function AssignmentPage() {
           </div>
 
           {totalPages > 1 && (
-            <PaginationControlSimple
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+            <PaginationControlSimple currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           )}
 
           <div className={styles.summary}>
-            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Hiển thị{' '}  
-            {startItem} - {endItem}  • Tổng <strong>{filteredData.length}</strong> phân công
+            Trang <strong>{currentPage}</strong> / <strong>{totalPages}</strong> • Tổng <strong>{filteredData.length}</strong> phân công
           </div>
         </>
       )}
