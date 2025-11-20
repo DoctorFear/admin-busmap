@@ -1,17 +1,34 @@
 // app/login/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Link from "next/link";
+import { setLanguage, getCurrentLang, translateAll } from "@/lib/autoTranslate";
+import { Globe } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState(""); // ← Đổi thành username
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // State cho nút ngôn ngữ
+  const [displayLang, setDisplayLang] = useState<"VI" | "EN">("VI");
+
+  useEffect(() => {
+    const saved = getCurrentLang();
+    if (saved === "en") setDisplayLang("EN");
+    setTimeout(translateAll, 150);
+  }, []);
+
+  const toggleLang = () => {
+    const newLang = displayLang === "VI" ? "en" : "vi";
+    setLanguage(newLang);
+    setDisplayLang(newLang === "vi" ? "VI" : "EN");
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +38,7 @@ export default function LoginPage() {
       const res = await fetch("http://localhost:8888/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }), // ← Gửi username
+        body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -64,6 +81,7 @@ export default function LoginPage() {
               required
               className={styles.input}
               placeholder="ph_lan, tai_le"
+              data-no-translate
             />
           </div>
 
@@ -76,10 +94,11 @@ export default function LoginPage() {
               required
               className={styles.input}
               placeholder="••••••••"
+              data-no-translate
             />
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} data-no-translate>{error}</p>}
 
           <button type="submit" disabled={loading} className={styles.button}>
             {loading ? (
@@ -93,9 +112,40 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <Link href="/register" className={styles.registerLink}>
-          Đăng ký
-        </Link>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: "1.5rem",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center",  gap: "0.3rem" }}>
+            <p style={{ marginBottom: "0.1rem", color: "#444", fontSize: "14px" }}>Chưa có tài khoản?</p>
+            <Link href="/register" className={styles.registerLink}>
+              Đăng ký
+            </Link>
+          </div>
+
+
+          <button
+            onClick={toggleLang}
+            className={styles.registerLink2}
+            aria-label="Đổi ngôn ngữ"
+            style={{
+              background: "none",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              cursor: "pointer",
+              padding: "0.25rem 0.75rem",
+            }}
+          >
+            {displayLang}
+          </button>
+        </div>
+
+
+
       </div>
     </div>
   );

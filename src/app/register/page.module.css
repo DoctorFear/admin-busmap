@@ -151,7 +151,7 @@
 
 .loginLink {
   display: block;
-  margin-top: 1.5rem;
+
   color: #667eea;
   font-size: 0.95rem;
   text-decoration: none;
@@ -164,7 +164,26 @@
 }
 
 .loginLink::before {
-  content: "Đã có tài khoản? ";
+  color: #666;
+  font-weight: normal;
+}
+
+
+.registerLink2 {
+  display: block;
+
+  color: #667eea;
+  font-size: 0.95rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+.registerLink2:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+.registerLink::before {
+
   color: #666;
   font-weight: normal;
 }
