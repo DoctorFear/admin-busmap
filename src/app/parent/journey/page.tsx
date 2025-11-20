@@ -28,10 +28,28 @@ export default function ParentJourneyPage(): JSX.Element {
         </div>
 
         <div className={styles.busInfo} aria-live="polite">
-          <p><strong>Xe:</strong> Xe 01 - Tuyến A</p>
-          <p><strong>Tài xế:</strong> Nguyễn Văn A</p>
-          <p><strong>Trạng thái:</strong> Đang di chuyển</p>
-          <p><strong>Thời gian đến dự kiến:</strong> 7:30 AM</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", color: "#374151" }}>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <span style={{ fontWeight: "bold" }}>Xe:</span>
+              <span data-no-translate>Xe 01</span>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <span style={{ fontWeight: "bold" }}>Tài xế:</span>
+              <span data-no-translate>Nguyễn Văn A</span>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <span style={{ fontWeight: "bold" }}>Tuyến đường:</span>
+              <span data-no-translate>Tuyến ABC</span>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <span style={{ fontWeight: "bold" }}>Trạng thái:</span>
+              <span data-no-translate>Đang di chuyển</span>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <span style={{ fontWeight: "bold" }}>Thời gian đến dự kiến:</span>
+              <span data-no-translate>7:30 AM</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

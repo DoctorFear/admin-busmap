@@ -35,10 +35,10 @@ export default function IncidentTable({ incidents, onSendNotification }: Inciden
           {incidents.length > 0 ? (
             incidents.map((incident) => (
               <tr key={incident.id} className={styles.tr}>
-                <td className={styles.td}>{incident.driver}</td>
-                <td className={styles.td}>{incident.bus}</td>
-                <td className={styles.td}>{incident.issue}</td>
-                <td className={styles.td}>{new Date(incident.timestamp).toLocaleString()}</td>
+                <td className={styles.td} data-no-translate>{incident.driver}</td>
+                <td className={styles.td} data-no-translate>{incident.bus}</td>
+                <td className={styles.td} data-no-translate>{incident.issue}</td>
+                <td className={styles.td} data-no-translate>{new Date(incident.timestamp).toLocaleString()}</td>
                 <td className={styles.td}>
                   {incident.status === 'sent' ? 'Đã gửi' : 'Chưa gửi'}
                 </td>

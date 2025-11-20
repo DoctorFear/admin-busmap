@@ -21,18 +21,14 @@ export default function Setting(): JSX.Element {
         <h3 className={styles.title}>Cài đặt</h3>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <label htmlFor="language">Ngôn ngữ:</label>
-          <select id="language" className={styles.select}>
-            <option value="vi">Tiếng Việt</option>
-            <option value="en">Tiếng Anh</option>
-          </select>
+
 
           <label htmlFor="email">Email:</label>
           <input
             type="email"
             id="email"
             defaultValue="phuhuynh@example.com"
-            className={styles.input}
+            className={styles.input} data-no-translate
           />
 
           <label htmlFor="phone">Số điện thoại:</label>
@@ -40,7 +36,7 @@ export default function Setting(): JSX.Element {
             type="tel"
             id="phone"
             defaultValue="0123456789"
-            className={styles.input}
+            className={styles.input} data-no-translate
           />
 
           <label htmlFor="notification-distance">Khoảng cách thông báo:</label>
@@ -49,7 +45,7 @@ export default function Setting(): JSX.Element {
               type="number"
               id="notification-distance"
               defaultValue="500"
-              className={styles.inputSmall}
+              className={styles.inputSmall} data-no-translate
             />
             <span>mét</span>
           </div>

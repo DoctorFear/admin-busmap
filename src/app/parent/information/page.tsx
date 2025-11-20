@@ -25,7 +25,7 @@ export default function Information(): JSX.Element {
           <div className={styles.avatarSection}>
             <img
               src={preview}
-              alt="Ảnh đại diện học sinh"
+              
               className={styles.studentAvatar}
             />
             <label htmlFor="avatar-upload" className={styles.uploadBtn}>
@@ -42,18 +42,25 @@ export default function Information(): JSX.Element {
 
           {/* Bên phải: thông tin */}
           <div className={styles.studentDetails}>
-            <p>
-              <strong>Tên:</strong> Nguyễn Văn An
-            </p>
-            <p>
-              <strong>Điểm đón:</strong> 123 Đường Lê Lợi
-            </p>
-            <p>
-              <strong>Điểm trả:</strong> Trường DEF
-            </p>
-            <p>
-              <strong>Lịch trình:</strong> Thứ 2–6, Xe 01, 6:30 AM – 8:00 AM
-            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", color: "#374151" }}>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ fontWeight: "bold" }}>Tên:</span>
+                <span data-no-translate>Nguyễn Văn An</span>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ fontWeight: "bold" }}>Điểm đón:</span>
+                <span data-no-translate>123 Đường Lê Lợi</span>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ fontWeight: "bold" }}>Điểm trả:</span>
+                <span data-no-translate>Trường DEF</span>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ fontWeight: "bold" }}>Lịch trình:</span>
+                <span data-no-translate>Thứ 2–6, Xe 01, 6:30 AM – 8:00 AM</span>
+              </div>
+            </div>
+
             <button className={styles.submitBtn}>Cập nhật điểm đón</button>
           </div>
         </div>

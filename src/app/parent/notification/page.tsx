@@ -24,7 +24,7 @@ export default function ParentNotificationPage() {
         </div>
 
         {notifications.map((item: NotificationItem, index: number) => (
-          <div
+          <div data-no-translate
             key={index}
             className={`${styles.notificationItem} ${
               item.status.includes("Trễ") ? styles.alert : ""
