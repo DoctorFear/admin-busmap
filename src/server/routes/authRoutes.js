@@ -20,25 +20,38 @@ import cookieParser from "cookie-parser";
 const router = express.Router();
 
 router.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  console.log("[Login] - User in login page", email, password)
-  if (!email || !password)
-    return res.status(400).json({ msg: "Thiếu email hoặc mật khẩu" });
+  const { username, password } = req.body;
+  console.log("[Login] - User in login page", username, password)
+  
+  if (!username || !password)
+    return res.status(400).json({ 
+      success: false,
+      msg: "Vui lòng nhập tên đăng nhập và mật khẩu" 
+    });
 
-  const sql = "SELECT userID, role, passwordHash FROM Users WHERE email = ? LIMIT 1";
-  db.query(sql, [email], async (err, results) => {
+  const sql = "SELECT userID, role, fullName, email, phone, passwordHash FROM Users WHERE username = ? LIMIT 1";
+  db.query(sql, [username], async (err, results) => {
     if (err) {
       console.error("DB error:", err);
-      return res.status(500).json({ msg: "Lỗi truy vấn database" });
+      return res.status(500).json({ 
+        success: false,
+        msg: "Lỗi truy vấn database" 
+      });
     }
 
     if (!results || results.length === 0)
-      return res.status(401).json({ msg: "Email không tồn tại" });
+      return res.status(401).json({ 
+        success: false,
+        msg: "Tên đăng nhập hoặc mật khẩu không chính xác" 
+      });
 
     const user = results[0];
-    // ⚠️ Dùng bcrypt nếu password trong DB đã hash, ở đây tạm so sánh trực tiếp
+    // ⚠️ Kiểm tra mật khẩu (trong thực tế nên dùng bcrypt)
     if (password !== user.passwordHash)
-      return res.status(401).json({ msg: "Sai mật khẩu" });
+      return res.status(401).json({ 
+        success: false,
+        msg: "Tên đăng nhập hoặc mật khẩu không chính xác" 
+      });
 
     // 🔑 Tạo JWT token
     const token = jwt.sign(
@@ -55,7 +68,19 @@ router.post("/login", (req, res) => {
       maxAge: 2 * 60 * 60 * 1000, // 2h
     });
 
-    return res.json({ userID: user.userID, role: user.role });
+    return res.json({ 
+      success: true,
+      msg: "Đăng nhập thành công",
+      role: user.role,
+      data: {
+        userID: user.userID,
+        username: username,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role
+      }
+    });
   });
 });
 

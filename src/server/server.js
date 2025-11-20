@@ -20,7 +20,7 @@ import assignmentRoutes from './routes/assignmentRoutes.js';
 import overviewRoutes from './routes/overviewRoutes.js';
 import driverAlertRoutes from './routes/driverAlertRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
-
+import driverAlertRoutes from './routes/driverAlertRoutes.js';
 
 // TESTING:
 import routePythonService from "./routes/routePythonService.js"
@@ -64,6 +64,7 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/overview', overviewRoutes);
 app.use('/api/driver-alerts', driverAlertRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/driver-alerts', driverAlertRoutes);
 
 
 // Testing

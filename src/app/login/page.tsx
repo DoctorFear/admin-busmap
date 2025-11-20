@@ -35,7 +35,7 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:8888/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -45,6 +45,14 @@ export default function LoginPage() {
         setError(data.msg || "Đăng nhập thất bại");
         setLoading(false);
         return;
+      }
+
+      // Lưu userID vào localStorage
+      if (data.data?.userID) {
+        localStorage.setItem('userID', String(data.data.userID));
+        localStorage.setItem('username', data.data.username || '');
+        localStorage.setItem('fullName', data.data.fullName || '');
+        localStorage.setItem('role', data.role || '');
       }
 
       switch (data.role) {
