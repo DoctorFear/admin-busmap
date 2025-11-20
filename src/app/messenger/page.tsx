@@ -8,6 +8,17 @@ import Notification from '@/components/Notification';
 import styles from './page.module.css';
 import { Recipient, Incident, mockParents, mockDrivers, mockIncidents } from '@/lib/data_messaging';
 
+interface NotificationRecord {
+  notificationID: number;
+  toUserID: number;
+  fromUserID: number | null;
+  type: 'ARRIVAL' | 'PICKUP' | 'INCIDENT' | 'SYSTEM' | 'REMINDER';
+  title: string | null;
+  content: string;
+  sentAt: string;
+  readAt: string | null;
+}
+
 export default function MessagingPage() {
   const [recipients, setRecipients] = useState<Recipient[]>([...mockParents, ...mockDrivers]);
   const [incidents, setIncidents] = useState<Incident[]>(mockIncidents);
@@ -15,6 +26,57 @@ export default function MessagingPage() {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [recipientType, setRecipientType] = useState<'all' | 'parent' | 'driver'>('all');
+  const [userID, setUserID] = useState<number | null>(null);
+  const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
+  // Lấy user ID từ localStorage
+  useEffect(() => {
+    const storedUserID = localStorage.getItem('userID');
+    if (storedUserID) {
+      setUserID(parseInt(storedUserID));
+    }
+  }, []);
+
+  // Fetch notifications từ database
+  useEffect(() => {
+    if (userID) {
+      fetchNotifications();
+    }
+  }, [userID]);
+
+  const fetchNotifications = async () => {
+    if (!userID) return;
+    
+    try {
+      setLoadingNotifications(true);
+      const res = await fetch(`/api/notifications/${userID}`);
+      const data = await res.json();
+      
+      if (data.success) {
+        setNotifications(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  // Mark notification as read
+  const handleMarkAsRead = async (notificationID: number) => {
+    try {
+      await fetch(`/api/notifications/${notificationID}/read`, {
+        method: 'PUT',
+      });
+      
+      setNotifications(prev =>
+        prev.map(n => n.notificationID === notificationID ? { ...n, readAt: new Date().toISOString() } : n)
+      );
+    } catch (err) {
+      console.error('Error marking as read:', err);
+    }
+  };
 
   // Filter recipients based on search term, date, and recipient type
   const filteredRecipients = recipients.filter(
@@ -99,6 +161,59 @@ export default function MessagingPage() {
       />
 
       <IncidentTable incidents={incidents} onSendNotification={handleSendIncidentNotification} />
+
+      {/* Thông báo từ database */}
+      <div style={{ marginTop: '2rem', padding: '1rem' }}>
+        <h3>Thông báo nhận được ({notifications.filter(n => !n.readAt).length} chưa đọc)</h3>
+        {loadingNotifications ? (
+          <p>Đang tải...</p>
+        ) : notifications.length === 0 ? (
+          <p style={{ color: '#999' }}>Không có thông báo nào</p>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.5rem' }}>
+            {notifications.slice(0, 10).map((notif) => (
+              <div
+                key={notif.notificationID}
+                style={{
+                  padding: '0.75rem',
+                  backgroundColor: notif.readAt ? '#f5f5f5' : '#fffbf0',
+                  borderLeft: '4px solid ' + (notif.type === 'INCIDENT' ? '#FF5722' : '#2196F3'),
+                  borderRadius: '4px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <strong>{notif.title || notif.type}</strong>
+                  <p style={{ margin: '0.25rem 0', fontSize: '0.9em' }}>{notif.content}</p>
+                  <span style={{ fontSize: '0.8em', color: '#999' }}>
+                    {new Date(notif.sentAt).toLocaleString('vi-VN')}
+                  </span>
+                </div>
+                {!notif.readAt && (
+                  <button
+                    onClick={() => handleMarkAsRead(notif.notificationID)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      marginLeft: '1rem',
+                      backgroundColor: '#FF9800',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '0.85em',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Đánh dấu đã đọc
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

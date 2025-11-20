@@ -4,7 +4,7 @@ import mysql from 'mysql2';
 
 const SQL_DATABASE_NAME = 'SchoolBusManagement_VFinal';
 const SQL_USER = 'root';
-const SQL_PASSWORD = '';
+const SQL_PASSWORD = 'root'; // Thay đổi nếu cần
 
 
 

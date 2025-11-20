@@ -18,6 +18,9 @@ import parentRoutes from './routes/parentRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
 import assignmentRoutes from './routes/assignmentRoutes.js';
 import overviewRoutes from './routes/overviewRoutes.js';
+import driverAlertRoutes from './routes/driverAlertRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+
 
 // TESTING:
 import routePythonService from "./routes/routePythonService.js"
@@ -59,6 +62,8 @@ app.use('/api/parents', parentRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/overview', overviewRoutes);
+app.use('/api/driver-alerts', driverAlertRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 
 // Testing
