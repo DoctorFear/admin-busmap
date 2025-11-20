@@ -121,9 +121,9 @@ export default function DriverSchedulePage() {
             <tbody>
               {weeklySchedule.map((item, index) => (
                 <tr key={index}>
-                  <td>{formatDate(item.date)}</td>
-                  <td>{item.route}</td>
-                  <td>{formatTime(item.startTime, item.endTime)}</td>
+                  <td>{formatDate(item.date)}<a></a></td>
+                  <td>{item.route}<a></a></td>
+                  <td>{formatTime(item.startTime, item.endTime)}<a></a></td>
                 </tr>
               ))}
             </tbody>
@@ -152,9 +152,13 @@ export default function DriverSchedulePage() {
                       : "1px solid #e5e7eb",
                 }}
               >
-                <p>
-                  <strong>Chuyến {index + 1}:</strong> {schedule.route}
-                </p>
+                <div style={{ marginBottom: "0.8rem",display: "flex", gap: "0.3rem" }}>
+                  <p style={{ margin: 0 }}>
+                    <strong>Chuyến {index + 1}:</strong>
+                  </p>
+                  <p style={{ margin: 0 }}>{schedule.route}<img></img></p>
+                </div>
+
                 <p>
                   <strong>Thời gian:</strong>{" "}
                   {formatTime(schedule.startTime, schedule.endTime)},{" "}
@@ -213,9 +217,6 @@ export default function DriverSchedulePage() {
           <p>Hôm nay không có lịch làm việc.</p>
         )}
 
-        <p style={{ marginTop: "1rem" }}>
-          <a href="mailto:manager@ssb1.0.edu.vn">Liên hệ quản lý</a>
-        </p>
       </div>
     </div>
   );

@@ -57,6 +57,7 @@ const performTranslate = () => {
         if (!p) return NodeFilter.FILTER_REJECT;
         if (p.closest("[data-no-translate], script, style, svg, code, pre")) return NodeFilter.FILTER_REJECT;
         if (p.tagName === "TD" && p.querySelector("a")) return NodeFilter.FILTER_REJECT;
+        if (p.tagName === "P" && p.querySelector("img")) return NodeFilter.FILTER_REJECT; // ← THÊM DÒNG NÀY
         if (!node.nodeValue?.trim()) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }

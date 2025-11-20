@@ -235,7 +235,13 @@ export default function DriverPage() {
                 borderRadius: 8,
                 border: item.status === 'RUNNING' ? '2px solid #3b82f6' : '1px solid #e5e7eb'
               }}>
-                <p><strong>Chuyến {index + 1}:</strong> {item.route}</p>
+                <div style={{ marginBottom: "0.8rem",display: "flex", gap: "0.3rem" }}>
+                  <p style={{ margin: 0 }}>
+                    <strong>Chuyến {index + 1}:</strong>
+                  </p>
+                  <p style={{ margin: 0 }}>{item.route}<img></img></p>
+                </div>
+
                 <p><strong>Thời gian: </strong>{formatTime(item.startTime, item.endTime)}, {formatDate(item.date)}</p>
                 <p>
                   <strong>Trạng thái:</strong>{" "}
@@ -288,9 +294,9 @@ export default function DriverPage() {
               <tbody>
                 {weeklySchedule.map(item => (
                   <tr key={item.tripID}>
-                    <td>{formatDate(item.date)}</td>
-                    <td>{item.route}</td>
-                    <td>{formatTime(item.startTime, item.endTime)}</td>
+                    <td>{formatDate(item.date)}<a></a></td>
+                    <td>{item.route}<a></a></td>
+                    <td>{formatTime(item.startTime, item.endTime)}<a></a></td>
                   </tr>
                 ))}
               </tbody>
@@ -309,14 +315,14 @@ export default function DriverPage() {
           ) : tripInfo ? (
             <>
               <p style={{ marginBottom: '0.5rem', color: '#374151' }}>
-                <strong>Tuyến:</strong> {tripInfo.routeName}
+                <strong>Tuyến đường:</strong> {tripInfo.routeName}
               </p>
               <p style={{ marginBottom: '1rem', color: '#374151' }}>
                 <strong>Trạng thái:</strong> Đã đón {completedStudents}/{studentList.length} học sinh, {absentStudents} vắng mặt
               </p>
               {studentList.map(student => (
                 <div key={student.studentID} className={styles.studentItem}>
-                  <p>{student.studentName} - Lớp: {student.grade}</p>
+                  <p>{student.studentName} - {student.grade}<img></img></p>
                   <select
                     value={student.status}
                     onChange={(e) => updateStudentStatus(student.studentID, student.status, e.target.value)}

@@ -33,12 +33,9 @@ export default function DriverAlertsPage() {
         
         <h3 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Lịch sử cảnh báo</h3>
         {alerts.map((alert, index) => (
-          <div key={index} className={styles.alertItem}>{alert}</div>
+          <div key={index} className={styles.alertItem} data-no-translate>{alert}</div>
         ))}
-        
-        <p className={styles.contactLinks}>
-          <a href="mailto:support@ssb1.0.edu.vn">Liên hệ hỗ trợ</a>
-        </p>
+      
       </div>
     </div>
   );

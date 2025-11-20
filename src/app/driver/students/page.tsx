@@ -200,7 +200,7 @@ export default function DriverStudentsPage() {
         </h3>
 
         <p style={{ marginBottom: "0.5rem", color: "#374151" }}>
-          <strong>Tuyến:</strong> {tripInfo.routeName}
+          <strong>Tuyến đường:</strong> {tripInfo.routeName}
         </p>
 
         <p style={{ marginBottom: "1rem", color: "#374151" }}>
@@ -212,7 +212,7 @@ export default function DriverStudentsPage() {
           <div key={student.studentID} className={styles.studentItem}>
             <p>
               {student.studentName}  –  {student.grade}  –  {student.address}
-            </p>
+            <img></img></p>
 
             <select
               value={student.status}
