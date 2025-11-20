@@ -46,3 +46,5 @@ next-env.d.ts
 
 # docs and fix log
 /zdoc_and_fix
+
+CHANGES_LOG.md
