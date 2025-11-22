@@ -2,11 +2,12 @@
 import express from "express";
 import db from "../db.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
 // ================== LOGIN ==================
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password)
@@ -14,7 +15,7 @@ router.post("/login", (req, res) => {
 
   const sql = "SELECT userID, role, passwordHash FROM Users WHERE username = ?";
 
-  db.query(sql, [username], (err, results) => {
+  db.query(sql, [username], async (err, results) => {
     if (err) return res.status(500).json({ msg: "Lỗi truy vấn database" });
 
     if (!results || results.length === 0)
@@ -22,11 +23,11 @@ router.post("/login", (req, res) => {
 
     const user = results[0];
 
-    // So sánh trực tiếp (tạm bỏ hash)
-    if (password !== user.passwordHash) {
-      return res.status(401).json({ msg: "Sai mật khẩu" });
-    }
+    // So sánh password hash
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) return res.status(401).json({ msg: "Sai mật khẩu" });
 
+    // Tạo token JWT
     const token = jwt.sign(
       { userID: user.userID, role: user.role },
       process.env.JWT_SECRET || "mysecretkey",
@@ -35,10 +36,10 @@ router.post("/login", (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: false, // true nếu chạy HTTPS
       sameSite: "lax",
       maxAge: 2 * 60 * 60 * 1000,
-      path:"/",
+      path: "/",
     });
 
     return res.json({
@@ -51,10 +52,9 @@ router.post("/login", (req, res) => {
 
 // ================== LOGOUT ==================
 router.post("/logout", (req, res) => {
-  // Xóa cookie token đúng path
   res.clearCookie("token", {
     httpOnly: true,
-    secure: fasle,
+    secure: false,
     sameSite: "lax",
     path: "/",
   });
@@ -62,31 +62,31 @@ router.post("/logout", (req, res) => {
   return res.status(200).json({ message: "Đăng xuất thành công" });
 });
 
-
 // ================== REGISTER ==================
-router.post("/register", (req, res) => {
-  console.log(">>> BODY RECEIVED FROM FRONTEND:", req.body);
-
-  // map đúng field từ frontend
+router.post("/register", async (req, res) => {
   const fullName = req.body.fullName || req.body.name;
-  const passwordHash = req.body.passwordHash || req.body.password;
+  const password = req.body.passwordHash || req.body.password;
   const email = req.body.email || null;
   const phone = req.body.phone || null;
   const username = req.body.username;
   const role = req.body.role;
   const languagePref = req.body.languagePref || "vi";
 
-  if (!fullName || !username || !passwordHash || !role) {
+  if (!fullName || !username || !password || !role) {
     return res.status(400).json({ msg: "Thiếu dữ liệu bắt buộc" });
   }
 
   const checkSql = "SELECT userID FROM Users WHERE username = ?";
-  db.query(checkSql, [username], (err, results) => {
+  db.query(checkSql, [username], async (err, results) => {
     if (err) return res.status(500).json({ msg: "Lỗi database" });
 
     if (results.length > 0) {
       return res.status(409).json({ msg: "Username đã tồn tại" });
     }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     const insertSql = `
       INSERT INTO Users 
@@ -103,9 +103,7 @@ router.post("/register", (req, res) => {
         return res.json({ msg: "Đăng ký thành công" });
       }
     );
-    
   });
 });
-
 
 export default router;

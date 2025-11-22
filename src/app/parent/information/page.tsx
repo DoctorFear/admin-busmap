@@ -6,6 +6,7 @@ import styles from './page.module.css';
 
 export default function Information(): JSX.Element {
   const [preview, setPreview] = useState<string>('/default-avatar.png'); // ảnh mặc định
+  const [pickupPoint, setPickupPoint] = useState<string>('123 Đường Lê Lợi');
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -13,6 +14,16 @@ export default function Information(): JSX.Element {
       const imageUrl = URL.createObjectURL(file);
       setPreview(imageUrl);
     }
+  };
+
+  const handlePickupChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPickupPoint(e.target.value);
+  };
+
+  const handleUpdate = () => {
+    // Gọi API hoặc xử lý submit
+    console.log('Điểm đón mới:', pickupPoint);
+    alert(`Điểm đón đã được cập nhật: ${pickupPoint}`);
   };
 
   return (
@@ -25,7 +36,6 @@ export default function Information(): JSX.Element {
           <div className={styles.avatarSection}>
             <img
               src={preview}
-              
               className={styles.studentAvatar}
             />
             <label htmlFor="avatar-upload" className={styles.uploadBtn}>
@@ -49,7 +59,7 @@ export default function Information(): JSX.Element {
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <span style={{ fontWeight: "bold" }}>Điểm đón:</span>
-                <span data-no-translate>123 Đường Lê Lợi</span>
+                <span data-no-translate>{pickupPoint}</span>
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <span style={{ fontWeight: "bold" }}>Điểm trả:</span>
@@ -61,7 +71,26 @@ export default function Information(): JSX.Element {
               </div>
             </div>
 
-            <button className={styles.submitBtn}>Cập nhật điểm đón</button>
+            {/* Form cập nhật điểm đón ở phía dưới */}
+            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label htmlFor="pickup" style={{ fontWeight: 'bold' }}>Cập nhật điểm đón:</label>
+              <input
+                id="pickup"
+                type="text"
+                value={pickupPoint}
+                onChange={handlePickupChange}
+                placeholder="Nhập điểm đón mới"
+                style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+              />
+
+              <button
+                className={styles.submitBtn}
+                style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}
+                onClick={handleUpdate}
+              >
+                Cập nhật điểm đón
+              </button>
+            </div>
           </div>
         </div>
       </div>
