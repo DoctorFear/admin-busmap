@@ -181,6 +181,8 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 - BE, server(express): 8888
 - FE: 3000
 
+3. Icon library, svg, filled color you want: `npm install lucide-react`
+
 ---
 ---
 ---

@@ -146,13 +146,13 @@ export default function TrackPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>Theo dõi vị trí xe buýt (Realtime)</h1>
-        <div className={styles.stats}>
+        {/* <div className={styles.stats}>
           <span>
             Đang theo dõi:{" "}
             {buses.filter((b) => b.isTracking && b.isOnline).length}
           </span>
           <span>Tổng: {buses.length}</span>
-        </div>
+        </div> */}
       </div>
 
       <div className={styles.layout}>

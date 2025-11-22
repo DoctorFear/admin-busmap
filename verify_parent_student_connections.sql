@@ -22,8 +22,8 @@ SELECT
   s.studentID,
   s.fullName as 'Tên học sinh',
   CASE 
-    WHEN s.studentID IS NULL THEN '❌ KHÔNG CÓ'
-    ELSE '✅ CÓ'
+    WHEN s.studentID IS NULL THEN 'KHÔNG CÓ'
+    ELSE 'CÓ'
   END as 'Trạng thái'
 FROM Parent p
 JOIN Users u ON p.parentID = u.userID

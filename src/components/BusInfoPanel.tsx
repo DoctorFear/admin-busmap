@@ -2,7 +2,7 @@
 'use client';
 
 import { Bus } from '@/lib/data_buses';
-import { Car, User, MapPin, Clock, AlertTriangle, Signal } from 'lucide-react';
+import { Car, User, MapPin, Clock, AlertTriangle, Signal, Route } from 'lucide-react';
 import styles from '@/styles/BusInfoPanel.module.css';
 
 interface Props {
@@ -52,7 +52,7 @@ export default function BusInfoPanel({ bus, onToggleTracking }: Props) {
           alignItems: 'center',
           padding: '8px 0',
         }}>
-          <MapPin size={18} color="#FF9800" />
+          <Route size={18} color="#FF9800" />
           <span style={{ fontSize: '13px', color: '#666' }}>Tuyến</span>
           <span style={{ fontSize: '14px', fontWeight: 700 }}>{bus.route}</span>
         </div>

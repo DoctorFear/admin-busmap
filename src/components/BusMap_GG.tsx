@@ -5,9 +5,9 @@
 // ================================================================================
 //
 // TỔNG QUAN:
-// Component này hiển thị bản đồ Google Maps với các tuyến xe buýt được phân cụm.
-// Các tuyến được vẽ theo ĐƯỜNG PHỐ THỰC TẾ (không phải đường chim bay) bằng cách
-// sử dụng Google Directions API với địa chỉ thật từ realAddressLocation.json.
+// Show Google Maps với các tuyến xe buýt được phân cụm (K-Means).
+// Các tuyến được routes: Roadmap (không phải đường chim bay) 
+// -> Google Directions API với địa chỉ thật từ realAddressLocation.json.
 //
 // ================================================================================
 // GOOGLE APIs SỬ DỤNG:
@@ -71,7 +71,7 @@
 // ================================================================================
 //
 // 1. Ưu tiên dùng REAL ADDRESS (string) thay vì lat/lng khi gọi Directions API
-//    → Google Maps tìm đường chính xác hơn với địa chỉ văn bản
+//    -> Google Maps tìm đường chính xác hơn với address text, chứ không phải vĩ/kinh độ
 //
 // 2. Fallback về lat/lng nếu không có realAddress
 //
@@ -170,7 +170,7 @@ export default function BusMap_GG({
   // ====================================================================
   // [1] LẤY DỮ LIỆU PHÂN CỤM TỪ PYTHON SERVICE VÀ CONVERT THÀNH ROUTES/STOPS
   // ====================================================================
-  // Flow: Gọi NodeJS endpoint (/test-python) → NodeJS gọi Python service → Nhận clusters → Convert thành routes/stops
+  // Flow: Gọi NodeJS endpoint (/test-python) -> NodeJS gọi Python service -> Nhận clusters(phân cụm bằng Python) -> Convert thành routes/stops
   useEffect(() => {
     console.log("[1] Đang fetch dữ liệu phân cụm từ Python service...");
     
@@ -309,7 +309,7 @@ export default function BusMap_GG({
     console.log("[2] Kiểm tra buses cho routes:", selectedRouteIds);
     
     selectedRouteIds.forEach((routeId) => {
-      // Nếu route này chưa có bus → tạo mới
+      // Nếu route này chưa có bus -> tạo mới
       if (!routeBuses[routeId]) {
         const newBus = {
           id: `route-${routeId}`,
@@ -606,7 +606,7 @@ export default function BusMap_GG({
             // VD: [LatLng(10.76, 106.68), LatLng(10.761, 106.681), ...]
             const overviewPath = result.routes[0].overview_path;
             
-            // CONVERT: LatLng objects → plain {lat, lng} objects
+            // CONVERT: LatLng objects -> plain {lat, lng} objects
             // Vì: LatLng có methods .lat() và .lng(), không phải properties
             const path = overviewPath.map((p: any) => ({
               lat: p.lat(), // Gọi method .lat() để lấy giá trị latitude
@@ -614,7 +614,7 @@ export default function BusMap_GG({
             }));
             
             // Lưu path vào state
-            // → Trigger re-render → useMemo [5] chạy lại → tạo polylines → render [7]
+            // -> Trigger re-render -> useMemo [5] chạy lại -> tạo polylines -> render [7]
             setDirectionsPaths((prev) => ({ ...prev, [id]: path }));
             
             // Tính tổng khoảng cách và thời gian từ legs
@@ -766,7 +766,6 @@ export default function BusMap_GG({
         {/* [6] HIỂN THỊ MARKER XE BUÝT REALTIME */}
         {/* ============================================================ */}
         {/* 
-        TÍNH NĂNG:
         - Hiển thị icon xe bus cho mỗi route được chọn
         - Bus bắt đầu ở SGU (điểm đầu route)
         - Click vào bus để xem thông tin chi tiết
@@ -824,8 +823,10 @@ export default function BusMap_GG({
             })
         }
         
-        {/* Render thêm buses từ props (từ socket realtime) nếu có */}
-        {
+        {/* BỎ: 
+          Render thêm buses từ props (từ socket realtime) */
+        }
+        {/* {
           buses
             ?.filter((bus) => {
               const lat = Number(bus.lat);
@@ -860,7 +861,7 @@ export default function BusMap_GG({
                 />
               );
             })
-        }
+        } */}
 
         {/* ============================================================ */}
         {/* [7] VẼ POLYLINE (ĐƯỜNG ĐI) CHO MỖI TUYẾN */}
