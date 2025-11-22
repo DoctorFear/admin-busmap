@@ -14,6 +14,8 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     role: "parent",
+    studentName: "", // chỉ dành cho parent
+    license: "",     // chỉ dành cho driver
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,12 +25,16 @@ export default function RegisterPage() {
   };
 
   const validateForm = () => {
-    const { name, phone, username, password, confirmPassword } = formData;
+    const { name, phone, username, password, confirmPassword, role, studentName, license } = formData;
 
     if (!name || !phone || !username || !password || !confirmPassword)
       return "Vui lòng điền đầy đủ các trường bắt buộc";
 
     if (password !== confirmPassword) return "Mật khẩu xác nhận không khớp";
+
+    // validation theo role
+    if (role === "parent" && !studentName) return "Vui lòng nhập tên học sinh";
+    if (role === "driver" && !license) return "Vui lòng nhập biển số xe / giấy phép";
 
     return "";
   };
@@ -46,17 +52,20 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:8888/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.name,
-          username: formData.username,
-          passwordHash: formData.password,
-          phone: formData.phone,
-          role: formData.role,
-        }),
-      });
+const res = await fetch("http://localhost:8888/api/auth/register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    fullName: formData.name,
+    username: formData.username,
+    password: formData.password,   // ✅ gửi password thô
+    phone: formData.phone,
+    role: formData.role,
+    studentName: formData.role === "parent" ? formData.studentName : undefined,
+    license: formData.role === "driver" ? formData.license : undefined,
+  }),
+});
+
 
       const data = await res.json();
 
@@ -92,6 +101,36 @@ export default function RegisterPage() {
               className={styles.input}
             />
           </div>
+
+          {formData.role === "parent" && (
+            <div className={styles.formGroup}>
+              <label>Tên học sinh</label>
+              <input
+                type="text"
+                name="studentName"
+                value={formData.studentName}
+                onChange={handleChange}
+                required
+                placeholder="Nguyễn Minh Anh"
+                className={styles.input}
+              />
+            </div>
+          )}
+
+          {formData.role === "driver" && (
+            <div className={styles.formGroup}>
+              <label>Biển số / Giấy phép</label>
+              <input
+                type="text"
+                name="license"
+                value={formData.license}
+                onChange={handleChange}
+                required
+                placeholder="B2-123456"
+                className={styles.input}
+              />
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label>Số điện thoại</label>
