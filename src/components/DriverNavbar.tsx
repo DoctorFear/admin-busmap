@@ -101,14 +101,15 @@ export default function DriverNavbar() {
             {displayLang}
           </button>
         </li>
-      </ul>
 
       {/* Nút Logout */}
-      <div className={styles.logoutBtn}>
-        <button type="button" className={styles.logout} onClick={() => {/* TODO: xử lý logout */}}>
-          <LogOut size={20} />
-        </button>
-      </div>
+        <li>
+          <Link href="/login" className={styles.logout}>
+            <LogOut size={20} />
+          </Link>
+        </li>
+      </ul>
+
     </nav>
   );
 }

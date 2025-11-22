@@ -49,7 +49,7 @@ export default function LoginPage() {
 
       switch (data.role) {
         case "admin":
-          router.push("/admin");
+          router.push("/dashboard");
           break;
         case "parent":
           router.push("/parent");

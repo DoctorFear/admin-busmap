@@ -106,7 +106,7 @@ export default function ParentNavbar() {
 
         {/* Logout */}
         <li>
-          <Link href="/logout" className={styles.logout}>
+          <Link href="/login" className={styles.logout}>
             <LogOut size={20} />
           </Link>
         </li>
