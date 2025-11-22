@@ -137,10 +137,12 @@ type ClusterBusStop = { busStopID: number; lat: number; lng: number; parentID: n
 export default function BusMap_GG({ 
   buses, 
   onBusSelect,
+  onBusUnselect,
   isMoving = false,
 }: { 
   buses: any[];
   onBusSelect?: (bus: any) => void;
+  onBusUnselect?: () => void;
   isMoving?: boolean;
 }) {
   // State: danh sách tuyến/cụm, tuyến được chọn, danh sách điểm dừng của từng cụm
@@ -155,6 +157,23 @@ export default function BusMap_GG({
   // STATE: XE BUS ĐƯỢC CHỌN (ĐỂ HIGHLIGHT VÀ HIỂN THỊ THÔNG TIN)
   // ====================================================================
   const [selectedBusId, setSelectedBusId] = useState<string | null>(null);
+  
+  // ====================================================================
+  // EFFECT: CLEAR SELECTED BUS KHI NHẬN SIGNAL TỪ PARENT
+  // ====================================================================
+  // Lắng nghe signal từ parent component (khi user click "Tắt theo dõi")
+  useEffect(() => {
+    if (onBusUnselect) {
+      // Tạo event listener để nhận signal
+      const handleUnselect = () => {
+        console.log('[BusMap_GG] Nhận signal bỏ chọn bus, clear selectedBusId');
+        setSelectedBusId(null);
+      };
+      
+      window.addEventListener('busUnselected', handleUnselect);
+      return () => window.removeEventListener('busUnselected', handleUnselect);
+    }
+  }, [onBusUnselect]);
   
   // ====================================================================
   // STATE: BUSES TỰ ĐỘNG TẠO CHO MỖI ROUTE
@@ -375,7 +394,7 @@ export default function BusMap_GG({
           const bus = updated[routeId];
           const path = directionsPaths[routeId];
           
-          // Nếu route chưa có path → skip
+          // Nếu route chưa có path -> skip
           if (!path || path.length === 0) {
             console.log(`[3] Route ${routeId} chưa có path, skip`);
             return;
@@ -384,7 +403,7 @@ export default function BusMap_GG({
           // Lấy index hiện tại
           const currentIndex = bus.currentPathIndex || 0;
           
-          // Nếu đã đến cuối path → reset về đầu
+          // Nếu đã đến cuối path -> reset về đầu
           if (currentIndex >= path.length - 1) {
             console.log(`[3] Bus route ${routeId} đã đến cuối, reset về đầu`);
             const newBus = {

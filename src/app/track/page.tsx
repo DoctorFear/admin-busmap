@@ -120,6 +120,13 @@ export default function TrackPage() {
     // Bỏ chọn bus (đóng panel)
     setSelectedBus(null);
     
+    // ===================================================================
+    // GỬI SIGNAL ĐẾN BUSMAP_GG ĐỂ CLEAR selectedBusId
+    // ===================================================================
+    // Điều này ngăn BusMap_GG gọi onBusSelect(newBus) trong useEffect [3]
+    window.dispatchEvent(new Event('busUnselected'));
+    console.log('[TrackPage] Dispatched busUnselected event');
+    
     // Cập nhật trạng thái tracking của bus
     setBuses((prev) =>
       prev.map((b) =>
@@ -128,6 +135,12 @@ export default function TrackPage() {
     );
     
     console.log('[TrackPage] Bus unselected, panel should close');
+  };
+  
+  // --- 3.1. Handle bus unselect ---
+  const handleBusUnselect = () => {
+    console.log('[TrackPage] handleBusUnselect called');
+    setSelectedBus(null);
   };
   
   // --- 4. Handle bus selection từ map ---
@@ -163,6 +176,7 @@ export default function TrackPage() {
           <BusMap_GG 
             buses={buses} 
             onBusSelect={handleBusSelect}
+            onBusUnselect={handleBusUnselect}
             isMoving={isMoving}
           />
           {/* <BusMap
