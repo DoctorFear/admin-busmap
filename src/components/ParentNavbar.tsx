@@ -124,7 +124,6 @@ export default function ParentNavbar() {
           <button
             onClick={handleLogout}
             className={styles.logout}
-            style={{ background: "none", border: "none", cursor: "pointer" }}
             aria-label="Logout"
           >
             <LogOut size={20} />
