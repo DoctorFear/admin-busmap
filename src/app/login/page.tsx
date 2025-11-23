@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // State cho nút ngôn ngữ
   const [displayLang, setDisplayLang] = useState<"VI" | "EN">("VI");
 
   useEffect(() => {
@@ -46,6 +45,19 @@ export default function LoginPage() {
         setError(data.msg || "Đăng nhập thất bại");
         setLoading(false);
         return;
+      }
+
+      // Lưu thông tin vào localStorage
+      localStorage.setItem('userRole', data.role);
+      localStorage.setItem('userID', data.userID.toString());
+      localStorage.setItem('fullName', data.fullName);
+      
+      if (data.role === 'driver' && data.driverID) {
+        localStorage.setItem('driverID', data.driverID.toString());
+      }
+      
+      if (data.role === 'parent' && data.parentID) {
+        localStorage.setItem('parentID', data.parentID.toString());
       }
 
       switch (data.role) {
@@ -128,7 +140,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-
           <button
             onClick={toggleLang}
             className={styles.registerLink2}
@@ -144,9 +155,6 @@ export default function LoginPage() {
             {displayLang}
           </button>
         </div>
-
-
-
       </div>
     </div>
   );
