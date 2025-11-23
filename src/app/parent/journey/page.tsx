@@ -1,56 +1,217 @@
 'use client';
 
-import React, { JSX } from 'react';
+const PORT_SERVER = 8888;
+
+import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import BusMap_GG from '@/components/BusMap_GG';
+import BusInfoPanel from '@/components/BusInfoPanel';
+import { Bus } from '@/lib/data_buses';
 import styles from './page.module.css';
 
 /**
- * Trang theo dõi hành trình dành cho /parent/journey
- * - Client component để sau này dễ tích hợp Google Maps client-side
+ * Trang theo dõi hành trình dành cho Parent
+ * - Parent chỉ thấy bus của con mình đang đi (filter theo parentID)
+ * - Tái sử dụng BusMap_GG component từ admin
+ * - Socket.IO realtime updates
  */
-export default function ParentJourneyPage(): JSX.Element {
+export default function ParentJourneyPage() {
+  const [buses, setBuses] = useState<Bus[]>([]);
+  const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [allowedBusIDs, setAllowedBusIDs] = useState<Set<number>>(new Set()); // Bus IDs của parent
+  
+  // Đăng nhập -> lấy parentID
+  const PARENT_ID = 11; // Hardcode
+
+  // --- 1. Fetch danh sách buses của con parent ---
+  useEffect(() => {
+    const fetchStudentBuses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:${PORT_SERVER}/api/parents/${PARENT_ID}/student-buses`);
+        
+        if (!response.ok) {
+          throw new Error('Không thể tải thông tin xe buýt');
+        }
+        
+        const data = await response.json();
+        
+        console.log('->_<- API Response:', data);
+        
+        // Lưu danh sách busIDs được phép xem
+        const busIDsSet = new Set<number>(data.map((item: any) => item.busID));
+        setAllowedBusIDs(busIDsSet);
+        
+        console.log('->_<- Parent được xem buses:', Array.from(busIDsSet));
+        
+        // Convert sang định dạng Bus cho BusMap_GG
+        const busesData: Bus[] = data.map((item: any) => ({
+          id: item.busID.toString(),
+          busNumber: item.licensePlate || `Xe ${item.busID}`, // Dùng licensePlate thay vì busNumber
+          driverName: `Tài xế xe ${item.busID}`,
+          route: item.routeName || `Tuyến ${item.routeID}`,
+          status: item.tripStatus === 'RUNNING' ? 'moving' : 'stopped',
+          eta: new Date(Date.now() + 30 * 60000).toLocaleTimeString('vi-VN', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }),
+          x: 0,
+          y: 0,
+          lat: 10.759983, // Default SGU, sẽ được cập nhật bởi Socket.IO
+          lng: 106.682257,
+          lastUpdate: new Date(),
+          isTracking: true,
+          isOnline: true,
+          alerts: [],
+        }));
+        
+        setBuses(busesData);
+        setError(null);
+      } catch (err) {
+        console.error('Lỗi fetch student buses:', err);
+        setError('Không thể tải thông tin xe buýt. Vui lòng thử lại sau.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchStudentBuses();
+  }, [PARENT_ID]);
+
+  // --- 2. Socket.IO realtime updates (với filtering) ---
+  useEffect(() => {
+    // Chỉ connect socket khi đã có allowedBusIDs
+    if (allowedBusIDs.size === 0) return;
+
+    const socket = io(`http://localhost:${PORT_SERVER}`);
+
+    socket.on('connect', () => {
+      console.log('->_<- Parent kết nối Socket.IO:', socket.id);
+      console.log('->LOCK<- Parent chỉ xem buses:', Array.from(allowedBusIDs));
+    });
+
+    socket.on('updateBusLocation', (data) => {
+      // FILTER: Chỉ xử lý nếu busID thuộc danh sách của parent
+      if (!allowedBusIDs.has(data.busID)) {
+        console.log('!X! Bỏ qua bus không thuộc parent:', data.busID);
+        return;
+      }
+
+      console.log('->_<- Parent nhận realtime bus location:', data);
+
+      setBuses((prevBuses) => {
+        const updatedBuses = prevBuses.map((bus) =>
+          bus.id === data.busID.toString()
+            ? { 
+                ...bus, 
+                lat: data.lat, 
+                lng: data.lng, 
+                isOnline: true,
+                lastUpdate: new Date(),
+                status: (data.speed > 5 ? 'moving' : 'stopped') as 'moving' | 'stopped',
+              }
+            : bus
+        );
+        return updatedBuses;
+      });
+    });
+
+    socket.on('disconnect', () => {
+      console.warn('->WARNING<- Parent mất kết nối Socket.IO');
+    });
+
+    return () => { 
+      socket.disconnect();
+    };
+  }, [allowedBusIDs]); // Re-connect khi allowedBusIDs thay đổi
+
+  // --- 3. Toggle tracking ---
+  const toggleTracking = (id: string) => {
+    console.log('[ParentJourneyPage] Toggle tracking:', id);
+    setSelectedBus(null);
+    window.dispatchEvent(new Event('busUnselected'));
+    
+    setBuses((prev) =>
+      prev.map((b) =>
+        b.id === id ? { ...b, isTracking: !b.isTracking } : b
+      )
+    );
+  };
+  
+  // --- 4. Handle bus selection ---
+  const handleBusSelect = (bus: any) => {
+    console.log('[ParentJourneyPage] Bus selected:', bus);
+    setSelectedBus(bus);
+  };
+  
+  const handleBusUnselect = () => {
+    console.log('[ParentJourneyPage] handleBusUnselect');
+    setSelectedBus(null);
+  };
+
+  // --- 6. Render ---
+  if (loading) {
+    return (
+      <div className={styles.mainContent}>
+        <div className={styles.loading}>
+          <p>Đang tải thông tin xe buýt...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.mainContent}>
+        <div className={styles.error}>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (buses.length === 0) {
+    return (
+      <div className={styles.mainContent}>
+        <div className={styles.empty}>
+          <p>Con bạn hiện chưa có chuyến xe nào đang hoạt động.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.mainContent}>
       <div className={styles.overview}>
         <div className={styles.overviewHeader}>
-          <h3>Theo dõi xe buýt</h3>
+          <h3>Theo dõi xe buýt của con</h3>
+          <p className={styles.subtitle}>
+            Xe buýt: <strong>{buses[0]?.busNumber}</strong> - Tuyến: <strong>{buses[0]?.route}</strong>
+          </p>
         </div>
 
-        <div className={styles.mapPlaceholder} role="region" aria-label="Bản đồ hành trình">
-          <div className={styles.mapText}>
-            Bản đồ thời gian thực (Google Maps API sẽ được tích hợp ở đây)
-          </div>
-
-          <div className={styles.mapControls} role="group" aria-label="Điều khiển bản đồ">
-            <button type="button" className={styles.controlBtn} aria-label="Phóng to">Phóng to</button>
-            <button type="button" className={styles.controlBtn} aria-label="Thu nhỏ">Thu nhỏ</button>
-            <button type="button" className={styles.controlBtn} aria-label="Tắt theo dõi">Tắt theo dõi</button>
-          </div>
+        <div className={styles.mapContainer}>
+          {/* Google Maps với BusMap_GG */}
+          <BusMap_GG 
+            buses={buses} 
+            onBusSelect={handleBusSelect}
+            onBusUnselect={handleBusUnselect}
+            isMoving={false}
+            hideRoutePanel={true}
+          />
         </div>
 
-        <div className={styles.busInfo} aria-live="polite">
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", color: "#374151" }}>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ fontWeight: "bold" }}>Xe:</span>
-              <span data-no-translate>Xe 01</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ fontWeight: "bold" }}>Tài xế:</span>
-              <span data-no-translate>Nguyễn Văn A</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ fontWeight: "bold" }}>Tuyến đường:</span>
-              <span data-no-translate>Tuyến ABC</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ fontWeight: "bold" }}>Trạng thái:</span>
-              <span data-no-translate>Đang di chuyển</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ fontWeight: "bold" }}>Thời gian đến dự kiến:</span>
-              <span data-no-translate>7:30 AM</span>
-            </div>
+        {/* Bus Info Panel */}
+        {selectedBus && (
+          <div className={styles.infoPanelContainer}>
+            <BusInfoPanel
+              bus={selectedBus}
+              onToggleTracking={toggleTracking}
+            />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

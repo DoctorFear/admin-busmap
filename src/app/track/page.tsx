@@ -158,7 +158,7 @@ export default function TrackPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Theo dõi vị trí xe buýt (Realtime)</h1>
+        {/* <h1>Theo dõi vị trí xe buýt (Realtime)</h1> */}
         {/* <div className={styles.stats}>
           <span>
             Đang theo dõi:{" "}

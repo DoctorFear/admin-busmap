@@ -1,4 +1,151 @@
-/* page.module.css */
+.mainContent {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem;
+  background-color: #faf7ff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Montserrat", sans-serif;
+  margin-top: 4rem;
+}
+
+.overview {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.overviewHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.overviewHeader h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Map Container */
+.mapContainer {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background-color: #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.controlBtn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.controlBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.startBtn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.startBtn:hover {
+  background-color: #45a049;
+}
+
+.stopBtn {
+  background-color: #f44336;
+  color: white;
+}
+
+.stopBtn:hover {
+  background-color: #da190b;
+}
+
+/* Info Panel Container */
+.infoPanelContainer {
+  margin-top: 1rem;
+}
+
+/* Loading, Error, Empty States */
+.loading,
+.error,
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+}
+
+.loading p,
+.empty p {
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+.error p {
+  font-size: 1.1rem;
+  color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 1rem;
+    margin-top: 3.25rem;
+  }
+
+  .mapContainer {
+    height: 400px;
+  }
+
+  .controlBtn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .overviewHeader h3 {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+}
+
+
+
+/* 
+
 .mainContent {
   min-height: calc(100vh - 70px);
   display: flex;
@@ -101,3 +248,5 @@
     font-size: 0.85rem;
   }
 }
+
+*/

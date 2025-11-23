@@ -2,7 +2,8 @@ import {
   getAllParents,
   createParent as createParentModel,
   updateParent as updateParentModel,
-  deleteParent as deleteParentModel
+  deleteParent as deleteParentModel,
+  getStudentBusesByParent
 } from '../models/parentModel.js';
 
 export const getParents = (req, res) => {
@@ -37,5 +38,21 @@ export const deleteParent = (req, res) => {
   deleteParentModel(id, (err) => {
     if (err) return res.status(400).json({ error: err.message });
     res.json({ message: 'Xóa phụ huynh thành công!' });
+  });
+};
+
+/**
+ * Lấy danh sách buses/routes mà con của parent đang đi
+ * Logic: Parent -> Student -> BoardingRecord -> Trip -> Bus + Route
+ */
+export const getStudentBuses = (req, res) => {
+  const parentId = req.params.parentId;
+  
+  getStudentBusesByParent(parentId, (err, results) => {
+    if (err) {
+      console.error(`Lỗi lấy buses của parent ${parentId}:`, err);
+      return res.status(500).json({ error: 'Lỗi server khi lấy thông tin xe buýt' });
+    }
+    res.status(200).json(results);
   });
 };

@@ -78,3 +78,52 @@ export const updateParent = (id, data, callback) => {
 export const deleteParent = (id, callback) => {
   db.query(`DELETE FROM Users WHERE userID = ? AND role = 'parent'`, [id], callback);
 };
+
+/**
+ * Lấy danh sách buses/routes mà con của parent đang đi
+ * 
+ * Logic: 
+ * 1. Parent (parentUserID) -> Student (studentID) [1:1 relationship]
+ * 2. Student -> BoardingRecord -> Trip (tripID)
+ * 3. Trip -> Bus (busID) + Route (routeID)
+ * 4. Chỉ lấy trips đang RUNNING hoặc PLANNED (không lấy COMPLETED/CANCELLED)
+ * 5. Chỉ lấy trips hôm nay (tripDate = CURDATE())
+ * 6. Trả về thông tin: busID, licensePlate, routeID, routeName, tripStatus
+ */
+export const getStudentBusesByParent = (parentId, callback) => {
+  const sql = `
+    SELECT DISTINCT
+      b.busID,
+      b.licensePlate,
+      b.capacity,
+      b.model,
+      b.status AS busStatus,
+      r.routeID,
+      r.routeName,
+      r.description AS routeDescription,
+      r.estimatedTime,
+      t.tripID,
+      t.tripDate,
+      t.startTime,
+      t.endTime,
+      t.status AS tripStatus,
+      s.studentID,
+      s.fullName AS studentName,
+      br.status AS boardingStatus
+    FROM Student s
+    INNER JOIN BoardingRecord br ON s.studentID = br.studentID
+    INNER JOIN Trip t ON br.tripID = t.tripID
+    INNER JOIN Bus b ON t.assignedBusID = b.busID
+    INNER JOIN Route r ON t.routeID = r.routeID
+    WHERE s.parentUserID = ?
+      AND t.status IN ('PLANNED', 'RUNNING')
+      AND t.tripDate = CURDATE()
+    ORDER BY t.startTime
+    LIMIT 1
+  `;
+  
+  db.query(sql, [parentId], (err, results) => {
+    if (err) return callback(err, null);
+    callback(null, results);
+  });
+};

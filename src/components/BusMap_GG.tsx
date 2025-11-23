@@ -139,11 +139,13 @@ export default function BusMap_GG({
   onBusSelect,
   onBusUnselect,
   isMoving = false,
+  hideRoutePanel = false,
 }: { 
   buses: any[];
   onBusSelect?: (bus: any) => void;
   onBusUnselect?: () => void;
   isMoving?: boolean;
+  hideRoutePanel?: boolean;
 }) {
   // State: danh sách tuyến/cụm, tuyến được chọn, danh sách điểm dừng của từng cụm
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -1000,22 +1002,23 @@ export default function BusMap_GG({
       - Checkbox "All" để chọn/bỏ chọn tất cả tuyến đường cùng lúc
       - Khi chọn tuyến đường, hiển thị đường đi của tuyến đó trên bản đồ
       */}
-      <div
-        style={{
-          position: "absolute",
-          top: 12,
-          right: 12,
-          background: "rgba(255,255,255,0.95)",
-          borderRadius: 8,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          padding: 12,
-          maxHeight: 280,
-          width: 280,
-          overflow: "auto",
-          fontSize: 14,
-        }}
-      >
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>Tuyến đường</div>
+      {!hideRoutePanel && (
+        <div
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            background: "rgba(255,255,255,0.95)",
+            borderRadius: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            padding: 12,
+            maxHeight: 280,
+            width: 280,
+            overflow: "auto",
+            fontSize: 14,
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 8 }}>Tuyến đường</div>
         {routes.length === 0 ? (
           <div style={{ color: "#666" }}>Không có dữ liệu tuyến</div>
         ) : (
@@ -1085,6 +1088,7 @@ export default function BusMap_GG({
           </>
         )}
       </div>
+      )}
     </div>
   );
 }
