@@ -1,10 +1,15 @@
 'use client';
 
-import React, { JSX, FormEvent } from 'react';
+import React, { JSX, FormEvent, useState } from 'react';
 import { Save } from 'lucide-react';
 import styles from './page.module.css';
+import { useRouter } from "next/navigation";
 
 export default function Setting(): JSX.Element {
+  const router = useRouter();
+  // Lấy parentID từ localStorage
+  const [parentID, setParentID] = useState<number | null>(null);
+
   const viewBusDetails = (busId: string) => {
     console.log(`Viewing details for bus: ${busId}`);
     // TODO: Thêm logic hiển thị chi tiết xe tại đây (modal, API,...)

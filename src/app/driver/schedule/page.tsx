@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "../page.module.css";
 
 interface ScheduleItem {
@@ -15,14 +16,36 @@ interface ScheduleItem {
 const PORT_SERVER = 8888;
 
 export default function DriverSchedulePage() {
+  const router = useRouter();
+  
+  // Lấy driverID từ localStorage
+  const [driverID, setDriverID] = useState<number | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
   const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>([]);
   const [todaySchedule, setTodaySchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const driverID = 1;
+
+  // Kiểm tra authentication và lấy driverID
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    const storedDriverID = localStorage.getItem('driverID');
+    
+    if (role !== 'driver' || !storedDriverID) {
+      alert('Vui lòng đăng nhập với tài khoản tài xế!');
+      router.push('/login');
+      return;
+    }
+    
+    setDriverID(parseInt(storedDriverID));
+    setIsAuthLoading(false);
+  }, [router]);
 
   // Lấy dữ liệu lịch trình
   const fetchSchedule = async () => {
+    if (!driverID) return; // THÊM: Đợi có driverID
+    
     try {
       const res = await fetch(`http://localhost:${PORT_SERVER}/api/schedules/driver/${driverID}`);
       if (!res.ok) throw new Error("Không thể kết nối máy chủ");
@@ -51,8 +74,11 @@ export default function DriverSchedulePage() {
     }
   };
 
+  // THÊM: useEffect chỉ chạy khi có driverID
   useEffect(() => {
-    fetchSchedule();
+    if (driverID) {
+      fetchSchedule();
+    }
   }, [driverID]);
 
   // Hàm bắt đầu chuyến xe
@@ -99,6 +125,11 @@ export default function DriverSchedulePage() {
     };
     return `${formatHour(startTime)} - ${formatHour(endTime)}`;
   };
+
+  // THÊM: Loading khi kiểm tra auth
+  if (isAuthLoading) {
+    return <p>Đang tải thông tin tài xế...</p>;
+  }
 
   // Hiển thị giao diện
   if (loading) return <p>Đang tải dữ liệu...</p>;

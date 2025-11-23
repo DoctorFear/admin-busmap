@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 interface ScheduleItem {
@@ -9,15 +10,16 @@ interface ScheduleItem {
   route: string;
   startTime: string;
   endTime: string;
-  status: string; // PLANNED | RUNNING | COMPLETED
+  status: string;
 }
 
 interface DriverStudent {
   studentID: number;
   studentName: string;
   grade: string;
+  address: string;
   pickupLocation: string;
-  status: string; // chua-don | da-don | da-tra | vang-mat
+  status: string;
   tripID: number;
   tripDate: string;
   tripStartTime: string;
@@ -27,19 +29,39 @@ interface DriverStudent {
 }
 
 const PORT_SERVER = 8888;
-const DRIVER_ID = 1;
 
 export default function DriverPage() {
-  // Lịch làm việc
+  const router = useRouter();
+  
+  // Lấy driverID từ localStorage
+  const [driverID, setDriverID] = useState<number | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    const storedDriverID = localStorage.getItem('driverID');
+    
+    if (role !== 'driver' || !storedDriverID) {
+      alert('Vui lòng đăng nhập với tài khoản tài xế!');
+      router.push('/login');
+      return;
+    }
+    
+    setDriverID(parseInt(storedDriverID));
+    setIsAuthLoading(false);
+  }, [router]);
+
   const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>([]);
   const [todaySchedule, setTodaySchedule] = useState<ScheduleItem[]>([]);
   const [scheduleLoading, setScheduleLoading] = useState(true);
   const [scheduleError, setScheduleError] = useState("");
 
   const fetchSchedule = async () => {
+    if (!driverID) return;
+    
     setScheduleLoading(true);
     try {
-      const res = await fetch(`http://localhost:${PORT_SERVER}/api/schedules/driver/${DRIVER_ID}`);
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/schedules/driver/${driverID}`);
       if (!res.ok) throw new Error("Không thể kết nối máy chủ");
       const data: ScheduleItem[] = await res.json();
       setWeeklySchedule(data);
@@ -100,7 +122,6 @@ export default function DriverPage() {
     return `${formatHour(startTime)} - ${formatHour(endTime)}`;
   };
 
-  // Danh sách học sinh
   const [studentList, setStudentList] = useState<DriverStudent[]>([]);
   const [tripInfo, setTripInfo] = useState<DriverStudent | null>(null);
   const [allCompleted, setAllCompleted] = useState(false);
@@ -108,9 +129,11 @@ export default function DriverPage() {
   const [studentsError, setStudentsError] = useState("");
 
   const fetchStudents = async () => {
+    if (!driverID) return;
+    
     setStudentsLoading(true);
     try {
-      const res = await fetch(`http://localhost:${PORT_SERVER}/api/students/driver/${DRIVER_ID}`, { cache: "no-store" });
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/students/driver/${driverID}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Không thể kết nối máy chủ");
       const data = await res.json();
 
@@ -138,10 +161,13 @@ export default function DriverPage() {
     }
   };
 
+  // useEffect chỉ chạy khi có driverID
   useEffect(() => {
-    fetchSchedule();
-    fetchStudents();
-  }, []);
+    if (driverID) {
+      fetchSchedule();
+      fetchStudents();
+    }
+  }, [driverID]);
 
   const canChangeStatus = (current: string, next: string) => {
     const order = ["chua-don", "da-don", "da-tra", "vang-mat"];
@@ -194,7 +220,6 @@ export default function DriverPage() {
   const completedStudents = studentList.filter(s => s.status === 'da-don' || s.status === 'da-tra').length;
   const absentStudents = studentList.filter(s => s.status === 'vang-mat').length;
 
-  // Cảnh báo
   const [alertMessage, setAlertMessage] = useState('');
   const [alerts, setAlerts] = useState(['Kẹt xe tại ngã tư Lê Lợi - 6:45 AM, 19/09/2025']);
 
@@ -207,10 +232,17 @@ export default function DriverPage() {
     }
   };
 
+  // Loading khi kiểm tra auth
+  if (isAuthLoading) {
+    return (
+      <div className={styles.driverContainer}>
+        <p>Đang tải thông tin tài xế...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.driverContainer}>
-
-      {/* ---------- Map Section ---------- */}
       <div className={styles.mapSection}>
         <h3>Theo dõi hành trình</h3>
         <div className={styles.mapPlaceholder}>
@@ -222,7 +254,6 @@ export default function DriverPage() {
           </div>
         </div>
 
-        {/* Lịch hôm nay */}
         <div className={styles.schedule}>
           <h3>Lịch làm việc hôm nay</h3>
           {scheduleLoading ? <p>Đang tải dữ liệu...</p> :
@@ -277,7 +308,6 @@ export default function DriverPage() {
         </div>
       </div>
 
-      {/* Lịch tuần */}
       <div className={styles.schedule}>
         <h3>Lịch làm việc tuần này</h3>
         {scheduleLoading ? <p>Đang tải dữ liệu...</p> :
@@ -305,7 +335,6 @@ export default function DriverPage() {
         }
       </div>
 
-      {/* Danh sách học sinh */}
       <div className={styles.studentList}>
         <h3>Danh sách học sinh</h3>
         {studentsLoading ? <p>Đang tải dữ liệu...</p> :
@@ -322,7 +351,7 @@ export default function DriverPage() {
               </p>
               {studentList.map(student => (
                 <div key={student.studentID} className={styles.studentItem}>
-                  <p>{student.studentName} - {student.grade}<img></img></p>
+                  <p>{student.studentName} – {student.grade} – {student.address}<img></img></p>
                   <select
                     value={student.status}
                     onChange={(e) => updateStudentStatus(student.studentID, student.status, e.target.value)}
@@ -340,7 +369,6 @@ export default function DriverPage() {
         }
       </div>
 
-      {/* Cảnh báo */}
       <div className={styles.alerts}>
         <h3>Gửi cảnh báo</h3>
         <form className={styles.alertForm} onSubmit={handleAlertSubmit}>

@@ -2,8 +2,13 @@
 
 import { useState } from 'react';
 import styles from '../page.module.css';
+import { useRouter } from "next/navigation";
 
 export default function DriverAlertsPage() {
+  const router = useRouter();
+  
+  // Lấy driverID từ localStorage
+  const [driverID, setDriverID] = useState<number | null>(null);
   const [alertMessage, setAlertMessage] = useState('');
   const [alerts, setAlerts] = useState(['Kẹt xe tại ngã tư Lê Lợi - 6:45 AM, 19/09/2025']);
 

@@ -3,11 +3,15 @@
 import React, { useState, ChangeEvent, JSX } from 'react';
 import { Upload } from 'lucide-react';
 import styles from './page.module.css';
+import { useRouter } from "next/navigation";
 
 export default function Information(): JSX.Element {
+  const router = useRouter();
   const [preview, setPreview] = useState<string>('/default-avatar.png'); // ảnh mặc định
   const [pickupPoint, setPickupPoint] = useState<string>('123 Đường Lê Lợi');
-
+  // Lấy parentID từ localStorage
+  const [parentID, setParentID] = useState<number | null>(null);
+  
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

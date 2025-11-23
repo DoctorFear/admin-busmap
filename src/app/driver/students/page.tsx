@@ -1,20 +1,43 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styles from "../page.module.css";
 
 export default function DriverStudentsPage() {
+  const router = useRouter();
+  
+  // Lấy driverID từ localStorage
+  const [driverID, setDriverID] = useState<number | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
   const [studentList, setStudentList] = useState<any[]>([]);
   const [tripInfo, setTripInfo] = useState<any>(null);
   const [allCompleted, setAllCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const driverID = 1;
   const PORT_SERVER = 8888;
+
+  // Kiểm tra authentication và lấy driverID
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    const storedDriverID = localStorage.getItem('driverID');
+    
+    if (role !== 'driver' || !storedDriverID) {
+      alert('Vui lòng đăng nhập với tài khoản tài xế!');
+      router.push('/login');
+      return;
+    }
+    
+    setDriverID(parseInt(storedDriverID));
+    setIsAuthLoading(false);
+  }, [router]);
 
   // Lấy danh sách học sinh của tài xế
   const fetchStudents = async () => {
+    if (!driverID) return; // THÊM: Đợi có driverID
+    
     try {
       setLoading(true);
       const res = await fetch(
@@ -62,9 +85,12 @@ export default function DriverStudentsPage() {
     }
   };
 
+  // THÊM: useEffect chỉ chạy khi có driverID
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    if (driverID) {
+      fetchStudents();
+    }
+  }, [driverID]);
 
   // Kiểm tra trạng thái có thể chuyển đổi hợp lệ hay không
   const canChangeStatus = (currentStatus: string, newStatus: string): boolean => {
@@ -143,6 +169,11 @@ export default function DriverStudentsPage() {
     if (!timeStr) return "";
     return timeStr.substring(0, 5);
   };
+
+  // THÊM: Loading khi kiểm tra auth
+  if (isAuthLoading) {
+    return <p>Đang tải thông tin tài xế...</p>;
+  }
 
   // Hiển thị khi đang tải
   if (loading) return <p>Đang tải dữ liệu...</p>;

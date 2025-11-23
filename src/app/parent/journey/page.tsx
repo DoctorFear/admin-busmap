@@ -8,6 +8,7 @@ import BusMap_GG from '@/components/BusMap_GG';
 import BusInfoPanel from '@/components/BusInfoPanel';
 import { Bus } from '@/lib/data_buses';
 import styles from './page.module.css';
+import { useRouter } from "next/navigation";
 
 /**
  * Trang theo dõi hành trình dành cho Parent
@@ -16,21 +17,34 @@ import styles from './page.module.css';
  * - Socket.IO realtime updates
  */
 export default function ParentJourneyPage() {
+  const router = useRouter();
   const [buses, setBuses] = useState<Bus[]>([]);
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [allowedBusIDs, setAllowedBusIDs] = useState<Set<number>>(new Set()); // Bus IDs của parent
   
-  // Đăng nhập -> lấy parentID
-  const PARENT_ID = 11; // Hardcode
+  // Lấy parentID từ localStorage
+  const [parentID, setParentID] = useState<number | null>(null);
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    const storedParentID = localStorage.getItem('parentID');
+    if (role !== 'parent' || !storedParentID) {
+      alert('Vui lòng đăng nhập với tài khoản phụ huynh!');
+      router.push('/login');
+      return;
+    }
+
+    setParentID(parseInt(storedParentID));
+  }, [router]);
 
   // --- 1. Fetch danh sách buses của con parent ---
   useEffect(() => {
     const fetchStudentBuses = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:${PORT_SERVER}/api/parents/${PARENT_ID}/student-buses`);
+        const response = await fetch(`http://localhost:${PORT_SERVER}/api/parents/${parentID}/student-buses`);
         
         if (!response.ok) {
           throw new Error('Không thể tải thông tin xe buýt');
@@ -78,8 +92,8 @@ export default function ParentJourneyPage() {
     };
     
     fetchStudentBuses();
-  }, [PARENT_ID]);
-
+  }, [parentID]);
+  
   // --- 2. Socket.IO realtime updates (với filtering) ---
   useEffect(() => {
     // Chỉ connect socket khi đã có allowedBusIDs
