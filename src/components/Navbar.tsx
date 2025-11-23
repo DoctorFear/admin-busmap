@@ -38,7 +38,20 @@ export default function Navbar() {
     setLanguage(newLang);
     setDisplayLang(newLang === "vi" ? "VI" : "EN");
   };
+  async function handleLogout() {
+    try {
+      await fetch("http://localhost:8888/api/auth/logout", {
+        method: "POST",
+        credentials: "include",  // gửi cookie để server xóa session
+      });
 
+      // Điều hướng về trang login
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+  
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Main navigation">
       <div className={styles.logo}>
@@ -97,11 +110,15 @@ export default function Navbar() {
             {displayLang}
           </button>
         </li>
-
         <li>
-          <Link href="/login" className={styles.logout}>
+          <button
+            onClick={handleLogout}
+            className={styles.logout}
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+            aria-label="Logout"
+          >
             <LogOut size={20} />
-          </Link>
+          </button>
         </li>
       </ul>
     </nav>

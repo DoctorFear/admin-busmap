@@ -39,6 +39,21 @@ export default function ParentNavbar() {
     setDisplayLang(newLang === "vi" ? "VI" : "EN");
   };
 
+  // ------------------ LOGOUT FUNCTION ------------------
+  async function handleLogout() {
+    try {
+      await fetch("http://localhost:8888/api/auth/logout", {
+        method: "POST",
+        credentials: "include",  // gửi cookie session
+      });
+
+      // Điều hướng về login
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Parent navigation">
       {/* Logo */}
@@ -91,7 +106,7 @@ export default function ParentNavbar() {
           </Link>
         </li>
 
-        {/* Nút đổi ngôn ngữ – đẩy sang phải */}
+        {/* Nút đổi ngôn ngữ */}
         <li style={{ marginLeft: "auto"}}>
           <button
             data-no-translate
@@ -104,11 +119,16 @@ export default function ParentNavbar() {
           </button>
         </li>
 
-        {/* Logout */}
+        {/* ------------------ NÚT LOGOUT ------------------ */}
         <li>
-          <Link href="/login" className={styles.logout}>
+          <button
+            onClick={handleLogout}
+            className={styles.logout}
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+            aria-label="Logout"
+          >
             <LogOut size={20} />
-          </Link>
+          </button>
         </li>
       </ul>
     </nav>

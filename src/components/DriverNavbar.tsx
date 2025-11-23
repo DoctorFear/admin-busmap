@@ -39,6 +39,21 @@ export default function DriverNavbar() {
     setDisplayLang(newLang === "vi" ? "VI" : "EN");
   };
 
+  // ------------------ LOGOUT FUNCTION ------------------
+  async function handleLogout() {
+    try {
+      await fetch("http://localhost:8888/api/auth/logout", {
+        method: "POST",
+        credentials: "include", // BẮT BUỘC để gửi cookie session
+      });
+
+      // Điều hướng về trang login
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+
   return (
     <nav className={styles.navbar} role="navigation" aria-label="Driver navigation">
       {/* Logo */}
@@ -64,6 +79,7 @@ export default function DriverNavbar() {
             <LayoutDashboard size={18} /> Trang chủ
           </Link>
         </li>
+
         <li>
           <Link
             href="/driver/schedule"
@@ -72,6 +88,7 @@ export default function DriverNavbar() {
             <CalendarDays size={18} /> Lịch làm việc
           </Link>
         </li>
+
         <li>
           <Link
             href="/driver/students"
@@ -80,6 +97,7 @@ export default function DriverNavbar() {
             <Users size={18} /> Danh sách học sinh
           </Link>
         </li>
+
         <li>
           <Link
             href="/driver/alerts"
@@ -89,8 +107,8 @@ export default function DriverNavbar() {
           </Link>
         </li>
 
-        {/* Nút đổi ngôn ngữ – đẩy sang phải */}
-        <li style={{ marginLeft: "auto", marginRight: "20px"}}>
+        {/* Nút đổi ngôn ngữ */}
+        <li style={{ marginLeft: "auto", marginRight: "20px" }}>
           <button
             data-no-translate
             onClick={toggleLang}
@@ -102,14 +120,18 @@ export default function DriverNavbar() {
           </button>
         </li>
 
-      {/* Nút Logout */}
+        {/* ------------------ NÚT LOGOUT ------------------ */}
         <li>
-          <Link href="/login" className={styles.logout}>
+          <button
+            onClick={handleLogout}
+            className={styles.logout}
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+            aria-label="Logout"
+          >
             <LogOut size={20} />
-          </Link>
+          </button>
         </li>
       </ul>
-
     </nav>
   );
 }
