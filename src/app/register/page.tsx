@@ -1,40 +1,89 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import Link from "next/link";
+import { setLanguage, getCurrentLang, translateAll } from "@/lib/autoTranslate";
+
+type Role = "parent" | "driver";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [role, setRole] = useState<Role>("parent");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     username: "",
     password: "",
     confirmPassword: "",
-    role: "parent",
-    studentName: "", // chỉ dành cho parent
-    license: "",     // chỉ dành cho driver
+    studentName: "",
+    address: "",
+    license: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [displayLang, setDisplayLang] = useState<"VI" | "EN">("VI");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  useEffect(() => {
+    const saved = getCurrentLang();
+    if (saved === "en") setDisplayLang("EN");
+    setTimeout(translateAll, 150);
+  }, []);
+
+  const toggleLang = () => {
+    const newLang = displayLang === "VI" ? "en" : "vi";
+    setLanguage(newLang);
+    setDisplayLang(newLang === "vi" ? "VI" : "EN");
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleRoleChange = (newRole: Role) => {
+    setRole(newRole);
+    setFormData(prev => ({
+      ...prev,
+      studentName: newRole === "parent" ? prev.studentName : "",
+      address: newRole === "parent" ? prev.address : "",
+      license: newRole === "driver" ? prev.license : "",
+    }));
+  };
+
+  // ==================== VALIDATION ====================
   const validateForm = () => {
-    const { name, phone, username, password, confirmPassword, role, studentName, license } = formData;
+    const { name, phone, username, password, confirmPassword, studentName, address, license } = formData;
 
     if (!name || !phone || !username || !password || !confirmPassword)
       return "Vui lòng điền đầy đủ các trường bắt buộc";
 
-    if (password !== confirmPassword) return "Mật khẩu xác nhận không khớp";
+    // Mật khẩu >= 6 ký tự
+    if (password.length < 6)
+      return "Mật khẩu phải có ít nhất 6 ký tự";
 
-    // validation theo role
-    if (role === "parent" && !studentName) return "Vui lòng nhập tên học sinh";
-    if (role === "driver" && !license) return "Vui lòng nhập biển số xe / giấy phép";
+    if (password !== confirmPassword)
+      return "Mật khẩu xác nhận không khớp";
+
+    // Số điện thoại VN
+    const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
+    if (!phoneRegex.test(phone))
+      return "Số điện thoại không hợp lệ (VD: 0901234567)";
+
+    // Parent validation
+    if (role === "parent") {
+      if (!studentName) return "Vui lòng nhập tên học sinh";
+      if (!address) return "Vui lòng nhập địa chỉ";
+
+      if (address.length < 5)
+        return "Địa chỉ quá ngắn, vui lòng nhập đầy đủ";
+    }
+
+    // Driver validation (biển số xe VN)
+    if (role === "driver") {
+      const licenseRegex = /^([0-9]{2}[A-Z]{1,2}-?[0-9]{3}\.?[0-9]{2})$/;
+      if (!licenseRegex.test(license))
+        return "Biển số xe không đúng định dạng (VD: 51A-123.45)";
+    }
 
     return "";
   };
@@ -52,20 +101,20 @@ export default function RegisterPage() {
     }
 
     try {
-const res = await fetch("http://localhost:8888/api/auth/register", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    fullName: formData.name,
-    username: formData.username,
-    password: formData.password,   // ✅ gửi password thô
-    phone: formData.phone,
-    role: formData.role,
-    studentName: formData.role === "parent" ? formData.studentName : undefined,
-    license: formData.role === "driver" ? formData.license : undefined,
-  }),
-});
-
+      const res = await fetch("http://localhost:8888/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.name,
+          username: formData.username,
+          password: formData.password,
+          phone: formData.phone,
+          role,
+          studentName: role === "parent" ? formData.studentName : undefined,
+          address: role === "parent" ? formData.address : undefined,
+          license: role === "driver" ? formData.license : undefined,
+        }),
+      });
 
       const data = await res.json();
 
@@ -88,6 +137,22 @@ const res = await fetch("http://localhost:8888/api/auth/register", {
     <div className={styles.container}>
       <div className={styles.card}>
         <h2 className={styles.title}>Đăng ký</h2>
+
+        <div className={styles.roleTabs}>
+          <div
+            className={`${styles.roleTab} ${role === "parent" ? styles.active : ""}`}
+            onClick={() => handleRoleChange("parent")}
+          >
+            Phụ huynh
+          </div>
+          <div
+            className={`${styles.roleTab} ${role === "driver" ? styles.active : ""}`}
+            onClick={() => handleRoleChange("driver")}
+          >
+            Tài xế
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label>Họ tên</label>
@@ -102,22 +167,37 @@ const res = await fetch("http://localhost:8888/api/auth/register", {
             />
           </div>
 
-          {formData.role === "parent" && (
-            <div className={styles.formGroup}>
-              <label>Tên học sinh</label>
-              <input
-                type="text"
-                name="studentName"
-                value={formData.studentName}
-                onChange={handleChange}
-                required
-                placeholder="Nguyễn Minh Anh"
-                className={styles.input}
-              />
-            </div>
+          {role === "parent" && (
+            <>
+              <div className={styles.formGroup}>
+                <label>Tên học sinh</label>
+                <input
+                  type="text"
+                  name="studentName"
+                  value={formData.studentName}
+                  onChange={handleChange}
+                  required
+                  placeholder="Nguyễn Minh Anh"
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Địa chỉ nhà</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  required
+                  placeholder="Số nhà, đường, quận"
+                  className={styles.input}
+                />
+              </div>
+            </>
           )}
 
-          {formData.role === "driver" && (
+          {role === "driver" && (
             <div className={styles.formGroup}>
               <label>Biển số / Giấy phép</label>
               <input
@@ -126,7 +206,7 @@ const res = await fetch("http://localhost:8888/api/auth/register", {
                 value={formData.license}
                 onChange={handleChange}
                 required
-                placeholder="B2-123456"
+                placeholder="51A-123.45"
                 className={styles.input}
               />
             </div>
@@ -166,7 +246,7 @@ const res = await fetch("http://localhost:8888/api/auth/register", {
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="••••••••"
+              placeholder="••••••"
               className={styles.input}
             />
           </div>
@@ -179,29 +259,52 @@ const res = await fetch("http://localhost:8888/api/auth/register", {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              placeholder="••••••••"
+              placeholder="••••••"
               className={styles.input}
             />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Vai trò</label>
-            <select name="role" value={formData.role} onChange={handleChange} className={styles.input}>
-              <option value="parent">Phụ huynh</option>
-              <option value="driver">Tài xế</option>
-            </select>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
 
           <button type="submit" disabled={loading} className={styles.button}>
-            {loading ? "Đang xử lý..." : "Đăng ký"}
+            {loading ? (
+              <span className={styles.loadingText}>
+                <div className={styles.spinner}></div>
+                Đang xử lý...
+              </span>
+            ) : (
+              "Đăng ký"
+            )}
           </button>
         </form>
-
+                <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: "1.5rem",
+          }}
+        >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center",  gap: "0.3rem" }}>
         <p>
-          Đã có tài khoản? <Link href="/login">Đăng nhập</Link>
-        </p>
+          Đã có tài khoản?</p>
+          <Link href="/login" className={styles.loginLink}>Đăng nhập</Link>
+        </div>
+                  <button
+            onClick={toggleLang}
+            className={styles.registerLink2}
+            aria-label="Đổi ngôn ngữ"
+            style={{
+              background: "none",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              cursor: "pointer",
+              padding: "0.25rem 0.75rem",
+            }}
+          >
+            {displayLang}
+          </button>
+      </div>
       </div>
     </div>
   );
