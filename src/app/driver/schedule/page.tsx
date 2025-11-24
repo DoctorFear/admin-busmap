@@ -30,7 +30,7 @@ export default function DriverSchedulePage() {
   // Kiểm tra authentication và lấy driverID
   useEffect(() => {
     const role = localStorage.getItem('userRole');
-    const storedDriverID = localStorage.getItem('driverID');
+    const storedDriverID = localStorage.getItem('userID');
     
     if (role !== 'driver' || !storedDriverID) {
       alert('Vui lòng đăng nhập với tài khoản tài xế!');

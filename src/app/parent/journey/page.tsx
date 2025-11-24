@@ -87,8 +87,6 @@ export default function ParentJourneyPage() {
         
         // Lưu danh sách busIDs được phép xem
         const busIDsSet = new Set<number>(data.map((item: any) => item.busID));
-        // Add 1 to sync index with admin view
-        // const busIDsSet = new Set<number>(Array.from(busIDsSet_fetch).map(id => id + 1));
         setAllowedBusIDs(busIDsSet);
         
         console.log('✅ Parent được xem buses:', Array.from(busIDsSet));
