@@ -89,13 +89,43 @@ router.post('/send', async (req, res) => {
       });
     }
 
+    // Step 4: Get all admin users and send notification to them as well
+    const adminQuery = `
+      SELECT userID FROM Users WHERE role = 'admin'
+    `;
+
+    const [adminUsers] = await db.promise().query(adminQuery);
+    let adminNotificationCount = 0;
+
+    if (adminUsers.length > 0) {
+      const adminNotificationTitle = getAlertTitle(alertType);
+      const driverQuery = `SELECT fullName FROM Users WHERE userID = ?`;
+      const [driverData] = await db.promise().query(driverQuery, [driverID]);
+      const driverName = driverData.length > 0 ? driverData[0].fullName : `Tài xế #${driverID}`;
+
+      const adminNotificationContent = `⚠️ Cảnh báo từ tài xế: ${driverName}\nChuyến xe: ${tripID}\nNội dung: ${alertMessage}\nMức độ: ${severity}\nPhụ huynh được thông báo: ${parentUsers.length}`;
+
+      for (const admin of adminUsers) {
+        await db.promise().query(notificationQuery, [
+          admin.userID,
+          driverID,
+          'INCIDENT',
+          `[ADMIN] ${adminNotificationTitle}`,
+          adminNotificationContent
+        ]);
+        adminNotificationCount++;
+      }
+    }
+
     // Response
     return res.status(200).json({
       success: true,
-      message: `Cảnh báo đã gửi tới ${notifications.length} phụ huynh`,
+      message: `Cảnh báo đã gửi tới ${notifications.length} phụ huynh và ${adminNotificationCount} quản trị viên`,
       data: {
         alertID,
-        notificationCount: notifications.length,
+        parentNotificationCount: notifications.length,
+        adminNotificationCount,
+        totalNotifications: notifications.length + adminNotificationCount,
         notifications
       }
     });

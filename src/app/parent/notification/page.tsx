@@ -3,8 +3,12 @@
 import { useState } from "react";
 import { notifications, NotificationItem } from "@/lib/data";
 import styles from "./page.module.css";
+import { useRouter } from "next/navigation";
 
 export default function ParentNotificationPage() {
+  const router = useRouter();
+  // Lấy parentID từ localStorage
+  const [parentID, setParentID] = useState<number | null>(null);
   const [enabled, setEnabled] = useState(true);
 
   return (
