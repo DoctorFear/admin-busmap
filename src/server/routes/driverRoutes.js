@@ -4,7 +4,8 @@ import {
   getDrivers, 
   createDriver, 
   updateDriver, 
-  deleteDriver 
+  deleteDriver,
+  getDriverRoute
 } from '../controllers/driverController.js';
 
 const router = express.Router();
@@ -13,5 +14,8 @@ router.get('/', getDrivers);
 router.post('/', createDriver);
 router.put('/:id', updateDriver);
 router.delete('/:id', deleteDriver);
+
+// Get driver route: http://localhost:${PORT_SERVER}/api/drivers/${driverId}/route
+router.get('/:driverId/route', getDriverRoute);
 
 export default router;

@@ -105,3 +105,36 @@ export const deleteDriver = (userId, callback) => {
 };
 
 // Nếu bạn có thêm các hàm khác (getById, v.v.) thì để ở dưới đây
+
+
+
+// ==================== LẤY TUYẾN XE ĐƯỢC PHÂN CÔNG CHO TÀI XẾ THEO driverID ====================
+export const getDriverRoute = (driverID, callback) => {
+  console.log('[DriverModel] getDriverRoute - driverID:', driverID);
+
+  const sql = `
+    SELECT 
+      trip.routeID,
+      trip.assignedBusID,
+      trip.tripDate,
+      trip.startTime,
+      trip.endTime,    
+      r.routeName
+    FROM Trip trip
+    JOIN Route r ON trip.routeID = r.routeID
+    WHERE 
+      trip.assignedDriverID = ?
+      AND trip.tripDate = CURDATE()
+    ORDER BY trip.startTime ASC
+    `;
+    // LIMIT 1;  // Chỉ lấy tuyến đầu tiên (nếu có nhiều tuyến được phân công)
+    
+  db.query(sql, [driverID], (err, results) => {
+    if (err) {
+      console.error('Lỗi getDriverRoute:', err);
+      return callback(err, null);
+    }
+    // Trả về tuyến xe hoặc null nếu không tìm thấy
+    callback(null, results.length > 0 ? results[0] : null);
+  });
+}

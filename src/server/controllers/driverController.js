@@ -3,7 +3,8 @@ import {
   getAllDrivers, 
   createDriver as createDriverModel, 
   updateDriver as updateDriverModel, 
-  deleteDriver as deleteDriverModel 
+  deleteDriver as deleteDriverModel,
+  getDriverRoute as getDriverRouteModel
 } from '../models/driverModel.js';
 
 /**
@@ -112,3 +113,21 @@ export const deleteDriver = (req, res) => {
     });
   });
 };
+
+// -------------------------------------------------------------
+export const getDriverRoute = (req, res) => {
+  const driverId = req.params.driverId;
+
+  if (!driverId) {
+    return res.status(400).json({ error: 'Thiếu ID tài xế!' });
+  }
+
+  getDriverRouteModel(driverId, (err, result) => {
+    if (err) {
+      console.error(`Lỗi lấy route của tài xế ${driverId}:`, err);
+      return res.status(500).json({ error: err.message || 'Lỗi server khi lấy route tài xế' });
+    }
+
+    res.status(200).json(result);
+  });
+}

@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
-import BusMap_GG from '@/components/BusMap_GG_Driver';
-import BusInfoPanel from '@/components/BusInfoPanel';
-import { Bus } from '@/lib/data_buses';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
-import { useRouter } from "next/navigation";
 
 interface ScheduleItem {
   tripID: number;
@@ -35,45 +31,16 @@ interface DriverStudent {
 const PORT_SERVER = 8888;
 
 export default function DriverPage() {
-  // ====================================================================
-  // KHAI BÁO TẤT CẢ HOOKS Ở ĐẦU (TRƯỚC BẤT KỲ LOGIC NÀO)
-  // ====================================================================
   const router = useRouter();
   
-  // Authentication & Driver Info
+  // Lấy driverID từ localStorage
   const [driverID, setDriverID] = useState<number | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  
-  // Bus tracking
-  const [buses, setBuses] = useState<Bus[]>([]);
-  const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [allowedBusIDs, setAllowedBusIDs] = useState<Set<number>>(new Set());
 
-  // Schedule
-  const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>([]);
-  const [todaySchedule, setTodaySchedule] = useState<ScheduleItem[]>([]);
-  const [scheduleLoading, setScheduleLoading] = useState(true);
-  const [scheduleError, setScheduleError] = useState("");
-
-  // Students
-  const [studentList, setStudentList] = useState<DriverStudent[]>([]);
-  const [tripInfo, setTripInfo] = useState<DriverStudent | null>(null);
-  const [allCompleted, setAllCompleted] = useState(false);
-  const [studentsLoading, setStudentsLoading] = useState(true);
-  const [studentsError, setStudentsError] = useState("");
-
-  // Alerts
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alerts, setAlerts] = useState(['Kẹt xe tại ngã tư Lê Lợi - 6:45 AM, 19/09/2025']);
-
-  // ====================================================================
-  // EFFECT 1: CHECK AUTHENTICATION
-  // ====================================================================
   useEffect(() => {
     const role = localStorage.getItem('userRole');
     const storedDriverID = localStorage.getItem('userID');
+    // const storedDriverID = localStorage.getItem('driverID');
     
     if (role !== 'driver' || !storedDriverID) {
       alert('Vui lòng đăng nhập với tài khoản tài xế!');
@@ -85,138 +52,10 @@ export default function DriverPage() {
     setIsAuthLoading(false);
   }, [router]);
 
-  // ====================================================================
-  // EFFECT 2: FETCH SCHEDULE & STUDENTS (when driverID ready)
-  // ====================================================================
-  useEffect(() => {
-    if (driverID) {
-      fetchSchedule();
-      fetchStudents();
-    }
-  }, [driverID]);
-
-  // ====================================================================
-  // EFFECT 3: FETCH BUSES (for map tracking)
-  // ====================================================================
-  useEffect(() => {
-    if (!driverID) return;
-
-    const fetchStudentBuses = async () => {
-      try {
-        setLoading(true);
-        console.log('[DriverJourneyPage] Fetching route for driver:', driverID);
-        
-        const response = await fetch(`http://localhost:${PORT_SERVER}/api/drivers/${driverID}/route`);
-        
-        if (!response.ok) {
-          throw new Error('Không thể tải thông tin xe buýt');
-        }
-        
-        const data = await response.json();
-        
-        console.log(' ->_<- API Response (driver route):', data);
-        
-        if (!data || !data.routeID || !data.assignedBusID) {
-          console.warn('⚠️ API trả về empty hoặc không có routeID/busID');
-          setBuses([]);
-          setAllowedBusIDs(new Set());
-          setError(null);
-          setLoading(false);
-          return;
-        }
-        
-        const busIDsSet = new Set<number>([data.assignedBusID]);
-        setAllowedBusIDs(busIDsSet);
-        
-        console.log('----------- Driver được xem buses -----------\n', Array.from(busIDsSet), '\n----------------------');
-        
-        const busesData: Bus[] = [{
-          id: data.assignedBusID.toString(),
-          busNumber: `Bus ${data.assignedBusID}`,
-          driverName: `Tài xế (ID: ${driverID})`,
-          route: data.routeName || `Tuyến ${data.routeID}`,
-          status: 'stopped',
-          eta: new Date(Date.now() + 30 * 60000).toLocaleTimeString('vi-VN', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          x: 0,
-          y: 0,
-          lat: 10.759983082120561,
-          lng: 106.68225725256899,
-          lastUpdate: new Date(),
-          isTracking: true,
-          isOnline: true,
-          alerts: [],
-        } as any];
-        
-        (busesData[0] as any).routeID = data.routeID;
-        
-        console.log(' ->_<- Đã tạo buses data:', busesData);
-        console.log(' ->_<- Route names từ buses:', busesData.map(b => b.route));
-        setBuses(busesData);
-        setError(null);
-      } catch (err) {
-        console.error('!!! Lỗi fetch driver route:', err);
-        setError('Không thể tải thông tin xe buýt. Vui lòng thử lại sau.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchStudentBuses();
-  }, [driverID]);
-  
-  // ====================================================================
-  // EFFECT 4: SOCKET.IO REALTIME UPDATES
-  // ====================================================================
-  useEffect(() => {
-    if (allowedBusIDs.size === 0) return;
-
-    const socket = io(`http://localhost:${PORT_SERVER}`);
-
-    socket.on('connect', () => {
-      console.log('->_<- Driver kết nối Socket.IO:', socket.id);
-      console.log('->LOCK<- Driver chỉ xem buses:', Array.from(allowedBusIDs));
-    });
-
-    socket.on('updateBusLocation', (data) => {
-      if (!allowedBusIDs.has(data.busID)) {
-        console.log('!X! Bỏ qua bus không thuộc driver:', data.busID);
-        return;
-      }
-
-      console.log('->_<- Driver nhận realtime bus location:', data);
-
-      setBuses((prevBuses) => {
-        const updatedBuses = prevBuses.map((bus) =>
-          bus.id === data.busID.toString()
-            ? { 
-                ...bus, 
-                lat: data.lat, 
-                lng: data.lng, 
-                isOnline: true,
-                lastUpdate: new Date(),
-                status: (data.speed > 5 ? 'moving' : 'stopped') as 'moving' | 'stopped',
-              }
-            : bus
-        );
-        return updatedBuses;
-      });
-    });
-
-    socket.on('disconnect', () => {
-      console.warn('->WARNING<- Driver mất kết nối Socket.IO');
-    });
-
-    return () => { 
-      socket.disconnect();
-    };
-  }, [allowedBusIDs]);
-
-  // ====================================================================
-  // HELPER FUNCTIONS
-  // ====================================================================
+  const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>([]);
+  const [todaySchedule, setTodaySchedule] = useState<ScheduleItem[]>([]);
+  const [scheduleLoading, setScheduleLoading] = useState(true);
+  const [scheduleError, setScheduleError] = useState("");
 
   const fetchSchedule = async () => {
     if (!driverID) return;
@@ -284,6 +123,12 @@ export default function DriverPage() {
     return `${formatHour(startTime)} - ${formatHour(endTime)}`;
   };
 
+  const [studentList, setStudentList] = useState<DriverStudent[]>([]);
+  const [tripInfo, setTripInfo] = useState<DriverStudent | null>(null);
+  const [allCompleted, setAllCompleted] = useState(false);
+  const [studentsLoading, setStudentsLoading] = useState(true);
+  const [studentsError, setStudentsError] = useState("");
+
   const fetchStudents = async () => {
     if (!driverID) return;
     
@@ -316,6 +161,14 @@ export default function DriverPage() {
       setStudentsLoading(false);
     }
   };
+
+  // useEffect chỉ chạy khi có driverID
+  useEffect(() => {
+    if (driverID) {
+      fetchSchedule();
+      fetchStudents();
+    }
+  }, [driverID]);
 
   const canChangeStatus = (current: string, next: string) => {
     const order = ["chua-don", "da-don", "da-tra", "vang-mat"];
@@ -368,6 +221,9 @@ export default function DriverPage() {
   const completedStudents = studentList.filter(s => s.status === 'da-don' || s.status === 'da-tra').length;
   const absentStudents = studentList.filter(s => s.status === 'vang-mat').length;
 
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alerts, setAlerts] = useState(['Kẹt xe tại ngã tư Lê Lợi - 6:45 AM, 19/09/2025']);
+
   const handleAlertSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (alertMessage.trim()) {
@@ -377,34 +233,7 @@ export default function DriverPage() {
     }
   };
 
-  // ====================================================================
-  // EVENT HANDLERS
-  // ====================================================================
-  const toggleTracking = (id: string) => {
-    console.log('[DriverJourneyPage] Toggle tracking:', id);
-    setSelectedBus(null);
-    window.dispatchEvent(new Event('busUnselected'));
-    
-    setBuses((prev) =>
-      prev.map((b) =>
-        b.id === id ? { ...b, isTracking: !b.isTracking } : b
-      )
-    );
-  };
-  
-  const handleBusSelect = (bus: any) => {
-    console.log('[DriverJourneyPage] Bus selected:', bus);
-    setSelectedBus(bus);
-  };
-  
-  const handleBusUnselect = () => {
-    console.log('[DriverJourneyPage] handleBusUnselect');
-    setSelectedBus(null);
-  };
-
-  // ====================================================================
-  // RENDER CONDITIONS
-  // ====================================================================
+  // Loading khi kiểm tra auth
   if (isAuthLoading) {
     return (
       <div className={styles.driverContainer}>
@@ -413,57 +242,18 @@ export default function DriverPage() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className={styles.mainContent}>
-        <div className={styles.loading}>
-          <p>Đang tải thông tin xe buýt...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.mainContent}>
-        <div className={styles.error}>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ====================================================================
-  // MAIN RENDER
-  // ====================================================================
   return (
     <div className={styles.driverContainer}>
       <div className={styles.mapSection}>
-        {/* <h3>Theo dõi hành trình</h3> */}
-
-
-        {/* REALTIME MAP */}
-
-        <BusMap_GG 
-          buses={buses} 
-          onBusSelect={handleBusSelect}
-        />
-        
-  {/* 
-  // -------------------------------------------------------------
-  // -------------------------------------------------------------
-  // ------------------------------------------------------------- 
-  // */}
-
-
-        {/* <div className={styles.mapPlaceholder}>
+        <h3>Theo dõi hành trình</h3>
+        <div className={styles.mapPlaceholder}>
           Bản đồ thời gian thực (Google Maps API sẽ được tích hợp)
           <div className={styles.mapControls}>
             <button>Phóng to</button>
             <button>Thu nhỏ</button>
             <button>Tắt theo dõi</button>
           </div>
-        </div> */}
+        </div>
 
         <div className={styles.schedule}>
           <h3>Lịch làm việc hôm nay</h3>

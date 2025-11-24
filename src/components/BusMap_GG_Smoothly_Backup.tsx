@@ -1,6 +1,88 @@
 // Client component: hiển thị Google Map + tuyến, điểm đón và icon bus
 "use client";
 // ================================================================================
+// BUSMAP_GG.TSX - GOOGLE MAPS INTEGRATION WITH REAL ADDRESSES
+// ================================================================================
+//
+// TỔNG QUAN:
+// Show Google Maps với các tuyến xe buýt được phân cụm (K-Means).
+// Các tuyến được routes: Roadmap (không phải đường chim bay) 
+// -> Google Directions API với địa chỉ thật từ realAddressLocation.json.
+//
+// ================================================================================
+// GOOGLE APIs SỬ DỤNG:
+// ================================================================================
+//
+// 1. GOOGLE MAPS JAVASCRIPT API (@react-google-maps/api)
+//    - GoogleMap: Component render bản đồ
+//    - Marker: Component đánh dấu điểm trên bản đồ (bus, bus stops)
+//    - Polyline: Component vẽ đường kẻ nối các điểm
+//    - useJsApiLoader: Hook load Google Maps API với API key
+//
+// 2. GOOGLE DIRECTIONS API (google.maps.DirectionsService)
+//    - Mục đích: Tìm đường đi tối ưu giữa nhiều điểm theo đường phố thực tế
+//    - Input: origin (điểm đầu), destination (điểm cuối), waypoints (điểm giữa)
+//    - Output: routes[0].overview_path = array of {lat, lng} theo đường phố
+//    - Quan trọng: Ưu tiên dùng STRING ADDRESS thay vì lat/lng để chính xác hơn
+//
+// ================================================================================
+// FLOW HOẠT ĐỘNG:
+// ================================================================================
+//
+// [1] LOAD DATA:
+//     - Fetch clusters từ Python service (hoặc dùng realAddressLocation.json)
+//     - Convert clusters thành routes/stops với realAddress field
+//     - Lưu vào state: routes[], routeStops{}
+//
+// [2] AUTO-SELECT:
+//     - Tự động chọn tuyến đầu tiên để hiển thị
+//
+// [3] (RESERVED)
+//
+// [4] DIRECTIONS API:
+//     - Với mỗi tuyến được chọn, gọi DirectionsService.route()
+//     - Request parameters:
+//       * origin: realAddress hoặc {lat, lng} của điểm đầu
+//       * destination: realAddress hoặc {lat, lng} của điểm cuối
+//       * waypoints: Array of {location: realAddress or {lat,lng}, stopover: true}
+//       * travelMode: DRIVING (có thể đổi WALKING, BICYCLING, TRANSIT)
+//       * optimizeWaypoints: false (giữ nguyên thứ tự)
+//     - Response: routes[0].overview_path = array of LatLng objects
+//     - Lưu path vào directionsPaths{} state
+//
+// [5] CREATE POLYLINES:
+//     - Tạo polyline objects từ directionsPaths
+//     - Mỗi tuyến có màu riêng (ROUTE_COLORS)
+//     - Fallback về stops nếu chưa có Directions
+//
+// [6] RENDER BUS MARKERS:
+//     - Hiển thị vị trí realtime của xe buýt (nếu có)
+//
+// [7] RENDER POLYLINES:
+//     - Vẽ các đường đi trên map bằng Polyline component
+//     - Path từ Directions API → đường phố thực tế
+//
+// [8] RENDER STOP MARKERS:
+//     - Hiển thị điểm đón với marker tròn có số thứ tự
+//     - Mỗi cụm có màu riêng
+//
+// ================================================================================
+// LƯU Ý QUAN TRỌNG:
+// ================================================================================
+//
+// 1. Ưu tiên dùng REAL ADDRESS (string) thay vì lat/lng khi gọi Directions API
+//    -> Google Maps tìm đường chính xác hơn với address text, chứ không phải vĩ/kinh độ
+//
+// 2. Fallback về lat/lng nếu không có realAddress
+//
+// 3. Fallback về đường thẳng nếu Directions API fail
+//
+// 4. Validate tất cả lat/lng trước khi sử dụng (Number.isFinite)
+//
+// 5. API Key được load từ NEXT_PUBLIC_GG_MAPS_KEY environment variable
+//
+// ================================================================================
+
 
 import { useEffect, useMemo, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
@@ -24,10 +106,10 @@ const containerStyle = { width: "100%", height: "700px" };  // Map container sty
 
 // Mảng màu cho các cluster (mỗi cụm một màu riêng biệt cho markers)
 const ROUTE_COLORS = [
-  "#fb3c2eff", // Đỏ
-  "#ff9800", // Cam
-  "#008cffff", // Xanh dương
+  "#f44336", // Đỏ
+  "#2196f3", // Xanh dương
   "#4caf50", // Xanh lá
+  "#ff9800", // Cam
   "#9c27b0", // Tím
   "#00bcd4", // Cyan
   "#ff5722", // Đỏ cam
@@ -70,6 +152,12 @@ export default function BusMap_GG({
   const [selectedRouteIds, setSelectedRouteIds] = useState<number[]>([]);
   const [routeStops, setRouteStops] = useState<Record<number, Stop[]>>({});
   
+  // ====================================================================
+  // STATE: MAPPING ROUTEID -> BUSID (TỪ DATABASE)
+  // ====================================================================
+  // Format: { 1: 2, 2: 5, 3: 8, ... } => route 1 dùng bus 2, route 2 dùng bus 5
+  const [routeToBusMap, setRouteToBusMap] = useState<Record<number, number>>({});
+  
   // VẼ ROUTE ĐƯỜNG ĐI
   const [directionsPaths, setDirectionsPaths] = useState<Record<number, { lat: number; lng: number }[]>>({});
   
@@ -105,6 +193,37 @@ export default function BusMap_GG({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GG_MAPS_KEY as string,
     libraries: MAP_LIBRARIES,
   });
+
+  // ====================================================================
+  // [0] LẤY DANH SÁCH BUSES ĐƯỢC ASSIGN CHO ROUTES HÔM NAY
+  // ====================================================================
+  useEffect(() => {
+    console.log("[0] Đang fetch bus assignments từ database...");
+    
+    fetch(`${API_BASE}/api/schedules/active-buses`)
+      .then(r => r.json())
+      .then(res => {
+        if (!res.ok) {
+          console.warn("[0] -_- Không lấy được bus assignments:", res.error);
+          return;
+        }
+        
+        const assignments = res.data || [];
+        console.log(`[0] ->_<- Nhận được ${assignments.length} bus assignments:`, assignments);
+        
+        // Convert array thành mapping: { routeID: busID }
+        const mapping: Record<number, number> = {};
+        assignments.forEach((item: any) => {
+          mapping[item.routeID] = item.busID;
+          console.log(`[0] Route ${item.routeID} -> Bus ${item.busID} (${item.licensePlate})`);
+        });
+        
+        setRouteToBusMap(mapping);
+      })
+      .catch(e => {
+        console.error("[0] !X! Lỗi khi fetch bus assignments:", e);
+      });
+  }, []);
 
   // ====================================================================
   // [1] LẤY DỮ LIỆU PHÂN CỤM TỪ PYTHON SERVICE VÀ CONVERT THÀNH ROUTES/STOPS
@@ -181,6 +300,7 @@ export default function BusMap_GG({
           // Tạo route object cho cluster này
           routesList.push({
             routeID: clusterId,
+            // routeName: `Tuyến ${clusterId + 1} (${busStops.length} điểm đón)`, // Tên tuyến: "Tuyến 1 (10 điểm đón)"
             routeName: `Tuyến ${clusterId} (${busStops.length} điểm đón)`, // Tên tuyến: "Tuyến 1 (10 điểm đón)"
           });
 
@@ -202,8 +322,10 @@ export default function BusMap_GG({
               return {
                 lat,
                 lng,
-                name: `Điểm đón ${idx}`, // Tên điểm dừng
-                sequence: idx, // Thứ tự trong tuyến (bắt đầu từ 1)
+                // name: `Điểm đón ${idx + 1}`, // Tên điểm dừng  
+                name: `Điểm đón ${idx}`,
+                // sequence: idx + 1, // Thứ tự trong tuyến (bắt đầu từ 1)
+                sequence: idx,
                 realAddress: busStop.realAddress || undefined, // Lưu địa chỉ thật để query Directions API
               } as Stop;
             })
@@ -240,66 +362,32 @@ export default function BusMap_GG({
   }, []);
 
   // ====================================================================
-  // [1.5] TỰ ĐỘNG SELECT ROUTES TỪ BUSES PROP (CHO PARENT PAGE)
-  // ====================================================================
-  // Khi parent page truyền buses prop -> tự động select routes tương ứng
-  useEffect(() => {
-    if (!buses || buses.length === 0) {
-      console.log('[1.5] Buses prop rỗng, không auto-select routes');
-      return;
-    }
-
-    console.log('[1.5] ✅ Nhận được buses prop:', buses);
-
-    // Lấy routeIDs từ buses (nếu có)
-    // Bus format: { id, busNumber, route: "Tuyến 1: Khu vực...", routeID: 0, ... }
-    const routeIDsFromBuses = buses
-      .map((bus: any) => bus.routeID)
-      .filter((id: any) => id !== undefined && id !== null);
-    
-    console.log('[1.5] Route IDs từ buses:', routeIDsFromBuses);
-
-    if (routeIDsFromBuses.length > 0) {
-      setSelectedRouteIds(routeIDsFromBuses);
-      console.log('[1.5] ✅ Auto-select routes:', routeIDsFromBuses);
-    } else {
-      // Fallback: Match bằng routeName
-      const routeNamesFromBuses = buses.map((bus: any) => bus.route).filter(Boolean);
-      console.log('[1.5] Route names từ buses (fallback):', routeNamesFromBuses);
-
-      const matchedRouteIds = routes
-        .filter((route) => routeNamesFromBuses.includes(route.routeName))
-        .map((route) => route.routeID);
-
-      console.log('[1.5] ✅ Auto-select routes by name:', matchedRouteIds);
-
-      if (matchedRouteIds.length > 0) {
-        setSelectedRouteIds(matchedRouteIds);
-      }
-    }
-  }, [buses, routes]);
-
-  // ====================================================================
-  // [2] TỰ ĐỘNG TẠO BUS CHO MỖI ROUTE ĐƯỢC CHỌN (CHỈ CHO ADMIN, KHÔNG CHO PARENT)
+  // [2] TỰ ĐỘNG TẠO BUS CHO MỖI ROUTE ĐƯỢC CHỌN
   // ====================================================================
   // Khi chọn route → tạo bus ở điểm bắt đầu (SGU)
   // Mỗi route có 1 bus riêng
+  // UPDATED: Dùng busID thật từ database thay vì routeID
   useEffect(() => {
-    // Nếu có buses prop từ parent → không tự tạo buses
-    if (buses && buses.length > 0) {
-      console.log("[2] Có buses prop từ parent, skip auto-create buses");
-      return;
-    }
-    
     console.log("[2] Kiểm tra buses cho routes:", selectedRouteIds);
     
     selectedRouteIds.forEach((routeId) => {
       // Nếu route này chưa có bus -> tạo mới
       if (!routeBuses[routeId]) {
+        // ===================================================================
+        // LẤY BUSID THẬT TỪ DATABASE (routeToBusMap)
+        // ===================================================================
+        const realBusID = routeToBusMap[routeId];
+        
+        if (!realBusID) {
+          console.warn(`[2] -_- Route ${routeId} chưa có bus assignment trong database, bỏ qua`);
+          return;
+        }
+        
         const newBus = {
-          id: `route-${routeId}`,
-          busNumber: `Bus Tuyến ${routeId}`,
-          driverName: `Tài xế ${routeId}`,
+          id: `bus-${realBusID}`, // UPDATED: Dùng busID thật
+          busID: realBusID,        // UPDATED: Lưu busID thật
+          busNumber: `Bus ${realBusID}`,
+          driverName: `Tài xế route ${routeId}`,
           route: routes.find(r => r.routeID === routeId)?.routeName || `Tuyến ${routeId}`,
           status: 'stopped' as const,
           lat: SGU_LAT_LNG.lat,
@@ -312,7 +400,7 @@ export default function BusMap_GG({
         };
         
         setRouteBuses(prev => ({ ...prev, [routeId]: newBus }));
-        console.log(`[2] Tạo bus mới cho tuyến ${routeId}:`, newBus);
+        console.log(`[2] ->_<- Tạo bus mới cho tuyến ${routeId}: busID=${realBusID}`, newBus);
       }
     });
     
@@ -328,7 +416,7 @@ export default function BusMap_GG({
         console.log(`[2] Xóa bus của tuyến ${routeId}`);
       }
     });
-  }, [selectedRouteIds, routes, buses]); // ---UPDATED: Thêm buses vào dependency---
+  }, [selectedRouteIds, routes, routeToBusMap]); // UPDATED: Thêm routeToBusMap vào dependency
 
 
   // ====================================================================
@@ -383,18 +471,22 @@ export default function BusMap_GG({
             updated[routeId] = newBus;
             hasUpdate = true;
             
-            // Gửi vị trí qua socket
+            // ====================================================================
+            // UPDATED: Gửi vị trí qua socket với BUSID THẬT và ROUTEID
+            // ====================================================================
             socket.emit('busLocation', {
-              busID: routeId,
+              routeID: routeId,            // ADDED: Gửi kèm routeID
+              busID: bus.busID || routeId, // UPDATED: Dùng busID thật, fallback về routeId
               lat: path[0].lat,
               lng: path[0].lng,
               speed: 30,
             });
-            
+            console.log(`[3] ->_<- Socket emit: route=${routeId}, busID=${bus.busID || routeId}, reset về đầu path`);
+
             // ===================================================================
             // CẬP NHẬT PANEL: Nếu bus này đang được chọn → update panel
             // ===================================================================
-            if (onBusSelect && selectedBusId === `route-${routeId}`) {
+            if (onBusSelect && selectedBusId === `bus-${bus.busID}`) { // UPDATED: Dùng busID
               onBusSelect(newBus);
             }
             
@@ -418,18 +510,25 @@ export default function BusMap_GG({
           
           console.log(`[3] Bus route ${routeId}: di chuyển từ index ${currentIndex} → ${nextIndex} (${Math.round(nextIndex / path.length * 100)}%)`);
           
-          // Gửi vị trí qua socket
+          
+          // ====================================================================
+          // UPDATED: Gửi vị trí qua socket với BUSID THẬT và ROUTEID
+          // ====================================================================
           socket.emit('busLocation', {
-            busID: routeId,
+            routeID: routeId,            // ADDED: Gửi kèm routeID
+            busID: bus.busID || routeId, // UPDATED: Dùng busID thật, fallback về routeId
             lat: nextPoint.lat,
             lng: nextPoint.lng,
             speed: 30 + Math.random() * 10, // 30-40 km/h
           });
-          
+          console.log(`[3] ->_<- Socket emit: route=${routeId}, busID=${bus.busID || routeId}, position=${nextIndex}/${path.length}`);
+
+
+
           // ===================================================================
           // CẬP NHẬT PANEL: Nếu bus này đang được chọn → update panel
           // ===================================================================
-          if (onBusSelect && selectedBusId === `route-${routeId}`) {
+          if (onBusSelect && selectedBusId === `bus-${bus.busID}`) { // UPDATED: Dùng busID
             onBusSelect(newBus);
           }
         });
@@ -751,18 +850,18 @@ export default function BusMap_GG({
         {/* [6] HIỂN THỊ MARKER XE BUÝT REALTIME */}
         {/* ============================================================ */}
         {/* 
-        - Hiển thị icon xe bus từ buses prop (parent truyền vào)
-        - Bus bắt đầu ở SGU (điểm đầu route) hoặc vị trí realtime từ Socket.IO
+        - Hiển thị icon xe bus cho mỗi route được chọn
+        - Bus bắt đầu ở SGU (điểm đầu route)
         - Click vào bus để xem thông tin chi tiết
         - Highlight bus đang được chọn (scale lớn hơn)
         - Animation khi di chuyển (smooth transition)
         */}
         {
-          (console.log("[6] Số lượng buses từ prop:", buses.length), null)
+          (console.log("[6] Số lượng route buses:", Object.keys(routeBuses).length), null)
         }
         {
-          // Render buses từ prop (parent truyền vào)
-          buses
+          // Render buses của các routes
+          Object.values(routeBuses)
             .filter((bus: any) => {
               // VALIDATE: Chỉ render bus có lat/lng hợp lệ
               const lat = Number(bus.lat);

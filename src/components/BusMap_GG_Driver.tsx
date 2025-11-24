@@ -24,10 +24,10 @@ const containerStyle = { width: "100%", height: "700px" };  // Map container sty
 
 // Mảng màu cho các cluster (mỗi cụm một màu riêng biệt cho markers)
 const ROUTE_COLORS = [
-  "#fb3c2eff", // Đỏ
+  // "#f44336", // Đỏ
+  // "#008cffff", // Xanh dương
+  "#26d22bff", // Xanh lá
   "#ff9800", // Cam
-  "#008cffff", // Xanh dương
-  "#4caf50", // Xanh lá
   "#9c27b0", // Tím
   "#00bcd4", // Cyan
   "#ff5722", // Đỏ cam
@@ -240,16 +240,17 @@ export default function BusMap_GG({
   }, []);
 
   // ====================================================================
-  // [1.5] TỰ ĐỘNG SELECT ROUTES TỪ BUSES PROP (CHO PARENT PAGE)
+  // [1.5] TỰ ĐỘNG SELECT ROUTES TỪ BUSES PROP (CHO DRIVER PAGE)
   // ====================================================================
-  // Khi parent page truyền buses prop -> tự động select routes tương ứng
+  // Khi driver page truyền buses prop -> tự động select routes tương ứng
+  // Nếu chỉ có 1 route -> tự động chọn
   useEffect(() => {
     if (!buses || buses.length === 0) {
       console.log('[1.5] Buses prop rỗng, không auto-select routes');
       return;
     }
 
-    console.log('[1.5] ✅ Nhận được buses prop:', buses);
+    console.log('[1.5]  ->_<- Nhận được buses prop (Driver):', buses);
 
     // Lấy routeIDs từ buses (nếu có)
     // Bus format: { id, busNumber, route: "Tuyến 1: Khu vực...", routeID: 0, ... }
@@ -257,11 +258,13 @@ export default function BusMap_GG({
       .map((bus: any) => bus.routeID)
       .filter((id: any) => id !== undefined && id !== null);
     
-    console.log('[1.5] Route IDs từ buses:', routeIDsFromBuses);
+    console.log('[1.5] Route IDs từ buses (Driver):', routeIDsFromBuses);
 
     if (routeIDsFromBuses.length > 0) {
-      setSelectedRouteIds(routeIDsFromBuses);
-      console.log('[1.5] ✅ Auto-select routes:', routeIDsFromBuses);
+      // CHỈ CHỌ N 1 ROUTE DUY NHẤT (driver chỉ có 1 tuyến)
+      const singleRoute = [routeIDsFromBuses[0]];
+      setSelectedRouteIds(singleRoute);
+      console.log('[1.5]  ->_<- Auto-select SINGLE route for driver:', singleRoute);
     } else {
       // Fallback: Match bằng routeName
       const routeNamesFromBuses = buses.map((bus: any) => bus.route).filter(Boolean);
@@ -271,10 +274,11 @@ export default function BusMap_GG({
         .filter((route) => routeNamesFromBuses.includes(route.routeName))
         .map((route) => route.routeID);
 
-      console.log('[1.5] ✅ Auto-select routes by name:', matchedRouteIds);
+      console.log('[1.5]  ->_<- Auto-select routes by name:', matchedRouteIds);
 
       if (matchedRouteIds.length > 0) {
-        setSelectedRouteIds(matchedRouteIds);
+        // CHỈ CHỌ N 1 ROUTE DUY NHẤT
+        setSelectedRouteIds([matchedRouteIds[0]]);
       }
     }
   }, [buses, routes]);
@@ -447,25 +451,6 @@ export default function BusMap_GG({
   }, [isMoving, directionsPaths, routeBuses, selectedBusId, onBusSelect]);
   // ====================================================================
   // Sử dụng Google Directions API để vẽ đường đi theo đường phố thực tế
-  // Không phải đường thẳng (chim bay) giữa các điểm
-  // 
-  // FLOW:
-  // 1. Lấy stops của route đã chọn
-  // 2. Tạo request với origin, destination, waypoints
-  // 3. Gọi DirectionsService.route() - Google API
-  // 4. API trả về route object với overview_path (array of lat/lng points)
-  // 5. Lưu path vào state để render Polyline
-  //
-  // GOOGLE DIRECTIONS API:
-  // - Input: origin (điểm đầu), destination (điểm cuối), waypoints (điểm giữa)
-  // - Mỗi điểm có thể là: { lat, lng } hoặc string địa chỉ
-  // - Output: routes[0].overview_path = array of LatLng objects
-  // - overview_path là đường đi đã được tối ưu theo đường phố thực tế
-  //
-  // QUAN TRỌNG:
-  // - Ưu tiên dùng STRING ADDRESS (realAddress) thay vì lat/lng
-  // - Google Maps tìm đường chính xác hơn với địa chỉ văn bản
-  // - Nếu không có realAddress → fallback về lat/lng
   useEffect(() => {
     // Chờ Google Maps API load xong
     if (!isLoaded) return;
@@ -554,27 +539,10 @@ export default function BusMap_GG({
           optimizeWaypoints: false, // false = giữ nguyên thứ tự waypoints (theo cluster), true = tối ưu thứ tự
         },
         (result: any, status: string) => {
+
           // ========================================================================
-          // XỬ LÝ KẾT QUẢ TỪ GOOGLE DIRECTIONS API
+          // XỬ LÝ KẾT QUẢ TỪ DIRECTIONS API
           // ========================================================================
-          // 
-          // RESPONSE FORMAT:
-          // {
-          //   routes: [
-          //     {
-          //       overview_path: [LatLng, LatLng, ...], // 100+ điểm theo đường phố
-          //       legs: [
-          //         {
-          //           distance: { value: 1234, text: "1.2 km" },
-          //           duration: { value: 180, text: "3 phút" },
-          //           steps: [...] // Chi tiết từng bước rẽ
-          //         }
-          //       ]
-          //     }
-          //   ],
-          //   status: "OK" hoặc "ZERO_RESULTS", "NOT_FOUND", etc.
-          // }
-          //
           
           console.log(`[4.3] ->_<- API Response cho tuyến ${id}:`, { status, hasRoutes: !!result?.routes?.[0] });
           
@@ -731,11 +699,11 @@ export default function BusMap_GG({
         return prev.filter((r) => r !== id);
       } else {
         // ====================================================================
-        // CHỌN: Add ID vào selectedRouteIds
+        // CHỌN: CHỈE CHỌN 1 ROUTE DUY NHẤT (Driver mode)
         // ====================================================================
         // useMemo [5] sẽ tự động đổi màu polyline sang màu BÌNH THƯỜNG
-        console.log(`[Toggle] Chọn tuyến ${id} → đổi sang màu bình thường`);
-        return [...prev, id];
+        console.log(`[Toggle] Chọn tuyến ${id} → bỏ chọn tất cả tuyến khác`);
+        return [id]; // CHỈIE GIỮ LẠI 1 ROUTE
       }
     });
   };
@@ -983,74 +951,49 @@ export default function BusMap_GG({
           }}
         >
           <div style={{ fontWeight: 600, marginBottom: 8 }}>Tuyến đường</div>
-        {routes.length === 0 ? (
-          <div style={{ color: "#666" }}>Không có dữ liệu tuyến</div>
-        ) : (
-          <>
-            {/* ============================================ */}
-            {/* CHECKBOX "ALL" - CHỌN/BỎ CHỌN TẤT CẢ */}
-            {/* ============================================ */}
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "6px 4px",
-                cursor: "pointer",
-                borderBottom: "1px solid #ddd", // Đường kẻ phân cách
-                marginBottom: 8,
-                fontWeight: 600, // In đậm để nổi bật
-              }}
-            >
-              <input
-                type="checkbox"
-                // CHECKED: Chỉ khi TẤT CẢ routes đều được chọn
-                // UNCHECKED: Khi không có hoặc chỉ có MỘT SỐ routes được chọn
-                checked={routes.length > 0 && selectedRouteIds.length === routes.length}
-                onChange={(e) => {
-                  // Nếu đang checked (tất cả đã chọn) → BỎ CHỌN tất cả
-                  // Nếu đang unchecked (không có hoặc một số) → CHỌN tất cả
-                  if (e.target.checked) {
-                    // CHỌN TẤT CẢ: Lấy tất cả routeID
-                    const allRouteIds = routes.map((r) => r.routeID);
-                    setSelectedRouteIds(allRouteIds);
-                    console.log("[Toggle All] Chọn tất cả tuyến:", allRouteIds);
-                  } else {
-                    // BỎ CHỌN TẤT CẢ
-                    setSelectedRouteIds([]);
-                    console.log("[Toggle All] Bỏ chọn tất cả tuyến");
-                  }
-                }}
-              />
-              <span>
-                Tất cả ({selectedRouteIds.length}/{routes.length})
-              </span>
-            </label>
-
-            {/* ============================================ */}
-            {/* DANH SÁCH CÁC TUYẾN */}
-            {/* ============================================ */}
-            {routes.map((r) => (
-              <label
-                key={r.routeID}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "6px 4px",
-                  cursor: "pointer",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedRouteIds.includes(r.routeID)}
-                  onChange={() => toggleRoute(r.routeID)}
-                />
-                <span>{r.routeName}</span>
-              </label>
-            ))}
-          </>
-        )}
+        {(() => {
+          // ====================================================================
+          // FILTER: CHỈ HIỂN THỊ ROUTES CÓ TRONG BUSES PROP (DRIVER MODE)
+          // ====================================================================
+          const allowedRouteIDs = buses?.map((bus: any) => bus.routeID).filter(Boolean) || [];
+          const filteredRoutes = routes.filter((route) => allowedRouteIDs.includes(route.routeID));
+          
+          console.log('[RoutePanel] Allowed routeIDs:', allowedRouteIDs);
+          console.log('[RoutePanel] Filtered routes:', filteredRoutes.map(r => `${r.routeID}: ${r.routeName}`));
+          
+          if (filteredRoutes.length === 0) {
+            return <div style={{ color: "#666" }}>Không có dữ liệu tuyến</div>;
+          }
+          
+          return (
+            <>
+              {/* BỎ CHECKBOX "ALL" - Không cần vì driver chỉ có 1 route */}
+              
+              {/* ============================================ */}
+              {/* DANH SÁCH CÁC TUYẾN (CHỈ HIỂN THỊ ROUTES ĐƯỢC FETCH) */}
+              {/* ============================================ */}
+              {filteredRoutes.map((r) => (
+                <label
+                  key={r.routeID}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "6px 4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="radio" // RADIO thay vì CHECKBOX (chỉ chọn 1)
+                    checked={selectedRouteIds.includes(r.routeID)}
+                    onChange={() => toggleRoute(r.routeID)}
+                  />
+                  <span>{r.routeName}</span>
+                </label>
+              ))}
+            </>
+          );
+        })()}
       </div>
       )}
     </div>

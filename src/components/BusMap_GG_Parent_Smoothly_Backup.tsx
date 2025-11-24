@@ -24,10 +24,10 @@ const containerStyle = { width: "100%", height: "700px" };  // Map container sty
 
 // Mảng màu cho các cluster (mỗi cụm một màu riêng biệt cho markers)
 const ROUTE_COLORS = [
-  "#fb3c2eff", // Đỏ
-  "#ff9800", // Cam
+  // "#f44336", // Đỏ
   "#008cffff", // Xanh dương
   "#4caf50", // Xanh lá
+  "#ff9800", // Cam
   "#9c27b0", // Tím
   "#00bcd4", // Cyan
   "#ff5722", // Đỏ cam

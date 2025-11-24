@@ -192,8 +192,8 @@ export default function ParentJourneyPage() {
   
   // --- 4. Handle bus selection ---
   const handleBusSelect = (bus: any) => {
-    console.log('[ParentJourneyPage] Bus selected:', bus);
-    setSelectedBus(bus);
+    // console.log('[ParentJourneyPage] Bus selected:', bus);
+    // setSelectedBus(bus);
   };
   
   const handleBusUnselect = () => {
