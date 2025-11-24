@@ -135,12 +135,14 @@ export const getStudentBusesByParent = (parentId, callback) => {
     JOIN Trip t ON bs.routeID = t.routeID
     JOIN Bus b ON t.assignedBusID = b.busID
     JOIN Route r ON bs.routeID = r.routeID
-    JOIN Student s ON s.parentUserID = ?
-    WHERE t.status IN ('PLANNED', 'RUNNING')
+    WHERE 
+    t.status IN ('PLANNED', 'RUNNING')
+    AND bs.parentID = ?
     LIMIT 1
-  `;
-  db.query(sql, [parentId], (err, results) => {
-    if (err) return callback(err, null);
-    callback(null, results);
-  });
-};
+    `;
+    db.query(sql, [parentId], (err, results) => {
+      if (err) return callback(err, null);
+      callback(null, results);
+    });
+  };
+  // -- JOIN Student s ON s.parentUserID = 21
