@@ -3,7 +3,9 @@ import {
   createParent as createParentModel,
   updateParent as updateParentModel,
   deleteParent as deleteParentModel,
-  getStudentBusesByParent
+  getStudentBusesByParent,
+  getParentProfile,
+  updateParentProfile
 } from '../models/parentModel.js';
 
 export const getParents = (req, res) => {
@@ -54,5 +56,32 @@ export const getStudentBuses = (req, res) => {
       return res.status(500).json({ error: 'Lỗi server khi lấy thông tin xe buýt' });
     }
     res.status(200).json(results);
+  });
+};
+
+// Lấy profile của parent theo parentId
+export const getProfile = (req, res) => {
+  const parentId = req.params.parentId;
+  
+  getParentProfile(parentId, (err, result) => {
+    if (err) {
+      console.error(`Lỗi lấy profile parent ${parentId}:`, err);
+      return res.status(500).json({ error: 'Lỗi server khi lấy thông tin profile' });
+    }
+    res.status(200).json(result);
+  });
+};
+
+// Cập nhật profile của parent theo parentId - Thuộc trang Parent
+export const updateProfile = (req, res) => {
+  const parentId = req.params.parentId;
+  const data = req.body;
+  
+  updateParentProfile(parentId, data, (err) => {
+    if (err) {
+      console.error(`Lỗi cập nhật profile parent ${parentId}:`, err);
+      return res.status(500).json({ error: 'Lỗi server khi cập nhật profile' });
+    }
+    res.json({ message: 'Cập nhật thông tin thành công!' });
   });
 };

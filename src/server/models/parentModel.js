@@ -146,3 +146,48 @@ export const getStudentBusesByParent = (parentId, callback) => {
     });
   };
   // -- JOIN Student s ON s.parentUserID = 21
+
+// Lấy thông tin profile của parent theo parentId
+export const getParentProfile = (parentId, callback) => {
+  const sql = `
+    SELECT 
+      u.userID,
+      u.email,
+      u.phone,
+      p.address
+    FROM Users u
+    LEFT JOIN Parent p ON p.parentID = u.userID
+    WHERE u.userID = ? AND u.role = 'parent'
+  `;
+  
+  db.query(sql, [parentId], (err, results) => {
+    if (err) return callback(err, null);
+    if (results.length === 0) return callback(new Error('Parent not found'), null);
+    callback(null, results[0]);
+  });
+};
+
+// Cập nhật thông tin profile của parent
+export const updateParentProfile = (parentId, data, callback) => {
+  const { email, phone, address } = data;
+  
+  const sqlUser = `
+    UPDATE Users 
+    SET email = ?, phone = ?
+    WHERE userID = ? AND role = 'parent'
+  `;
+  
+  db.query(sqlUser, [email, phone, parentId], (err) => {
+    if (err) return callback(err);
+    
+    const sqlParent = `
+      UPDATE Parent 
+      SET address = ?
+      WHERE parentID = ?
+    `;
+    
+    db.query(sqlParent, [address, parentId], (err) => {
+      callback(err);
+    });
+  });
+};
