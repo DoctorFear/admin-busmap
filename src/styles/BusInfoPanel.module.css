@@ -81,17 +81,17 @@
 }
 
 .trackBtn {
-  background: #F44336;
+  background: #ff8f25;
   color: white;
 }
 
 .trackBtn.active {
-  background: #F44336;
+  background: #ff8f25;
   color: white;
 }
 
 .trackBtn:hover {
-  background: #ce0e00;
+  background: #ff7e06;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

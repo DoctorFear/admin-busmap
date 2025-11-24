@@ -3,6 +3,9 @@ from flask import Flask, request, jsonify
 from cluster import cluster_busStop
 from tsp import solve_tsp_for_clusters
 import traceback
+# Save the optimized routes in memory(file) for quick response
+import os
+import json
 
 PYTHON_SERVICE_PORT = 5111
 # const center = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
@@ -12,7 +15,13 @@ SGU_LNG = 106.68225725256899
 app = Flask(__name__)
 
 # Save optimized route for response quickly, cache it in memory
-optimized_routes_cache = {}
+# Load cache from file if exists
+if os.path.exists("optimized_routes_cache.json"):
+    with open("optimized_routes_cache.json", "r") as cache_file:
+        optimized_routes_cache = json.load(cache_file)
+    print("--> Đã tải kết quả tối ưu từ file cache.")
+else:   
+    optimized_routes_cache = {}
 
 def reIndexSequenceAfterOptimize(optimized_routes):
     """
@@ -26,15 +35,31 @@ def reIndexSequenceAfterOptimize(optimized_routes):
     Output:
         optimized_routes with updated sequence starting from 1 
         (structure like the input but only sequence is reindexed for each cluster)
+    
+    ---UPDATED---
+    - Sửa routeID của tất cả bus stops trong mỗi route thành routeID của route đó
+    - Đổi cluster key từ "0"-"49" thành "1"-"50" (đánh số từ 1)
     """
     reindexed_routes = {}
-    for cluster_id, stops in optimized_routes.items():
+    
+    # Lặp qua các clusters (routes)
+    for cluster_id_str, stops in optimized_routes.items():
+        # ---UPDATED: Đổi cluster_id từ string "0"-"49" thành int 0-49, rồi +1 để thành 1-50---
+        old_cluster_id = int(cluster_id_str)
+        new_route_id = old_cluster_id + 1  # Đánh số từ 1 thay vì 0
+        
         reindexed_stops = []
         for index, stop in enumerate(stops):
+            # Re-index sequence (bắt đầu từ 1)
             stop["sequence"] = index + 1
+            
+            # ---UPDATED: Sửa routeID của bus stop thành routeID của route hiện tại---
+            stop["routeID"] = new_route_id
+            
             reindexed_stops.append(stop)
         
-        reindexed_routes[cluster_id] = reindexed_stops
+        # ---UPDATED: Dùng new_route_id (1-50) làm key thay vì old_cluster_id (0-49)---
+        reindexed_routes[str(new_route_id)] = reindexed_stops
 
     return reindexed_routes
 
@@ -110,11 +135,17 @@ def optimize(isReOptimize=False):
         }
         print(f"--> Thống kê kết quả tối ưu: {stats}")
 
+        # Save optimized routes to a file for caching
+        with open("optimized_routes_cache.json", "w") as cache_file:
+            json.dump(optimized_routes_after_reindexed_sequence, cache_file)
+        print("--> Đã lưu kết quả tối ưu vào file optimized_routes_cache.json") 
         # 3. Return JSON data to NodeJS with status code 200 (OK)
         return jsonify({
             "success": True,
             "optimizedRoutes": optimized_routes_after_reindexed_sequence,
-            "stats": stats
+            "stats": stats,
+            # Source data:
+            "originalData": data
         }), 200
         
     except Exception as e:

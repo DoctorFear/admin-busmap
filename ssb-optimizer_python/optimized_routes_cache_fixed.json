@@ -1,0 +1,4102 @@
+{
+  "42": [
+    {
+      "busStopID": 265,
+      "parentID": 275,
+      "routeID": 42,
+      "sequence": 1,
+      "lat": 10.7242766,
+      "lng": 106.6947475
+    },
+    {
+      "busStopID": 4,
+      "parentID": 14,
+      "routeID": 42,
+      "sequence": 2,
+      "lat": 10.7197581,
+      "lng": 106.709861
+    },
+    {
+      "busStopID": 290,
+      "parentID": 300,
+      "routeID": 42,
+      "sequence": 3,
+      "lat": 10.7141856,
+      "lng": 106.6909504
+    },
+    {
+      "busStopID": 474,
+      "parentID": 484,
+      "routeID": 42,
+      "sequence": 4,
+      "lat": 10.7202493,
+      "lng": 106.6925538
+    },
+    {
+      "busStopID": 1,
+      "parentID": 11,
+      "routeID": 42,
+      "sequence": 5,
+      "lat": 10.7159111,
+      "lng": 106.6946166
+    },
+    {
+      "busStopID": 463,
+      "parentID": 473,
+      "routeID": 42,
+      "sequence": 6,
+      "lat": 10.7030061,
+      "lng": 106.6942624
+    },
+    {
+      "busStopID": 337,
+      "parentID": 347,
+      "routeID": 42,
+      "sequence": 7,
+      "lat": 10.7032814,
+      "lng": 106.6805206
+    },
+    {
+      "busStopID": 96,
+      "parentID": 106,
+      "routeID": 42,
+      "sequence": 8,
+      "lat": 10.7011033,
+      "lng": 106.6845954
+    },
+    {
+      "busStopID": 242,
+      "parentID": 252,
+      "routeID": 42,
+      "sequence": 9,
+      "lat": 10.719059,
+      "lng": 106.6810344
+    },
+    {
+      "busStopID": 241,
+      "parentID": 251,
+      "routeID": 42,
+      "sequence": 10,
+      "lat": 10.7380683,
+      "lng": 106.6904584
+    }
+  ],
+  "41": [
+    {
+      "busStopID": 226,
+      "parentID": 236,
+      "routeID": 41,
+      "sequence": 1,
+      "lat": 10.7323473,
+      "lng": 106.726153
+    },
+    {
+      "busStopID": 464,
+      "parentID": 474,
+      "routeID": 41,
+      "sequence": 2,
+      "lat": 10.7286815,
+      "lng": 106.7565264
+    },
+    {
+      "busStopID": 122,
+      "parentID": 132,
+      "routeID": 41,
+      "sequence": 3,
+      "lat": 10.7253075,
+      "lng": 106.745714
+    },
+    {
+      "busStopID": 488,
+      "parentID": 498,
+      "routeID": 41,
+      "sequence": 4,
+      "lat": 10.7281386,
+      "lng": 106.7265547
+    },
+    {
+      "busStopID": 336,
+      "parentID": 346,
+      "routeID": 41,
+      "sequence": 5,
+      "lat": 10.7200103,
+      "lng": 106.7410653
+    },
+    {
+      "busStopID": 154,
+      "parentID": 164,
+      "routeID": 41,
+      "sequence": 6,
+      "lat": 10.7307814,
+      "lng": 106.7375509
+    },
+    {
+      "busStopID": 169,
+      "parentID": 179,
+      "routeID": 41,
+      "sequence": 7,
+      "lat": 10.7321035,
+      "lng": 106.7375002
+    },
+    {
+      "busStopID": 2,
+      "parentID": 12,
+      "routeID": 41,
+      "sequence": 8,
+      "lat": 10.7428978,
+      "lng": 106.7384406
+    },
+    {
+      "busStopID": 148,
+      "parentID": 158,
+      "routeID": 41,
+      "sequence": 9,
+      "lat": 10.7318209,
+      "lng": 106.7303242
+    },
+    {
+      "busStopID": 399,
+      "parentID": 409,
+      "routeID": 41,
+      "sequence": 10,
+      "lat": 10.7352376,
+      "lng": 106.7447856
+    }
+  ],
+  "37": [
+    {
+      "busStopID": 95,
+      "parentID": 105,
+      "routeID": 37,
+      "sequence": 1,
+      "lat": 10.7164337,
+      "lng": 106.7112549
+    },
+    {
+      "busStopID": 199,
+      "parentID": 209,
+      "routeID": 37,
+      "sequence": 2,
+      "lat": 10.7069869,
+      "lng": 106.7286493
+    },
+    {
+      "busStopID": 223,
+      "parentID": 233,
+      "routeID": 37,
+      "sequence": 3,
+      "lat": 10.7100752,
+      "lng": 106.713213
+    },
+    {
+      "busStopID": 14,
+      "parentID": 24,
+      "routeID": 37,
+      "sequence": 4,
+      "lat": 10.704988,
+      "lng": 106.7111116
+    },
+    {
+      "busStopID": 10,
+      "parentID": 20,
+      "routeID": 37,
+      "sequence": 5,
+      "lat": 10.7028643,
+      "lng": 106.7227735
+    },
+    {
+      "busStopID": 469,
+      "parentID": 479,
+      "routeID": 37,
+      "sequence": 6,
+      "lat": 10.7073187,
+      "lng": 106.7265499
+    },
+    {
+      "busStopID": 65,
+      "parentID": 75,
+      "routeID": 37,
+      "sequence": 7,
+      "lat": 10.7159665,
+      "lng": 106.726427
+    },
+    {
+      "busStopID": 3,
+      "parentID": 13,
+      "routeID": 37,
+      "sequence": 8,
+      "lat": 10.702225,
+      "lng": 106.7205969
+    },
+    {
+      "busStopID": 202,
+      "parentID": 212,
+      "routeID": 37,
+      "sequence": 9,
+      "lat": 10.709345,
+      "lng": 106.7335753
+    },
+    {
+      "busStopID": 405,
+      "parentID": 415,
+      "routeID": 37,
+      "sequence": 10,
+      "lat": 10.7069791,
+      "lng": 106.7357425
+    }
+  ],
+  "19": [
+    {
+      "busStopID": 211,
+      "parentID": 221,
+      "routeID": 19,
+      "sequence": 1,
+      "lat": 10.821988,
+      "lng": 106.7400648
+    },
+    {
+      "busStopID": 150,
+      "parentID": 160,
+      "routeID": 19,
+      "sequence": 2,
+      "lat": 10.8264376,
+      "lng": 106.7312014
+    },
+    {
+      "busStopID": 114,
+      "parentID": 124,
+      "routeID": 19,
+      "sequence": 3,
+      "lat": 10.8420417,
+      "lng": 106.7243326
+    },
+    {
+      "busStopID": 70,
+      "parentID": 80,
+      "routeID": 19,
+      "sequence": 4,
+      "lat": 10.8361657,
+      "lng": 106.7273357
+    },
+    {
+      "busStopID": 58,
+      "parentID": 68,
+      "routeID": 19,
+      "sequence": 5,
+      "lat": 10.8412845,
+      "lng": 106.7213682
+    },
+    {
+      "busStopID": 26,
+      "parentID": 36,
+      "routeID": 19,
+      "sequence": 6,
+      "lat": 10.8380335,
+      "lng": 106.7303667
+    },
+    {
+      "busStopID": 407,
+      "parentID": 417,
+      "routeID": 19,
+      "sequence": 7,
+      "lat": 10.8434172,
+      "lng": 106.7281877
+    },
+    {
+      "busStopID": 5,
+      "parentID": 15,
+      "routeID": 19,
+      "sequence": 8,
+      "lat": 10.820571,
+      "lng": 106.7327626
+    },
+    {
+      "busStopID": 383,
+      "parentID": 393,
+      "routeID": 19,
+      "sequence": 9,
+      "lat": 10.8258667,
+      "lng": 106.7304496
+    },
+    {
+      "busStopID": 67,
+      "parentID": 77,
+      "routeID": 19,
+      "sequence": 10,
+      "lat": 10.8206383,
+      "lng": 106.7286103
+    }
+  ],
+  "33": [
+    {
+      "busStopID": 421,
+      "parentID": 431,
+      "routeID": 33,
+      "sequence": 1,
+      "lat": 10.79497,
+      "lng": 106.6502795
+    },
+    {
+      "busStopID": 311,
+      "parentID": 321,
+      "routeID": 33,
+      "sequence": 2,
+      "lat": 10.7941875,
+      "lng": 106.6498424
+    },
+    {
+      "busStopID": 8,
+      "parentID": 18,
+      "routeID": 33,
+      "sequence": 3,
+      "lat": 10.797133,
+      "lng": 106.6338551
+    },
+    {
+      "busStopID": 340,
+      "parentID": 350,
+      "routeID": 33,
+      "sequence": 4,
+      "lat": 10.7967358,
+      "lng": 106.643678
+    },
+    {
+      "busStopID": 243,
+      "parentID": 253,
+      "routeID": 33,
+      "sequence": 5,
+      "lat": 10.7968715,
+      "lng": 106.6403729
+    },
+    {
+      "busStopID": 326,
+      "parentID": 336,
+      "routeID": 33,
+      "sequence": 6,
+      "lat": 10.8152857,
+      "lng": 106.6507769
+    },
+    {
+      "busStopID": 173,
+      "parentID": 183,
+      "routeID": 33,
+      "sequence": 7,
+      "lat": 10.8086195,
+      "lng": 106.6652669
+    },
+    {
+      "busStopID": 145,
+      "parentID": 155,
+      "routeID": 33,
+      "sequence": 8,
+      "lat": 10.8062696,
+      "lng": 106.6677433
+    },
+    {
+      "busStopID": 6,
+      "parentID": 16,
+      "routeID": 33,
+      "sequence": 9,
+      "lat": 10.8122125,
+      "lng": 106.6547624
+    },
+    {
+      "busStopID": 234,
+      "parentID": 244,
+      "routeID": 33,
+      "sequence": 10,
+      "lat": 10.798121,
+      "lng": 106.6615983
+    }
+  ],
+  "47": [
+    {
+      "busStopID": 7,
+      "parentID": 17,
+      "routeID": 47,
+      "sequence": 1,
+      "lat": 10.8215859,
+      "lng": 106.7964055
+    },
+    {
+      "busStopID": 473,
+      "parentID": 483,
+      "routeID": 47,
+      "sequence": 2,
+      "lat": 10.8291669,
+      "lng": 106.7980797
+    },
+    {
+      "busStopID": 69,
+      "parentID": 79,
+      "routeID": 47,
+      "sequence": 3,
+      "lat": 10.830902,
+      "lng": 106.7954407
+    },
+    {
+      "busStopID": 454,
+      "parentID": 464,
+      "routeID": 47,
+      "sequence": 4,
+      "lat": 10.8254478,
+      "lng": 106.7882062
+    },
+    {
+      "busStopID": 63,
+      "parentID": 73,
+      "routeID": 47,
+      "sequence": 5,
+      "lat": 10.8294961,
+      "lng": 106.7925612
+    },
+    {
+      "busStopID": 392,
+      "parentID": 402,
+      "routeID": 47,
+      "sequence": 6,
+      "lat": 10.8338382,
+      "lng": 106.7934159
+    },
+    {
+      "busStopID": 481,
+      "parentID": 491,
+      "routeID": 47,
+      "sequence": 7,
+      "lat": 10.8310692,
+      "lng": 106.7961397
+    },
+    {
+      "busStopID": 86,
+      "parentID": 96,
+      "routeID": 47,
+      "sequence": 8,
+      "lat": 10.8320753,
+      "lng": 106.7906866
+    },
+    {
+      "busStopID": 266,
+      "parentID": 276,
+      "routeID": 47,
+      "sequence": 9,
+      "lat": 10.8202958,
+      "lng": 106.7987561
+    },
+    {
+      "busStopID": 412,
+      "parentID": 422,
+      "routeID": 47,
+      "sequence": 10,
+      "lat": 10.8202862,
+      "lng": 106.7908916
+    }
+  ],
+  "30": [
+    {
+      "busStopID": 231,
+      "parentID": 241,
+      "routeID": 30,
+      "sequence": 1,
+      "lat": 10.8007015,
+      "lng": 106.6077085
+    },
+    {
+      "busStopID": 9,
+      "parentID": 19,
+      "routeID": 30,
+      "sequence": 2,
+      "lat": 10.7878182,
+      "lng": 106.6054608
+    },
+    {
+      "busStopID": 293,
+      "parentID": 303,
+      "routeID": 30,
+      "sequence": 3,
+      "lat": 10.7847784,
+      "lng": 106.6110699
+    },
+    {
+      "busStopID": 126,
+      "parentID": 136,
+      "routeID": 30,
+      "sequence": 4,
+      "lat": 10.8037615,
+      "lng": 106.6108333
+    },
+    {
+      "busStopID": 354,
+      "parentID": 364,
+      "routeID": 30,
+      "sequence": 5,
+      "lat": 10.7966697,
+      "lng": 106.6323661
+    },
+    {
+      "busStopID": 146,
+      "parentID": 156,
+      "routeID": 30,
+      "sequence": 6,
+      "lat": 10.7963085,
+      "lng": 106.6218195
+    },
+    {
+      "busStopID": 376,
+      "parentID": 386,
+      "routeID": 30,
+      "sequence": 7,
+      "lat": 10.788578,
+      "lng": 106.6234122
+    },
+    {
+      "busStopID": 189,
+      "parentID": 199,
+      "routeID": 30,
+      "sequence": 8,
+      "lat": 10.7770237,
+      "lng": 106.6273786
+    },
+    {
+      "busStopID": 269,
+      "parentID": 279,
+      "routeID": 30,
+      "sequence": 9,
+      "lat": 10.7841728,
+      "lng": 106.6175139
+    },
+    {
+      "busStopID": 329,
+      "parentID": 339,
+      "routeID": 30,
+      "sequence": 10,
+      "lat": 10.7772542,
+      "lng": 106.6145082
+    }
+  ],
+  "29": [
+    {
+      "busStopID": 37,
+      "parentID": 47,
+      "routeID": 29,
+      "sequence": 1,
+      "lat": 10.7601734,
+      "lng": 106.6705375
+    },
+    {
+      "busStopID": 102,
+      "parentID": 112,
+      "routeID": 29,
+      "sequence": 2,
+      "lat": 10.7574273,
+      "lng": 106.6659186
+    },
+    {
+      "busStopID": 11,
+      "parentID": 21,
+      "routeID": 29,
+      "sequence": 3,
+      "lat": 10.758052,
+      "lng": 106.6744368
+    },
+    {
+      "busStopID": 350,
+      "parentID": 360,
+      "routeID": 29,
+      "sequence": 4,
+      "lat": 10.763146,
+      "lng": 106.6764929
+    },
+    {
+      "busStopID": 419,
+      "parentID": 429,
+      "routeID": 29,
+      "sequence": 5,
+      "lat": 10.7596921,
+      "lng": 106.6789416
+    },
+    {
+      "busStopID": 56,
+      "parentID": 66,
+      "routeID": 29,
+      "sequence": 6,
+      "lat": 10.756982,
+      "lng": 106.6832149
+    },
+    {
+      "busStopID": 112,
+      "parentID": 122,
+      "routeID": 29,
+      "sequence": 7,
+      "lat": 10.7469908,
+      "lng": 106.6713635
+    },
+    {
+      "busStopID": 107,
+      "parentID": 117,
+      "routeID": 29,
+      "sequence": 8,
+      "lat": 10.7560726,
+      "lng": 106.6624601
+    },
+    {
+      "busStopID": 438,
+      "parentID": 448,
+      "routeID": 29,
+      "sequence": 9,
+      "lat": 10.7614466,
+      "lng": 106.6839178
+    },
+    {
+      "busStopID": 232,
+      "parentID": 242,
+      "routeID": 29,
+      "sequence": 10,
+      "lat": 10.7590638,
+      "lng": 106.6860053
+    }
+  ],
+  "46": [
+    {
+      "busStopID": 18,
+      "parentID": 28,
+      "routeID": 46,
+      "sequence": 1,
+      "lat": 10.8523194,
+      "lng": 106.6300187
+    },
+    {
+      "busStopID": 319,
+      "parentID": 329,
+      "routeID": 46,
+      "sequence": 2,
+      "lat": 10.8554672,
+      "lng": 106.6546942
+    },
+    {
+      "busStopID": 273,
+      "parentID": 283,
+      "routeID": 46,
+      "sequence": 3,
+      "lat": 10.8560246,
+      "lng": 106.6509202
+    },
+    {
+      "busStopID": 193,
+      "parentID": 203,
+      "routeID": 46,
+      "sequence": 4,
+      "lat": 10.863081,
+      "lng": 106.6396713
+    },
+    {
+      "busStopID": 15,
+      "parentID": 25,
+      "routeID": 46,
+      "sequence": 5,
+      "lat": 10.8696341,
+      "lng": 106.6263893
+    },
+    {
+      "busStopID": 106,
+      "parentID": 116,
+      "routeID": 46,
+      "sequence": 6,
+      "lat": 10.8686214,
+      "lng": 106.6356997
+    },
+    {
+      "busStopID": 12,
+      "parentID": 22,
+      "routeID": 46,
+      "sequence": 7,
+      "lat": 10.8668284,
+      "lng": 106.6400588
+    },
+    {
+      "busStopID": 155,
+      "parentID": 165,
+      "routeID": 46,
+      "sequence": 8,
+      "lat": 10.8643986,
+      "lng": 106.6357623
+    },
+    {
+      "busStopID": 80,
+      "parentID": 90,
+      "routeID": 46,
+      "sequence": 9,
+      "lat": 10.8579772,
+      "lng": 106.6233904
+    },
+    {
+      "busStopID": 495,
+      "parentID": 505,
+      "routeID": 46,
+      "sequence": 10,
+      "lat": 10.8403565,
+      "lng": 106.633435
+    }
+  ],
+  "17": [
+    {
+      "busStopID": 249,
+      "parentID": 259,
+      "routeID": 17,
+      "sequence": 1,
+      "lat": 10.867009,
+      "lng": 106.7621901
+    },
+    {
+      "busStopID": 415,
+      "parentID": 425,
+      "routeID": 17,
+      "sequence": 2,
+      "lat": 10.8662106,
+      "lng": 106.772002
+    },
+    {
+      "busStopID": 404,
+      "parentID": 414,
+      "routeID": 17,
+      "sequence": 3,
+      "lat": 10.8658029,
+      "lng": 106.7860919
+    },
+    {
+      "busStopID": 13,
+      "parentID": 23,
+      "routeID": 17,
+      "sequence": 4,
+      "lat": 10.8788669,
+      "lng": 106.7949087
+    },
+    {
+      "busStopID": 19,
+      "parentID": 29,
+      "routeID": 17,
+      "sequence": 5,
+      "lat": 10.875619,
+      "lng": 106.7986902
+    },
+    {
+      "busStopID": 152,
+      "parentID": 162,
+      "routeID": 17,
+      "sequence": 6,
+      "lat": 10.8756073,
+      "lng": 106.7980119
+    },
+    {
+      "busStopID": 445,
+      "parentID": 455,
+      "routeID": 17,
+      "sequence": 7,
+      "lat": 10.8789948,
+      "lng": 106.7804716
+    },
+    {
+      "busStopID": 41,
+      "parentID": 51,
+      "routeID": 17,
+      "sequence": 8,
+      "lat": 10.8706949,
+      "lng": 106.7954475
+    },
+    {
+      "busStopID": 161,
+      "parentID": 171,
+      "routeID": 17,
+      "sequence": 9,
+      "lat": 10.8794396,
+      "lng": 106.7711942
+    },
+    {
+      "busStopID": 489,
+      "parentID": 499,
+      "routeID": 17,
+      "sequence": 10,
+      "lat": 10.8621249,
+      "lng": 106.7655509
+    }
+  ],
+  "14": [
+    {
+      "busStopID": 390,
+      "parentID": 400,
+      "routeID": 14,
+      "sequence": 1,
+      "lat": 10.7284568,
+      "lng": 106.7137786
+    },
+    {
+      "busStopID": 491,
+      "parentID": 501,
+      "routeID": 14,
+      "sequence": 2,
+      "lat": 10.7423649,
+      "lng": 106.6976367
+    },
+    {
+      "busStopID": 459,
+      "parentID": 469,
+      "routeID": 14,
+      "sequence": 3,
+      "lat": 10.7302985,
+      "lng": 106.7136136
+    },
+    {
+      "busStopID": 497,
+      "parentID": 507,
+      "routeID": 14,
+      "sequence": 4,
+      "lat": 10.7282213,
+      "lng": 106.7211364
+    },
+    {
+      "busStopID": 496,
+      "parentID": 506,
+      "routeID": 14,
+      "sequence": 5,
+      "lat": 10.7302231,
+      "lng": 106.7127985
+    },
+    {
+      "busStopID": 16,
+      "parentID": 26,
+      "routeID": 14,
+      "sequence": 6,
+      "lat": 10.7360524,
+      "lng": 106.7111299
+    },
+    {
+      "busStopID": 371,
+      "parentID": 381,
+      "routeID": 14,
+      "sequence": 7,
+      "lat": 10.7305219,
+      "lng": 106.7142468
+    },
+    {
+      "busStopID": 147,
+      "parentID": 157,
+      "routeID": 14,
+      "sequence": 8,
+      "lat": 10.7354019,
+      "lng": 106.7164931
+    },
+    {
+      "busStopID": 409,
+      "parentID": 419,
+      "routeID": 14,
+      "sequence": 9,
+      "lat": 10.7375407,
+      "lng": 106.7230369
+    },
+    {
+      "busStopID": 190,
+      "parentID": 200,
+      "routeID": 14,
+      "sequence": 10,
+      "lat": 10.7469727,
+      "lng": 106.7173986
+    }
+  ],
+  "31": [
+    {
+      "busStopID": 389,
+      "parentID": 399,
+      "routeID": 31,
+      "sequence": 1,
+      "lat": 10.7814912,
+      "lng": 106.7841284
+    },
+    {
+      "busStopID": 235,
+      "parentID": 245,
+      "routeID": 31,
+      "sequence": 2,
+      "lat": 10.7833465,
+      "lng": 106.7758478
+    },
+    {
+      "busStopID": 258,
+      "parentID": 268,
+      "routeID": 31,
+      "sequence": 3,
+      "lat": 10.7934404,
+      "lng": 106.7823963
+    },
+    {
+      "busStopID": 35,
+      "parentID": 45,
+      "routeID": 31,
+      "sequence": 4,
+      "lat": 10.8052779,
+      "lng": 106.7804751
+    },
+    {
+      "busStopID": 369,
+      "parentID": 379,
+      "routeID": 31,
+      "sequence": 5,
+      "lat": 10.7999561,
+      "lng": 106.7785663
+    },
+    {
+      "busStopID": 280,
+      "parentID": 290,
+      "routeID": 31,
+      "sequence": 6,
+      "lat": 10.8043039,
+      "lng": 106.7732132
+    },
+    {
+      "busStopID": 17,
+      "parentID": 27,
+      "routeID": 31,
+      "sequence": 7,
+      "lat": 10.8040717,
+      "lng": 106.7778816
+    },
+    {
+      "busStopID": 416,
+      "parentID": 426,
+      "routeID": 31,
+      "sequence": 8,
+      "lat": 10.7908854,
+      "lng": 106.770292
+    },
+    {
+      "busStopID": 257,
+      "parentID": 267,
+      "routeID": 31,
+      "sequence": 9,
+      "lat": 10.7912637,
+      "lng": 106.7937453
+    },
+    {
+      "busStopID": 127,
+      "parentID": 137,
+      "routeID": 31,
+      "sequence": 10,
+      "lat": 10.7819098,
+      "lng": 106.7809031
+    }
+  ],
+  "11": [
+    {
+      "busStopID": 20,
+      "parentID": 30,
+      "routeID": 11,
+      "sequence": 1,
+      "lat": 10.8368991,
+      "lng": 106.6847136
+    },
+    {
+      "busStopID": 31,
+      "parentID": 41,
+      "routeID": 11,
+      "sequence": 2,
+      "lat": 10.8384043,
+      "lng": 106.6841423
+    },
+    {
+      "busStopID": 296,
+      "parentID": 306,
+      "routeID": 11,
+      "sequence": 3,
+      "lat": 10.8566785,
+      "lng": 106.6847946
+    },
+    {
+      "busStopID": 139,
+      "parentID": 149,
+      "routeID": 11,
+      "sequence": 4,
+      "lat": 10.8651297,
+      "lng": 106.6942102
+    },
+    {
+      "busStopID": 224,
+      "parentID": 234,
+      "routeID": 11,
+      "sequence": 5,
+      "lat": 10.8395567,
+      "lng": 106.6902661
+    },
+    {
+      "busStopID": 356,
+      "parentID": 366,
+      "routeID": 11,
+      "sequence": 6,
+      "lat": 10.850672,
+      "lng": 106.6927085
+    },
+    {
+      "busStopID": 317,
+      "parentID": 327,
+      "routeID": 11,
+      "sequence": 7,
+      "lat": 10.8562292,
+      "lng": 106.7030958
+    },
+    {
+      "busStopID": 42,
+      "parentID": 52,
+      "routeID": 11,
+      "sequence": 8,
+      "lat": 10.8394208,
+      "lng": 106.7016463
+    },
+    {
+      "busStopID": 436,
+      "parentID": 446,
+      "routeID": 11,
+      "sequence": 9,
+      "lat": 10.8402469,
+      "lng": 106.701332
+    },
+    {
+      "busStopID": 351,
+      "parentID": 361,
+      "routeID": 11,
+      "sequence": 10,
+      "lat": 10.8356553,
+      "lng": 106.699196
+    }
+  ],
+  "38": [
+    {
+      "busStopID": 236,
+      "parentID": 246,
+      "routeID": 38,
+      "sequence": 1,
+      "lat": 10.7184543,
+      "lng": 106.6046727
+    },
+    {
+      "busStopID": 367,
+      "parentID": 377,
+      "routeID": 38,
+      "sequence": 2,
+      "lat": 10.7086292,
+      "lng": 106.6044818
+    },
+    {
+      "busStopID": 306,
+      "parentID": 316,
+      "routeID": 38,
+      "sequence": 3,
+      "lat": 10.7093574,
+      "lng": 106.6051769
+    },
+    {
+      "busStopID": 21,
+      "parentID": 31,
+      "routeID": 38,
+      "sequence": 4,
+      "lat": 10.710213,
+      "lng": 106.6124526
+    },
+    {
+      "busStopID": 256,
+      "parentID": 266,
+      "routeID": 38,
+      "sequence": 5,
+      "lat": 10.7002836,
+      "lng": 106.6043417
+    },
+    {
+      "busStopID": 447,
+      "parentID": 457,
+      "routeID": 38,
+      "sequence": 6,
+      "lat": 10.703504,
+      "lng": 106.6193457
+    },
+    {
+      "busStopID": 268,
+      "parentID": 278,
+      "routeID": 38,
+      "sequence": 7,
+      "lat": 10.7078188,
+      "lng": 106.618248
+    },
+    {
+      "busStopID": 335,
+      "parentID": 345,
+      "routeID": 38,
+      "sequence": 8,
+      "lat": 10.7073164,
+      "lng": 106.6149889
+    },
+    {
+      "busStopID": 130,
+      "parentID": 140,
+      "routeID": 38,
+      "sequence": 9,
+      "lat": 10.715606,
+      "lng": 106.6161041
+    },
+    {
+      "busStopID": 157,
+      "parentID": 167,
+      "routeID": 38,
+      "sequence": 10,
+      "lat": 10.7246079,
+      "lng": 106.6034713
+    }
+  ],
+  "44": [
+    {
+      "busStopID": 283,
+      "parentID": 293,
+      "routeID": 44,
+      "sequence": 1,
+      "lat": 10.805753,
+      "lng": 106.7108166
+    },
+    {
+      "busStopID": 254,
+      "parentID": 264,
+      "routeID": 44,
+      "sequence": 2,
+      "lat": 10.814549,
+      "lng": 106.7099727
+    },
+    {
+      "busStopID": 439,
+      "parentID": 449,
+      "routeID": 44,
+      "sequence": 3,
+      "lat": 10.8244924,
+      "lng": 106.7167146
+    },
+    {
+      "busStopID": 94,
+      "parentID": 104,
+      "routeID": 44,
+      "sequence": 4,
+      "lat": 10.8227257,
+      "lng": 106.7116963
+    },
+    {
+      "busStopID": 297,
+      "parentID": 307,
+      "routeID": 44,
+      "sequence": 5,
+      "lat": 10.8153038,
+      "lng": 106.7147066
+    },
+    {
+      "busStopID": 22,
+      "parentID": 32,
+      "routeID": 44,
+      "sequence": 6,
+      "lat": 10.8207636,
+      "lng": 106.7089451
+    },
+    {
+      "busStopID": 270,
+      "parentID": 280,
+      "routeID": 44,
+      "sequence": 7,
+      "lat": 10.8227148,
+      "lng": 106.70842
+    },
+    {
+      "busStopID": 131,
+      "parentID": 141,
+      "routeID": 44,
+      "sequence": 8,
+      "lat": 10.8201993,
+      "lng": 106.6998897
+    },
+    {
+      "busStopID": 76,
+      "parentID": 86,
+      "routeID": 44,
+      "sequence": 9,
+      "lat": 10.814618,
+      "lng": 106.7000916
+    },
+    {
+      "busStopID": 158,
+      "parentID": 168,
+      "routeID": 44,
+      "sequence": 10,
+      "lat": 10.8072488,
+      "lng": 106.7056466
+    }
+  ],
+  "9": [
+    {
+      "busStopID": 187,
+      "parentID": 197,
+      "routeID": 9,
+      "sequence": 1,
+      "lat": 10.8815015,
+      "lng": 106.7768064
+    },
+    {
+      "busStopID": 141,
+      "parentID": 151,
+      "routeID": 9,
+      "sequence": 2,
+      "lat": 10.8957626,
+      "lng": 106.7688243
+    },
+    {
+      "busStopID": 413,
+      "parentID": 423,
+      "routeID": 9,
+      "sequence": 3,
+      "lat": 10.8953216,
+      "lng": 106.7958101
+    },
+    {
+      "busStopID": 36,
+      "parentID": 46,
+      "routeID": 9,
+      "sequence": 4,
+      "lat": 10.8912834,
+      "lng": 106.796792
+    },
+    {
+      "busStopID": 324,
+      "parentID": 334,
+      "routeID": 9,
+      "sequence": 5,
+      "lat": 10.890523,
+      "lng": 106.7956176
+    },
+    {
+      "busStopID": 479,
+      "parentID": 489,
+      "routeID": 9,
+      "sequence": 6,
+      "lat": 10.8983285,
+      "lng": 106.7772046
+    },
+    {
+      "busStopID": 23,
+      "parentID": 33,
+      "routeID": 9,
+      "sequence": 7,
+      "lat": 10.8853373,
+      "lng": 106.7793831
+    },
+    {
+      "busStopID": 377,
+      "parentID": 387,
+      "routeID": 9,
+      "sequence": 8,
+      "lat": 10.8863974,
+      "lng": 106.7780068
+    },
+    {
+      "busStopID": 46,
+      "parentID": 56,
+      "routeID": 9,
+      "sequence": 9,
+      "lat": 10.8942755,
+      "lng": 106.7921442
+    },
+    {
+      "busStopID": 417,
+      "parentID": 427,
+      "routeID": 9,
+      "sequence": 10,
+      "lat": 10.8831433,
+      "lng": 106.7793048
+    }
+  ],
+  "34": [
+    {
+      "busStopID": 271,
+      "parentID": 281,
+      "routeID": 34,
+      "sequence": 1,
+      "lat": 10.8445191,
+      "lng": 106.6007278
+    },
+    {
+      "busStopID": 55,
+      "parentID": 65,
+      "routeID": 34,
+      "sequence": 2,
+      "lat": 10.8623171,
+      "lng": 106.60417
+    },
+    {
+      "busStopID": 449,
+      "parentID": 459,
+      "routeID": 34,
+      "sequence": 3,
+      "lat": 10.8491326,
+      "lng": 106.6043332
+    },
+    {
+      "busStopID": 24,
+      "parentID": 34,
+      "routeID": 34,
+      "sequence": 4,
+      "lat": 10.8663685,
+      "lng": 106.6091319
+    },
+    {
+      "busStopID": 188,
+      "parentID": 198,
+      "routeID": 34,
+      "sequence": 5,
+      "lat": 10.8672195,
+      "lng": 106.6175144
+    },
+    {
+      "busStopID": 230,
+      "parentID": 240,
+      "routeID": 34,
+      "sequence": 6,
+      "lat": 10.8554466,
+      "lng": 106.6196545
+    },
+    {
+      "busStopID": 59,
+      "parentID": 69,
+      "routeID": 34,
+      "sequence": 7,
+      "lat": 10.8508316,
+      "lng": 106.6051965
+    },
+    {
+      "busStopID": 410,
+      "parentID": 420,
+      "routeID": 34,
+      "sequence": 8,
+      "lat": 10.8437013,
+      "lng": 106.6108192
+    },
+    {
+      "busStopID": 486,
+      "parentID": 496,
+      "routeID": 34,
+      "sequence": 9,
+      "lat": 10.8475411,
+      "lng": 106.6121938
+    },
+    {
+      "busStopID": 34,
+      "parentID": 44,
+      "routeID": 34,
+      "sequence": 10,
+      "lat": 10.8418869,
+      "lng": 106.6015264
+    }
+  ],
+  "48": [
+    {
+      "busStopID": 129,
+      "parentID": 139,
+      "routeID": 48,
+      "sequence": 1,
+      "lat": 10.7862326,
+      "lng": 106.695868
+    },
+    {
+      "busStopID": 457,
+      "parentID": 467,
+      "routeID": 48,
+      "sequence": 2,
+      "lat": 10.7925796,
+      "lng": 106.7088781
+    },
+    {
+      "busStopID": 314,
+      "parentID": 324,
+      "routeID": 48,
+      "sequence": 3,
+      "lat": 10.8022868,
+      "lng": 106.7065832
+    },
+    {
+      "busStopID": 229,
+      "parentID": 239,
+      "routeID": 48,
+      "sequence": 4,
+      "lat": 10.7938898,
+      "lng": 106.6801724
+    },
+    {
+      "busStopID": 25,
+      "parentID": 35,
+      "routeID": 48,
+      "sequence": 5,
+      "lat": 10.8053748,
+      "lng": 106.6872116
+    },
+    {
+      "busStopID": 255,
+      "parentID": 265,
+      "routeID": 48,
+      "sequence": 6,
+      "lat": 10.8011638,
+      "lng": 106.68717
+    },
+    {
+      "busStopID": 110,
+      "parentID": 120,
+      "routeID": 48,
+      "sequence": 7,
+      "lat": 10.8057089,
+      "lng": 106.6803135
+    },
+    {
+      "busStopID": 185,
+      "parentID": 195,
+      "routeID": 48,
+      "sequence": 8,
+      "lat": 10.800043,
+      "lng": 106.6853035
+    },
+    {
+      "busStopID": 484,
+      "parentID": 494,
+      "routeID": 48,
+      "sequence": 9,
+      "lat": 10.7884327,
+      "lng": 106.6925309
+    },
+    {
+      "busStopID": 426,
+      "parentID": 436,
+      "routeID": 48,
+      "sequence": 10,
+      "lat": 10.7804599,
+      "lng": 106.689132
+    }
+  ],
+  "8": [
+    {
+      "busStopID": 149,
+      "parentID": 159,
+      "routeID": 8,
+      "sequence": 1,
+      "lat": 10.88982,
+      "lng": 106.6806244
+    },
+    {
+      "busStopID": 93,
+      "parentID": 103,
+      "routeID": 8,
+      "sequence": 2,
+      "lat": 10.8926526,
+      "lng": 106.682387
+    },
+    {
+      "busStopID": 178,
+      "parentID": 188,
+      "routeID": 8,
+      "sequence": 3,
+      "lat": 10.8922143,
+      "lng": 106.6905526
+    },
+    {
+      "busStopID": 394,
+      "parentID": 404,
+      "routeID": 8,
+      "sequence": 4,
+      "lat": 10.8925311,
+      "lng": 106.6729942
+    },
+    {
+      "busStopID": 298,
+      "parentID": 308,
+      "routeID": 8,
+      "sequence": 5,
+      "lat": 10.8939884,
+      "lng": 106.6870772
+    },
+    {
+      "busStopID": 27,
+      "parentID": 37,
+      "routeID": 8,
+      "sequence": 6,
+      "lat": 10.8975636,
+      "lng": 106.6746197
+    },
+    {
+      "busStopID": 203,
+      "parentID": 213,
+      "routeID": 8,
+      "sequence": 7,
+      "lat": 10.8984826,
+      "lng": 106.6728879
+    },
+    {
+      "busStopID": 103,
+      "parentID": 113,
+      "routeID": 8,
+      "sequence": 8,
+      "lat": 10.8888011,
+      "lng": 106.6720712
+    },
+    {
+      "busStopID": 348,
+      "parentID": 358,
+      "routeID": 8,
+      "sequence": 9,
+      "lat": 10.8983222,
+      "lng": 106.6956844
+    },
+    {
+      "busStopID": 384,
+      "parentID": 394,
+      "routeID": 8,
+      "sequence": 10,
+      "lat": 10.8818899,
+      "lng": 106.6855065
+    }
+  ],
+  "5": [
+    {
+      "busStopID": 430,
+      "parentID": 440,
+      "routeID": 5,
+      "sequence": 1,
+      "lat": 10.7778103,
+      "lng": 106.639618
+    },
+    {
+      "busStopID": 285,
+      "parentID": 295,
+      "routeID": 5,
+      "sequence": 2,
+      "lat": 10.7783027,
+      "lng": 106.638348
+    },
+    {
+      "busStopID": 429,
+      "parentID": 439,
+      "routeID": 5,
+      "sequence": 3,
+      "lat": 10.7859399,
+      "lng": 106.6348595
+    },
+    {
+      "busStopID": 191,
+      "parentID": 201,
+      "routeID": 5,
+      "sequence": 4,
+      "lat": 10.7781773,
+      "lng": 106.6526629
+    },
+    {
+      "busStopID": 121,
+      "parentID": 131,
+      "routeID": 5,
+      "sequence": 5,
+      "lat": 10.7814263,
+      "lng": 106.6475773
+    },
+    {
+      "busStopID": 347,
+      "parentID": 357,
+      "routeID": 5,
+      "sequence": 6,
+      "lat": 10.7790946,
+      "lng": 106.6538518
+    },
+    {
+      "busStopID": 406,
+      "parentID": 416,
+      "routeID": 5,
+      "sequence": 7,
+      "lat": 10.7816481,
+      "lng": 106.6349154
+    },
+    {
+      "busStopID": 227,
+      "parentID": 237,
+      "routeID": 5,
+      "sequence": 8,
+      "lat": 10.790156,
+      "lng": 106.6496109
+    },
+    {
+      "busStopID": 117,
+      "parentID": 127,
+      "routeID": 5,
+      "sequence": 9,
+      "lat": 10.7898758,
+      "lng": 106.6523917
+    },
+    {
+      "busStopID": 28,
+      "parentID": 38,
+      "routeID": 5,
+      "sequence": 10,
+      "lat": 10.7781805,
+      "lng": 106.6496789
+    }
+  ],
+  "28": [
+    {
+      "busStopID": 341,
+      "parentID": 351,
+      "routeID": 28,
+      "sequence": 1,
+      "lat": 10.8098789,
+      "lng": 106.7648466
+    },
+    {
+      "busStopID": 485,
+      "parentID": 495,
+      "routeID": 28,
+      "sequence": 2,
+      "lat": 10.8091903,
+      "lng": 106.7538816
+    },
+    {
+      "busStopID": 386,
+      "parentID": 396,
+      "routeID": 28,
+      "sequence": 3,
+      "lat": 10.8125295,
+      "lng": 106.7620387
+    },
+    {
+      "busStopID": 195,
+      "parentID": 205,
+      "routeID": 28,
+      "sequence": 4,
+      "lat": 10.8210535,
+      "lng": 106.7628707
+    },
+    {
+      "busStopID": 159,
+      "parentID": 169,
+      "routeID": 28,
+      "sequence": 5,
+      "lat": 10.815493,
+      "lng": 106.7580053
+    },
+    {
+      "busStopID": 480,
+      "parentID": 490,
+      "routeID": 28,
+      "sequence": 6,
+      "lat": 10.8235742,
+      "lng": 106.7447583
+    },
+    {
+      "busStopID": 156,
+      "parentID": 166,
+      "routeID": 28,
+      "sequence": 7,
+      "lat": 10.8207921,
+      "lng": 106.7471132
+    },
+    {
+      "busStopID": 200,
+      "parentID": 210,
+      "routeID": 28,
+      "sequence": 8,
+      "lat": 10.8254827,
+      "lng": 106.7605549
+    },
+    {
+      "busStopID": 29,
+      "parentID": 39,
+      "routeID": 28,
+      "sequence": 9,
+      "lat": 10.8202273,
+      "lng": 106.759578
+    },
+    {
+      "busStopID": 388,
+      "parentID": 398,
+      "routeID": 28,
+      "sequence": 10,
+      "lat": 10.8144756,
+      "lng": 106.7635739
+    }
+  ],
+  "22": [
+    {
+      "busStopID": 30,
+      "parentID": 40,
+      "routeID": 22,
+      "sequence": 1,
+      "lat": 10.8073068,
+      "lng": 106.6249093
+    },
+    {
+      "busStopID": 343,
+      "parentID": 353,
+      "routeID": 22,
+      "sequence": 2,
+      "lat": 10.8085922,
+      "lng": 106.6226515
+    },
+    {
+      "busStopID": 395,
+      "parentID": 405,
+      "routeID": 22,
+      "sequence": 3,
+      "lat": 10.8179062,
+      "lng": 106.6273979
+    },
+    {
+      "busStopID": 108,
+      "parentID": 118,
+      "routeID": 22,
+      "sequence": 4,
+      "lat": 10.8330335,
+      "lng": 106.6329192
+    },
+    {
+      "busStopID": 47,
+      "parentID": 57,
+      "routeID": 22,
+      "sequence": 5,
+      "lat": 10.8130408,
+      "lng": 106.6315201
+    },
+    {
+      "busStopID": 288,
+      "parentID": 298,
+      "routeID": 22,
+      "sequence": 6,
+      "lat": 10.8329969,
+      "lng": 106.6377281
+    },
+    {
+      "busStopID": 338,
+      "parentID": 348,
+      "routeID": 22,
+      "sequence": 7,
+      "lat": 10.822232,
+      "lng": 106.6328837
+    },
+    {
+      "busStopID": 309,
+      "parentID": 319,
+      "routeID": 22,
+      "sequence": 8,
+      "lat": 10.8052945,
+      "lng": 106.6270969
+    },
+    {
+      "busStopID": 328,
+      "parentID": 338,
+      "routeID": 22,
+      "sequence": 9,
+      "lat": 10.8118506,
+      "lng": 106.6252278
+    },
+    {
+      "busStopID": 431,
+      "parentID": 441,
+      "routeID": 22,
+      "sequence": 10,
+      "lat": 10.8044429,
+      "lng": 106.6282364
+    }
+  ],
+  "26": [
+    {
+      "busStopID": 294,
+      "parentID": 304,
+      "routeID": 26,
+      "sequence": 1,
+      "lat": 10.8718622,
+      "lng": 106.656268
+    },
+    {
+      "busStopID": 192,
+      "parentID": 202,
+      "routeID": 26,
+      "sequence": 2,
+      "lat": 10.8859234,
+      "lng": 106.6432696
+    },
+    {
+      "busStopID": 50,
+      "parentID": 60,
+      "routeID": 26,
+      "sequence": 3,
+      "lat": 10.8940073,
+      "lng": 106.6512503
+    },
+    {
+      "busStopID": 140,
+      "parentID": 150,
+      "routeID": 26,
+      "sequence": 4,
+      "lat": 10.8956783,
+      "lng": 106.6514062
+    },
+    {
+      "busStopID": 245,
+      "parentID": 255,
+      "routeID": 26,
+      "sequence": 5,
+      "lat": 10.8949597,
+      "lng": 106.6623921
+    },
+    {
+      "busStopID": 32,
+      "parentID": 42,
+      "routeID": 26,
+      "sequence": 6,
+      "lat": 10.8750659,
+      "lng": 106.658834
+    },
+    {
+      "busStopID": 166,
+      "parentID": 176,
+      "routeID": 26,
+      "sequence": 7,
+      "lat": 10.8821702,
+      "lng": 106.6314971
+    },
+    {
+      "busStopID": 111,
+      "parentID": 121,
+      "routeID": 26,
+      "sequence": 8,
+      "lat": 10.8812641,
+      "lng": 106.6529978
+    },
+    {
+      "busStopID": 365,
+      "parentID": 375,
+      "routeID": 26,
+      "sequence": 9,
+      "lat": 10.8742945,
+      "lng": 106.657425
+    },
+    {
+      "busStopID": 49,
+      "parentID": 59,
+      "routeID": 26,
+      "sequence": 10,
+      "lat": 10.8741923,
+      "lng": 106.6457678
+    }
+  ],
+  "49": [
+    {
+      "busStopID": 325,
+      "parentID": 335,
+      "routeID": 49,
+      "sequence": 1,
+      "lat": 10.7457426,
+      "lng": 106.6091556
+    },
+    {
+      "busStopID": 295,
+      "parentID": 305,
+      "routeID": 49,
+      "sequence": 2,
+      "lat": 10.759962,
+      "lng": 106.6025504
+    },
+    {
+      "busStopID": 363,
+      "parentID": 373,
+      "routeID": 49,
+      "sequence": 3,
+      "lat": 10.7541351,
+      "lng": 106.6118171
+    },
+    {
+      "busStopID": 207,
+      "parentID": 217,
+      "routeID": 49,
+      "sequence": 4,
+      "lat": 10.7733596,
+      "lng": 106.6314596
+    },
+    {
+      "busStopID": 162,
+      "parentID": 172,
+      "routeID": 49,
+      "sequence": 5,
+      "lat": 10.7746784,
+      "lng": 106.6204355
+    },
+    {
+      "busStopID": 282,
+      "parentID": 292,
+      "routeID": 49,
+      "sequence": 6,
+      "lat": 10.7743916,
+      "lng": 106.6191649
+    },
+    {
+      "busStopID": 487,
+      "parentID": 497,
+      "routeID": 49,
+      "sequence": 7,
+      "lat": 10.7551468,
+      "lng": 106.6206973
+    },
+    {
+      "busStopID": 400,
+      "parentID": 410,
+      "routeID": 49,
+      "sequence": 8,
+      "lat": 10.7567188,
+      "lng": 106.6289485
+    },
+    {
+      "busStopID": 33,
+      "parentID": 43,
+      "routeID": 49,
+      "sequence": 9,
+      "lat": 10.7683583,
+      "lng": 106.6348755
+    },
+    {
+      "busStopID": 455,
+      "parentID": 465,
+      "routeID": 49,
+      "sequence": 10,
+      "lat": 10.75882,
+      "lng": 106.6000368
+    }
+  ],
+  "50": [
+    {
+      "busStopID": 284,
+      "parentID": 294,
+      "routeID": 50,
+      "sequence": 1,
+      "lat": 10.7516704,
+      "lng": 106.74788
+    },
+    {
+      "busStopID": 60,
+      "parentID": 70,
+      "routeID": 50,
+      "sequence": 2,
+      "lat": 10.7518482,
+      "lng": 106.7387783
+    },
+    {
+      "busStopID": 272,
+      "parentID": 282,
+      "routeID": 50,
+      "sequence": 3,
+      "lat": 10.7482255,
+      "lng": 106.7308821
+    },
+    {
+      "busStopID": 38,
+      "parentID": 48,
+      "routeID": 50,
+      "sequence": 4,
+      "lat": 10.7492229,
+      "lng": 106.7296132
+    },
+    {
+      "busStopID": 393,
+      "parentID": 403,
+      "routeID": 50,
+      "sequence": 5,
+      "lat": 10.747577,
+      "lng": 106.7411903
+    },
+    {
+      "busStopID": 435,
+      "parentID": 445,
+      "routeID": 50,
+      "sequence": 6,
+      "lat": 10.7553389,
+      "lng": 106.7531968
+    },
+    {
+      "busStopID": 364,
+      "parentID": 374,
+      "routeID": 50,
+      "sequence": 7,
+      "lat": 10.7479493,
+      "lng": 106.7497061
+    },
+    {
+      "busStopID": 218,
+      "parentID": 228,
+      "routeID": 50,
+      "sequence": 8,
+      "lat": 10.7438143,
+      "lng": 106.7470999
+    },
+    {
+      "busStopID": 366,
+      "parentID": 376,
+      "routeID": 50,
+      "sequence": 9,
+      "lat": 10.7489323,
+      "lng": 106.751937
+    },
+    {
+      "busStopID": 198,
+      "parentID": 208,
+      "routeID": 50,
+      "sequence": 10,
+      "lat": 10.7604988,
+      "lng": 106.7233849
+    }
+  ],
+  "15": [
+    {
+      "busStopID": 381,
+      "parentID": 391,
+      "routeID": 15,
+      "sequence": 1,
+      "lat": 10.8196124,
+      "lng": 106.6591422
+    },
+    {
+      "busStopID": 180,
+      "parentID": 190,
+      "routeID": 15,
+      "sequence": 2,
+      "lat": 10.8256427,
+      "lng": 106.6633908
+    },
+    {
+      "busStopID": 40,
+      "parentID": 50,
+      "routeID": 15,
+      "sequence": 3,
+      "lat": 10.8228211,
+      "lng": 106.6642278
+    },
+    {
+      "busStopID": 492,
+      "parentID": 502,
+      "routeID": 15,
+      "sequence": 4,
+      "lat": 10.8125333,
+      "lng": 106.6794006
+    },
+    {
+      "busStopID": 177,
+      "parentID": 187,
+      "routeID": 15,
+      "sequence": 5,
+      "lat": 10.8210446,
+      "lng": 106.6639947
+    },
+    {
+      "busStopID": 318,
+      "parentID": 328,
+      "routeID": 15,
+      "sequence": 6,
+      "lat": 10.8246707,
+      "lng": 106.6829785
+    },
+    {
+      "busStopID": 143,
+      "parentID": 153,
+      "routeID": 15,
+      "sequence": 7,
+      "lat": 10.8299743,
+      "lng": 106.6795368
+    },
+    {
+      "busStopID": 168,
+      "parentID": 178,
+      "routeID": 15,
+      "sequence": 8,
+      "lat": 10.8120305,
+      "lng": 106.6687528
+    },
+    {
+      "busStopID": 91,
+      "parentID": 101,
+      "routeID": 15,
+      "sequence": 9,
+      "lat": 10.8176361,
+      "lng": 106.6665524
+    },
+    {
+      "busStopID": 39,
+      "parentID": 49,
+      "routeID": 15,
+      "sequence": 10,
+      "lat": 10.813148,
+      "lng": 106.6645473
+    }
+  ],
+  "23": [
+    {
+      "busStopID": 197,
+      "parentID": 207,
+      "routeID": 23,
+      "sequence": 1,
+      "lat": 10.8197376,
+      "lng": 106.6571165
+    },
+    {
+      "busStopID": 352,
+      "parentID": 362,
+      "routeID": 23,
+      "sequence": 2,
+      "lat": 10.8474835,
+      "lng": 106.6703744
+    },
+    {
+      "busStopID": 220,
+      "parentID": 230,
+      "routeID": 23,
+      "sequence": 3,
+      "lat": 10.8355993,
+      "lng": 106.6477007
+    },
+    {
+      "busStopID": 99,
+      "parentID": 109,
+      "routeID": 23,
+      "sequence": 4,
+      "lat": 10.8380099,
+      "lng": 106.6584498
+    },
+    {
+      "busStopID": 43,
+      "parentID": 53,
+      "routeID": 23,
+      "sequence": 5,
+      "lat": 10.8449056,
+      "lng": 106.6546214
+    },
+    {
+      "busStopID": 334,
+      "parentID": 344,
+      "routeID": 23,
+      "sequence": 6,
+      "lat": 10.8320483,
+      "lng": 106.6540019
+    },
+    {
+      "busStopID": 164,
+      "parentID": 174,
+      "routeID": 23,
+      "sequence": 7,
+      "lat": 10.8359948,
+      "lng": 106.6557089
+    },
+    {
+      "busStopID": 475,
+      "parentID": 485,
+      "routeID": 23,
+      "sequence": 8,
+      "lat": 10.8324425,
+      "lng": 106.6561501
+    },
+    {
+      "busStopID": 251,
+      "parentID": 261,
+      "routeID": 23,
+      "sequence": 9,
+      "lat": 10.8345385,
+      "lng": 106.6581311
+    },
+    {
+      "busStopID": 442,
+      "parentID": 452,
+      "routeID": 23,
+      "sequence": 10,
+      "lat": 10.8332045,
+      "lng": 106.6584168
+    }
+  ],
+  "12": [
+    {
+      "busStopID": 125,
+      "parentID": 135,
+      "routeID": 12,
+      "sequence": 1,
+      "lat": 10.7377411,
+      "lng": 106.6031763
+    },
+    {
+      "busStopID": 194,
+      "parentID": 204,
+      "routeID": 12,
+      "sequence": 2,
+      "lat": 10.726553,
+      "lng": 106.6054249
+    },
+    {
+      "busStopID": 289,
+      "parentID": 299,
+      "routeID": 12,
+      "sequence": 3,
+      "lat": 10.7350638,
+      "lng": 106.6063701
+    },
+    {
+      "busStopID": 54,
+      "parentID": 64,
+      "routeID": 12,
+      "sequence": 4,
+      "lat": 10.7269774,
+      "lng": 106.6166808
+    },
+    {
+      "busStopID": 44,
+      "parentID": 54,
+      "routeID": 12,
+      "sequence": 5,
+      "lat": 10.7280857,
+      "lng": 106.6252588
+    },
+    {
+      "busStopID": 396,
+      "parentID": 406,
+      "routeID": 12,
+      "sequence": 6,
+      "lat": 10.7341595,
+      "lng": 106.6209855
+    },
+    {
+      "busStopID": 204,
+      "parentID": 214,
+      "routeID": 12,
+      "sequence": 7,
+      "lat": 10.7262949,
+      "lng": 106.6244991
+    },
+    {
+      "busStopID": 237,
+      "parentID": 247,
+      "routeID": 12,
+      "sequence": 8,
+      "lat": 10.7259859,
+      "lng": 106.625927
+    },
+    {
+      "busStopID": 213,
+      "parentID": 223,
+      "routeID": 12,
+      "sequence": 9,
+      "lat": 10.7346843,
+      "lng": 106.6137128
+    },
+    {
+      "busStopID": 62,
+      "parentID": 72,
+      "routeID": 12,
+      "sequence": 10,
+      "lat": 10.7320661,
+      "lng": 106.6095676
+    }
+  ],
+  "3": [
+    {
+      "busStopID": 360,
+      "parentID": 370,
+      "routeID": 3,
+      "sequence": 1,
+      "lat": 10.8260343,
+      "lng": 106.7477836
+    },
+    {
+      "busStopID": 303,
+      "parentID": 313,
+      "routeID": 3,
+      "sequence": 2,
+      "lat": 10.833356,
+      "lng": 106.7428857
+    },
+    {
+      "busStopID": 353,
+      "parentID": 363,
+      "routeID": 3,
+      "sequence": 3,
+      "lat": 10.835984,
+      "lng": 106.7516559
+    },
+    {
+      "busStopID": 45,
+      "parentID": 55,
+      "routeID": 3,
+      "sequence": 4,
+      "lat": 10.8344074,
+      "lng": 106.7459266
+    },
+    {
+      "busStopID": 170,
+      "parentID": 180,
+      "routeID": 3,
+      "sequence": 5,
+      "lat": 10.8434533,
+      "lng": 106.7436942
+    },
+    {
+      "busStopID": 239,
+      "parentID": 249,
+      "routeID": 3,
+      "sequence": 6,
+      "lat": 10.8468928,
+      "lng": 106.7399293
+    },
+    {
+      "busStopID": 101,
+      "parentID": 111,
+      "routeID": 3,
+      "sequence": 7,
+      "lat": 10.8335326,
+      "lng": 106.7482007
+    },
+    {
+      "busStopID": 380,
+      "parentID": 390,
+      "routeID": 3,
+      "sequence": 8,
+      "lat": 10.8430388,
+      "lng": 106.7484179
+    },
+    {
+      "busStopID": 425,
+      "parentID": 435,
+      "routeID": 3,
+      "sequence": 9,
+      "lat": 10.8438069,
+      "lng": 106.747162
+    },
+    {
+      "busStopID": 109,
+      "parentID": 119,
+      "routeID": 3,
+      "sequence": 10,
+      "lat": 10.8287202,
+      "lng": 106.7471142
+    }
+  ],
+  "43": [
+    {
+      "busStopID": 274,
+      "parentID": 284,
+      "routeID": 43,
+      "sequence": 1,
+      "lat": 10.8798766,
+      "lng": 106.7398005
+    },
+    {
+      "busStopID": 217,
+      "parentID": 227,
+      "routeID": 43,
+      "sequence": 2,
+      "lat": 10.889858,
+      "lng": 106.7587129
+    },
+    {
+      "busStopID": 105,
+      "parentID": 115,
+      "routeID": 43,
+      "sequence": 3,
+      "lat": 10.8864311,
+      "lng": 106.7256858
+    },
+    {
+      "busStopID": 208,
+      "parentID": 218,
+      "routeID": 43,
+      "sequence": 4,
+      "lat": 10.8917187,
+      "lng": 106.7469351
+    },
+    {
+      "busStopID": 48,
+      "parentID": 58,
+      "routeID": 43,
+      "sequence": 5,
+      "lat": 10.8978287,
+      "lng": 106.7337101
+    },
+    {
+      "busStopID": 418,
+      "parentID": 428,
+      "routeID": 43,
+      "sequence": 6,
+      "lat": 10.897557,
+      "lng": 106.7465021
+    },
+    {
+      "busStopID": 175,
+      "parentID": 185,
+      "routeID": 43,
+      "sequence": 7,
+      "lat": 10.8937448,
+      "lng": 106.7558216
+    },
+    {
+      "busStopID": 132,
+      "parentID": 142,
+      "routeID": 43,
+      "sequence": 8,
+      "lat": 10.8945845,
+      "lng": 106.7563703
+    },
+    {
+      "busStopID": 90,
+      "parentID": 100,
+      "routeID": 43,
+      "sequence": 9,
+      "lat": 10.8893066,
+      "lng": 106.7616925
+    },
+    {
+      "busStopID": 238,
+      "parentID": 248,
+      "routeID": 43,
+      "sequence": 10,
+      "lat": 10.8806064,
+      "lng": 106.7479995
+    }
+  ],
+  "25": [
+    {
+      "busStopID": 253,
+      "parentID": 263,
+      "routeID": 25,
+      "sequence": 1,
+      "lat": 10.7319539,
+      "lng": 106.6633572
+    },
+    {
+      "busStopID": 68,
+      "parentID": 78,
+      "routeID": 25,
+      "sequence": 2,
+      "lat": 10.7198517,
+      "lng": 106.655849
+    },
+    {
+      "busStopID": 301,
+      "parentID": 311,
+      "routeID": 25,
+      "sequence": 3,
+      "lat": 10.7066205,
+      "lng": 106.671055
+    },
+    {
+      "busStopID": 53,
+      "parentID": 63,
+      "routeID": 25,
+      "sequence": 4,
+      "lat": 10.7146619,
+      "lng": 106.6566776
+    },
+    {
+      "busStopID": 182,
+      "parentID": 192,
+      "routeID": 25,
+      "sequence": 5,
+      "lat": 10.7042246,
+      "lng": 106.6651133
+    },
+    {
+      "busStopID": 299,
+      "parentID": 309,
+      "routeID": 25,
+      "sequence": 6,
+      "lat": 10.7058719,
+      "lng": 106.6690974
+    },
+    {
+      "busStopID": 233,
+      "parentID": 243,
+      "routeID": 25,
+      "sequence": 7,
+      "lat": 10.7061605,
+      "lng": 106.6722968
+    },
+    {
+      "busStopID": 124,
+      "parentID": 134,
+      "routeID": 25,
+      "sequence": 8,
+      "lat": 10.7042787,
+      "lng": 106.6682692
+    },
+    {
+      "busStopID": 51,
+      "parentID": 61,
+      "routeID": 25,
+      "sequence": 9,
+      "lat": 10.7173969,
+      "lng": 106.6642958
+    },
+    {
+      "busStopID": 262,
+      "parentID": 272,
+      "routeID": 25,
+      "sequence": 10,
+      "lat": 10.7262212,
+      "lng": 106.6541352
+    }
+  ],
+  "45": [
+    {
+      "busStopID": 276,
+      "parentID": 286,
+      "routeID": 45,
+      "sequence": 1,
+      "lat": 10.8403712,
+      "lng": 106.7610802
+    },
+    {
+      "busStopID": 66,
+      "parentID": 76,
+      "routeID": 45,
+      "sequence": 2,
+      "lat": 10.8418967,
+      "lng": 106.7567767
+    },
+    {
+      "busStopID": 427,
+      "parentID": 437,
+      "routeID": 45,
+      "sequence": 3,
+      "lat": 10.8540059,
+      "lng": 106.7571881
+    },
+    {
+      "busStopID": 359,
+      "parentID": 369,
+      "routeID": 45,
+      "sequence": 4,
+      "lat": 10.8452602,
+      "lng": 106.7593153
+    },
+    {
+      "busStopID": 228,
+      "parentID": 238,
+      "routeID": 45,
+      "sequence": 5,
+      "lat": 10.8391013,
+      "lng": 106.7627458
+    },
+    {
+      "busStopID": 331,
+      "parentID": 341,
+      "routeID": 45,
+      "sequence": 6,
+      "lat": 10.8435885,
+      "lng": 106.7686806
+    },
+    {
+      "busStopID": 52,
+      "parentID": 62,
+      "routeID": 45,
+      "sequence": 7,
+      "lat": 10.8535547,
+      "lng": 106.7599083
+    },
+    {
+      "busStopID": 136,
+      "parentID": 146,
+      "routeID": 45,
+      "sequence": 8,
+      "lat": 10.8388607,
+      "lng": 106.7675869
+    },
+    {
+      "busStopID": 428,
+      "parentID": 438,
+      "routeID": 45,
+      "sequence": 9,
+      "lat": 10.8480512,
+      "lng": 106.7684867
+    },
+    {
+      "busStopID": 437,
+      "parentID": 447,
+      "routeID": 45,
+      "sequence": 10,
+      "lat": 10.8256014,
+      "lng": 106.7702485
+    }
+  ],
+  "27": [
+    {
+      "busStopID": 79,
+      "parentID": 89,
+      "routeID": 27,
+      "sequence": 1,
+      "lat": 10.8516018,
+      "lng": 106.7287275
+    },
+    {
+      "busStopID": 332,
+      "parentID": 342,
+      "routeID": 27,
+      "sequence": 2,
+      "lat": 10.8571447,
+      "lng": 106.7478117
+    },
+    {
+      "busStopID": 313,
+      "parentID": 323,
+      "routeID": 27,
+      "sequence": 3,
+      "lat": 10.8545341,
+      "lng": 106.7463772
+    },
+    {
+      "busStopID": 267,
+      "parentID": 277,
+      "routeID": 27,
+      "sequence": 4,
+      "lat": 10.8681976,
+      "lng": 106.7423083
+    },
+    {
+      "busStopID": 402,
+      "parentID": 412,
+      "routeID": 27,
+      "sequence": 5,
+      "lat": 10.8554229,
+      "lng": 106.7518578
+    },
+    {
+      "busStopID": 138,
+      "parentID": 148,
+      "routeID": 27,
+      "sequence": 6,
+      "lat": 10.8709148,
+      "lng": 106.7513114
+    },
+    {
+      "busStopID": 499,
+      "parentID": 509,
+      "routeID": 27,
+      "sequence": 7,
+      "lat": 10.872515,
+      "lng": 106.7574335
+    },
+    {
+      "busStopID": 322,
+      "parentID": 332,
+      "routeID": 27,
+      "sequence": 8,
+      "lat": 10.8606906,
+      "lng": 106.7486124
+    },
+    {
+      "busStopID": 57,
+      "parentID": 67,
+      "routeID": 27,
+      "sequence": 9,
+      "lat": 10.8759975,
+      "lng": 106.7446021
+    },
+    {
+      "busStopID": 397,
+      "parentID": 407,
+      "routeID": 27,
+      "sequence": 10,
+      "lat": 10.8492891,
+      "lng": 106.7390983
+    }
+  ],
+  "10": [
+    {
+      "busStopID": 61,
+      "parentID": 71,
+      "routeID": 10,
+      "sequence": 1,
+      "lat": 10.7753996,
+      "lng": 106.7619573
+    },
+    {
+      "busStopID": 225,
+      "parentID": 235,
+      "routeID": 10,
+      "sequence": 2,
+      "lat": 10.7925047,
+      "lng": 106.7645417
+    },
+    {
+      "busStopID": 172,
+      "parentID": 182,
+      "routeID": 10,
+      "sequence": 3,
+      "lat": 10.7845547,
+      "lng": 106.7625882
+    },
+    {
+      "busStopID": 434,
+      "parentID": 444,
+      "routeID": 10,
+      "sequence": 4,
+      "lat": 10.7995135,
+      "lng": 106.7612746
+    },
+    {
+      "busStopID": 92,
+      "parentID": 102,
+      "routeID": 10,
+      "sequence": 5,
+      "lat": 10.7996103,
+      "lng": 106.7584913
+    },
+    {
+      "busStopID": 64,
+      "parentID": 74,
+      "routeID": 10,
+      "sequence": 6,
+      "lat": 10.7939045,
+      "lng": 106.7465697
+    },
+    {
+      "busStopID": 77,
+      "parentID": 87,
+      "routeID": 10,
+      "sequence": 7,
+      "lat": 10.7827438,
+      "lng": 106.7439081
+    },
+    {
+      "busStopID": 387,
+      "parentID": 397,
+      "routeID": 10,
+      "sequence": 8,
+      "lat": 10.7769096,
+      "lng": 106.7667327
+    },
+    {
+      "busStopID": 443,
+      "parentID": 453,
+      "routeID": 10,
+      "sequence": 9,
+      "lat": 10.787102,
+      "lng": 106.7580983
+    },
+    {
+      "busStopID": 500,
+      "parentID": 510,
+      "routeID": 10,
+      "sequence": 10,
+      "lat": 10.7758117,
+      "lng": 106.7701914
+    }
+  ],
+  "32": [
+    {
+      "busStopID": 471,
+      "parentID": 481,
+      "routeID": 32,
+      "sequence": 1,
+      "lat": 10.8478198,
+      "lng": 106.7198318
+    },
+    {
+      "busStopID": 209,
+      "parentID": 219,
+      "routeID": 32,
+      "sequence": 2,
+      "lat": 10.8567918,
+      "lng": 106.7054009
+    },
+    {
+      "busStopID": 385,
+      "parentID": 395,
+      "routeID": 32,
+      "sequence": 3,
+      "lat": 10.8527945,
+      "lng": 106.7183839
+    },
+    {
+      "busStopID": 361,
+      "parentID": 371,
+      "routeID": 32,
+      "sequence": 4,
+      "lat": 10.8607231,
+      "lng": 106.7211712
+    },
+    {
+      "busStopID": 183,
+      "parentID": 193,
+      "routeID": 32,
+      "sequence": 5,
+      "lat": 10.8691237,
+      "lng": 106.7069402
+    },
+    {
+      "busStopID": 260,
+      "parentID": 270,
+      "routeID": 32,
+      "sequence": 6,
+      "lat": 10.8661116,
+      "lng": 106.7218438
+    },
+    {
+      "busStopID": 423,
+      "parentID": 433,
+      "routeID": 32,
+      "sequence": 7,
+      "lat": 10.8638476,
+      "lng": 106.7255596
+    },
+    {
+      "busStopID": 71,
+      "parentID": 81,
+      "routeID": 32,
+      "sequence": 8,
+      "lat": 10.8589005,
+      "lng": 106.709958
+    },
+    {
+      "busStopID": 73,
+      "parentID": 83,
+      "routeID": 32,
+      "sequence": 9,
+      "lat": 10.8551979,
+      "lng": 106.7174293
+    },
+    {
+      "busStopID": 88,
+      "parentID": 98,
+      "routeID": 32,
+      "sequence": 10,
+      "lat": 10.8520441,
+      "lng": 106.7121292
+    }
+  ],
+  "36": [
+    {
+      "busStopID": 441,
+      "parentID": 451,
+      "routeID": 36,
+      "sequence": 1,
+      "lat": 10.7655282,
+      "lng": 106.759824
+    },
+    {
+      "busStopID": 201,
+      "parentID": 211,
+      "routeID": 36,
+      "sequence": 2,
+      "lat": 10.7499672,
+      "lng": 106.770857
+    },
+    {
+      "busStopID": 450,
+      "parentID": 460,
+      "routeID": 36,
+      "sequence": 3,
+      "lat": 10.7583422,
+      "lng": 106.7689061
+    },
+    {
+      "busStopID": 135,
+      "parentID": 145,
+      "routeID": 36,
+      "sequence": 4,
+      "lat": 10.748328,
+      "lng": 106.7574446
+    },
+    {
+      "busStopID": 281,
+      "parentID": 291,
+      "routeID": 36,
+      "sequence": 5,
+      "lat": 10.7461325,
+      "lng": 106.771199
+    },
+    {
+      "busStopID": 305,
+      "parentID": 315,
+      "routeID": 36,
+      "sequence": 6,
+      "lat": 10.7509281,
+      "lng": 106.7533309
+    },
+    {
+      "busStopID": 420,
+      "parentID": 430,
+      "routeID": 36,
+      "sequence": 7,
+      "lat": 10.7413332,
+      "lng": 106.7597713
+    },
+    {
+      "busStopID": 97,
+      "parentID": 107,
+      "routeID": 36,
+      "sequence": 8,
+      "lat": 10.7445506,
+      "lng": 106.7637509
+    },
+    {
+      "busStopID": 375,
+      "parentID": 385,
+      "routeID": 36,
+      "sequence": 9,
+      "lat": 10.7407349,
+      "lng": 106.7590728
+    },
+    {
+      "busStopID": 72,
+      "parentID": 82,
+      "routeID": 36,
+      "sequence": 10,
+      "lat": 10.7355689,
+      "lng": 106.7585787
+    }
+  ],
+  "7": [
+    {
+      "busStopID": 206,
+      "parentID": 216,
+      "routeID": 7,
+      "sequence": 1,
+      "lat": 10.7547054,
+      "lng": 106.6951791
+    },
+    {
+      "busStopID": 323,
+      "parentID": 333,
+      "routeID": 7,
+      "sequence": 2,
+      "lat": 10.7591146,
+      "lng": 106.7126019
+    },
+    {
+      "busStopID": 355,
+      "parentID": 365,
+      "routeID": 7,
+      "sequence": 3,
+      "lat": 10.7620094,
+      "lng": 106.6945824
+    },
+    {
+      "busStopID": 302,
+      "parentID": 312,
+      "routeID": 7,
+      "sequence": 4,
+      "lat": 10.7639014,
+      "lng": 106.7132671
+    },
+    {
+      "busStopID": 278,
+      "parentID": 288,
+      "routeID": 7,
+      "sequence": 5,
+      "lat": 10.7656216,
+      "lng": 106.7001262
+    },
+    {
+      "busStopID": 362,
+      "parentID": 372,
+      "routeID": 7,
+      "sequence": 6,
+      "lat": 10.7549207,
+      "lng": 106.703543
+    },
+    {
+      "busStopID": 408,
+      "parentID": 418,
+      "routeID": 7,
+      "sequence": 7,
+      "lat": 10.7688725,
+      "lng": 106.7123013
+    },
+    {
+      "busStopID": 346,
+      "parentID": 356,
+      "routeID": 7,
+      "sequence": 8,
+      "lat": 10.7566386,
+      "lng": 106.6967579
+    },
+    {
+      "busStopID": 74,
+      "parentID": 84,
+      "routeID": 7,
+      "sequence": 9,
+      "lat": 10.755475,
+      "lng": 106.7127173
+    },
+    {
+      "busStopID": 493,
+      "parentID": 503,
+      "routeID": 7,
+      "sequence": 10,
+      "lat": 10.7588125,
+      "lng": 106.7158542
+    }
+  ],
+  "24": [
+    {
+      "busStopID": 212,
+      "parentID": 222,
+      "routeID": 24,
+      "sequence": 1,
+      "lat": 10.7516045,
+      "lng": 106.6549433
+    },
+    {
+      "busStopID": 478,
+      "parentID": 488,
+      "routeID": 24,
+      "sequence": 2,
+      "lat": 10.7645446,
+      "lng": 106.6530226
+    },
+    {
+      "busStopID": 252,
+      "parentID": 262,
+      "routeID": 24,
+      "sequence": 3,
+      "lat": 10.7608062,
+      "lng": 106.6429112
+    },
+    {
+      "busStopID": 372,
+      "parentID": 382,
+      "routeID": 24,
+      "sequence": 4,
+      "lat": 10.7556015,
+      "lng": 106.6390024
+    },
+    {
+      "busStopID": 277,
+      "parentID": 287,
+      "routeID": 24,
+      "sequence": 5,
+      "lat": 10.7381955,
+      "lng": 106.6381161
+    },
+    {
+      "busStopID": 244,
+      "parentID": 254,
+      "routeID": 24,
+      "sequence": 6,
+      "lat": 10.7351311,
+      "lng": 106.6419058
+    },
+    {
+      "busStopID": 120,
+      "parentID": 130,
+      "routeID": 24,
+      "sequence": 7,
+      "lat": 10.7255109,
+      "lng": 106.6392768
+    },
+    {
+      "busStopID": 498,
+      "parentID": 508,
+      "routeID": 24,
+      "sequence": 8,
+      "lat": 10.7416811,
+      "lng": 106.6453514
+    },
+    {
+      "busStopID": 75,
+      "parentID": 85,
+      "routeID": 24,
+      "sequence": 9,
+      "lat": 10.7476555,
+      "lng": 106.6467932
+    },
+    {
+      "busStopID": 246,
+      "parentID": 256,
+      "routeID": 24,
+      "sequence": 10,
+      "lat": 10.7482321,
+      "lng": 106.6599154
+    }
+  ],
+  "2": [
+    {
+      "busStopID": 378,
+      "parentID": 388,
+      "routeID": 2,
+      "sequence": 1,
+      "lat": 10.8201885,
+      "lng": 106.6084172
+    },
+    {
+      "busStopID": 98,
+      "parentID": 108,
+      "routeID": 2,
+      "sequence": 2,
+      "lat": 10.8342609,
+      "lng": 106.6159966
+    },
+    {
+      "busStopID": 82,
+      "parentID": 92,
+      "routeID": 2,
+      "sequence": 3,
+      "lat": 10.8289929,
+      "lng": 106.61551
+    },
+    {
+      "busStopID": 176,
+      "parentID": 186,
+      "routeID": 2,
+      "sequence": 4,
+      "lat": 10.8219019,
+      "lng": 106.6158897
+    },
+    {
+      "busStopID": 119,
+      "parentID": 129,
+      "routeID": 2,
+      "sequence": 5,
+      "lat": 10.8318312,
+      "lng": 106.6183172
+    },
+    {
+      "busStopID": 349,
+      "parentID": 359,
+      "routeID": 2,
+      "sequence": 6,
+      "lat": 10.8302231,
+      "lng": 106.6007496
+    },
+    {
+      "busStopID": 153,
+      "parentID": 163,
+      "routeID": 2,
+      "sequence": 7,
+      "lat": 10.8221522,
+      "lng": 106.6210484
+    },
+    {
+      "busStopID": 163,
+      "parentID": 173,
+      "routeID": 2,
+      "sequence": 8,
+      "lat": 10.8294039,
+      "lng": 106.6125933
+    },
+    {
+      "busStopID": 78,
+      "parentID": 88,
+      "routeID": 2,
+      "sequence": 9,
+      "lat": 10.8248211,
+      "lng": 106.6101781
+    },
+    {
+      "busStopID": 133,
+      "parentID": 143,
+      "routeID": 2,
+      "sequence": 10,
+      "lat": 10.8213794,
+      "lng": 106.6126027
+    }
+  ],
+  "18": [
+    {
+      "busStopID": 304,
+      "parentID": 314,
+      "routeID": 18,
+      "sequence": 1,
+      "lat": 10.8431443,
+      "lng": 106.7726405
+    },
+    {
+      "busStopID": 81,
+      "parentID": 91,
+      "routeID": 18,
+      "sequence": 2,
+      "lat": 10.8449297,
+      "lng": 106.7955881
+    },
+    {
+      "busStopID": 167,
+      "parentID": 177,
+      "routeID": 18,
+      "sequence": 3,
+      "lat": 10.8603828,
+      "lng": 106.7689897
+    },
+    {
+      "busStopID": 433,
+      "parentID": 443,
+      "routeID": 18,
+      "sequence": 4,
+      "lat": 10.8446571,
+      "lng": 106.7758805
+    },
+    {
+      "busStopID": 128,
+      "parentID": 138,
+      "routeID": 18,
+      "sequence": 5,
+      "lat": 10.8512225,
+      "lng": 106.7797532
+    },
+    {
+      "busStopID": 104,
+      "parentID": 114,
+      "routeID": 18,
+      "sequence": 6,
+      "lat": 10.8535508,
+      "lng": 106.7858951
+    },
+    {
+      "busStopID": 482,
+      "parentID": 492,
+      "routeID": 18,
+      "sequence": 7,
+      "lat": 10.8490347,
+      "lng": 106.7827011
+    },
+    {
+      "busStopID": 160,
+      "parentID": 170,
+      "routeID": 18,
+      "sequence": 8,
+      "lat": 10.8437219,
+      "lng": 106.7879667
+    },
+    {
+      "busStopID": 116,
+      "parentID": 126,
+      "routeID": 18,
+      "sequence": 9,
+      "lat": 10.8402069,
+      "lng": 106.79059
+    },
+    {
+      "busStopID": 205,
+      "parentID": 215,
+      "routeID": 18,
+      "sequence": 10,
+      "lat": 10.8445583,
+      "lng": 106.7919582
+    }
+  ],
+  "1": [
+    {
+      "busStopID": 398,
+      "parentID": 408,
+      "routeID": 1,
+      "sequence": 1,
+      "lat": 10.7208255,
+      "lng": 106.7612555
+    },
+    {
+      "busStopID": 137,
+      "parentID": 147,
+      "routeID": 1,
+      "sequence": 2,
+      "lat": 10.7040019,
+      "lng": 106.755952
+    },
+    {
+      "busStopID": 144,
+      "parentID": 154,
+      "routeID": 1,
+      "sequence": 3,
+      "lat": 10.7001947,
+      "lng": 106.7776905
+    },
+    {
+      "busStopID": 403,
+      "parentID": 413,
+      "routeID": 1,
+      "sequence": 4,
+      "lat": 10.7095278,
+      "lng": 106.7685781
+    },
+    {
+      "busStopID": 315,
+      "parentID": 325,
+      "routeID": 1,
+      "sequence": 5,
+      "lat": 10.7105281,
+      "lng": 106.774474
+    },
+    {
+      "busStopID": 465,
+      "parentID": 475,
+      "routeID": 1,
+      "sequence": 6,
+      "lat": 10.7133583,
+      "lng": 106.7770288
+    },
+    {
+      "busStopID": 83,
+      "parentID": 93,
+      "routeID": 1,
+      "sequence": 7,
+      "lat": 10.7063265,
+      "lng": 106.7599189
+    },
+    {
+      "busStopID": 287,
+      "parentID": 297,
+      "routeID": 1,
+      "sequence": 8,
+      "lat": 10.7149886,
+      "lng": 106.7708103
+    },
+    {
+      "busStopID": 259,
+      "parentID": 269,
+      "routeID": 1,
+      "sequence": 9,
+      "lat": 10.7111125,
+      "lng": 106.7605818
+    },
+    {
+      "busStopID": 370,
+      "parentID": 380,
+      "routeID": 1,
+      "sequence": 10,
+      "lat": 10.7291167,
+      "lng": 106.7666942
+    }
+  ],
+  "39": [
+    {
+      "busStopID": 345,
+      "parentID": 355,
+      "routeID": 39,
+      "sequence": 1,
+      "lat": 10.7241479,
+      "lng": 106.7735844
+    },
+    {
+      "busStopID": 84,
+      "parentID": 94,
+      "routeID": 39,
+      "sequence": 2,
+      "lat": 10.7233167,
+      "lng": 106.7747396
+    },
+    {
+      "busStopID": 123,
+      "parentID": 133,
+      "routeID": 39,
+      "sequence": 3,
+      "lat": 10.7260948,
+      "lng": 106.7725318
+    },
+    {
+      "busStopID": 374,
+      "parentID": 384,
+      "routeID": 39,
+      "sequence": 4,
+      "lat": 10.7211191,
+      "lng": 106.7889783
+    },
+    {
+      "busStopID": 87,
+      "parentID": 97,
+      "routeID": 39,
+      "sequence": 5,
+      "lat": 10.713976,
+      "lng": 106.7982583
+    },
+    {
+      "busStopID": 171,
+      "parentID": 181,
+      "routeID": 39,
+      "sequence": 6,
+      "lat": 10.7094724,
+      "lng": 106.7830291
+    },
+    {
+      "busStopID": 221,
+      "parentID": 231,
+      "routeID": 39,
+      "sequence": 7,
+      "lat": 10.7154252,
+      "lng": 106.7820095
+    },
+    {
+      "busStopID": 279,
+      "parentID": 289,
+      "routeID": 39,
+      "sequence": 8,
+      "lat": 10.7184511,
+      "lng": 106.7809577
+    },
+    {
+      "busStopID": 184,
+      "parentID": 194,
+      "routeID": 39,
+      "sequence": 9,
+      "lat": 10.7158298,
+      "lng": 106.7971586
+    },
+    {
+      "busStopID": 300,
+      "parentID": 310,
+      "routeID": 39,
+      "sequence": 10,
+      "lat": 10.7320645,
+      "lng": 106.7767086
+    }
+  ],
+  "40": [
+    {
+      "busStopID": 292,
+      "parentID": 302,
+      "routeID": 40,
+      "sequence": 1,
+      "lat": 10.7670522,
+      "lng": 106.6677528
+    },
+    {
+      "busStopID": 248,
+      "parentID": 258,
+      "routeID": 40,
+      "sequence": 2,
+      "lat": 10.7702843,
+      "lng": 106.6736943
+    },
+    {
+      "busStopID": 113,
+      "parentID": 123,
+      "routeID": 40,
+      "sequence": 3,
+      "lat": 10.7651349,
+      "lng": 106.6781393
+    },
+    {
+      "busStopID": 286,
+      "parentID": 296,
+      "routeID": 40,
+      "sequence": 4,
+      "lat": 10.7691145,
+      "lng": 106.6750776
+    },
+    {
+      "busStopID": 452,
+      "parentID": 462,
+      "routeID": 40,
+      "sequence": 5,
+      "lat": 10.7888523,
+      "lng": 106.6790609
+    },
+    {
+      "busStopID": 440,
+      "parentID": 450,
+      "routeID": 40,
+      "sequence": 6,
+      "lat": 10.8003353,
+      "lng": 106.671389
+    },
+    {
+      "busStopID": 339,
+      "parentID": 349,
+      "routeID": 40,
+      "sequence": 7,
+      "lat": 10.7899625,
+      "lng": 106.6566442
+    },
+    {
+      "busStopID": 85,
+      "parentID": 95,
+      "routeID": 40,
+      "sequence": 8,
+      "lat": 10.7945203,
+      "lng": 106.6613582
+    },
+    {
+      "busStopID": 333,
+      "parentID": 343,
+      "routeID": 40,
+      "sequence": 9,
+      "lat": 10.7946869,
+      "lng": 106.6705615
+    },
+    {
+      "busStopID": 316,
+      "parentID": 326,
+      "routeID": 40,
+      "sequence": 10,
+      "lat": 10.7805061,
+      "lng": 106.6801737
+    }
+  ],
+  "13": [
+    {
+      "busStopID": 448,
+      "parentID": 458,
+      "routeID": 13,
+      "sequence": 1,
+      "lat": 10.8730467,
+      "lng": 106.6065834
+    },
+    {
+      "busStopID": 401,
+      "parentID": 411,
+      "routeID": 13,
+      "sequence": 2,
+      "lat": 10.8860854,
+      "lng": 106.6066683
+    },
+    {
+      "busStopID": 263,
+      "parentID": 273,
+      "routeID": 13,
+      "sequence": 3,
+      "lat": 10.8976561,
+      "lng": 106.6122433
+    },
+    {
+      "busStopID": 342,
+      "parentID": 352,
+      "routeID": 13,
+      "sequence": 4,
+      "lat": 10.8784415,
+      "lng": 106.6084189
+    },
+    {
+      "busStopID": 89,
+      "parentID": 99,
+      "routeID": 13,
+      "sequence": 5,
+      "lat": 10.8861812,
+      "lng": 106.6173648
+    },
+    {
+      "busStopID": 261,
+      "parentID": 271,
+      "routeID": 13,
+      "sequence": 6,
+      "lat": 10.8888904,
+      "lng": 106.611799
+    },
+    {
+      "busStopID": 214,
+      "parentID": 224,
+      "routeID": 13,
+      "sequence": 7,
+      "lat": 10.8814189,
+      "lng": 106.61356
+    },
+    {
+      "busStopID": 327,
+      "parentID": 337,
+      "routeID": 13,
+      "sequence": 8,
+      "lat": 10.8878071,
+      "lng": 106.6149526
+    },
+    {
+      "busStopID": 461,
+      "parentID": 471,
+      "routeID": 13,
+      "sequence": 9,
+      "lat": 10.883626,
+      "lng": 106.6194955
+    },
+    {
+      "busStopID": 275,
+      "parentID": 285,
+      "routeID": 13,
+      "sequence": 10,
+      "lat": 10.877463,
+      "lng": 106.6091962
+    }
+  ],
+  "4": [
+    {
+      "busStopID": 373,
+      "parentID": 383,
+      "routeID": 4,
+      "sequence": 1,
+      "lat": 10.7240295,
+      "lng": 106.6355255
+    },
+    {
+      "busStopID": 100,
+      "parentID": 110,
+      "routeID": 4,
+      "sequence": 2,
+      "lat": 10.7157475,
+      "lng": 106.6440793
+    },
+    {
+      "busStopID": 458,
+      "parentID": 468,
+      "routeID": 4,
+      "sequence": 3,
+      "lat": 10.7066243,
+      "lng": 106.6331665
+    },
+    {
+      "busStopID": 115,
+      "parentID": 125,
+      "routeID": 4,
+      "sequence": 4,
+      "lat": 10.7046916,
+      "lng": 106.6368446
+    },
+    {
+      "busStopID": 310,
+      "parentID": 320,
+      "routeID": 4,
+      "sequence": 5,
+      "lat": 10.7167142,
+      "lng": 106.6247682
+    },
+    {
+      "busStopID": 174,
+      "parentID": 184,
+      "routeID": 4,
+      "sequence": 6,
+      "lat": 10.7065809,
+      "lng": 106.6314754
+    },
+    {
+      "busStopID": 118,
+      "parentID": 128,
+      "routeID": 4,
+      "sequence": 7,
+      "lat": 10.704481,
+      "lng": 106.6454112
+    },
+    {
+      "busStopID": 453,
+      "parentID": 463,
+      "routeID": 4,
+      "sequence": 8,
+      "lat": 10.7065558,
+      "lng": 106.6465356
+    },
+    {
+      "busStopID": 490,
+      "parentID": 500,
+      "routeID": 4,
+      "sequence": 9,
+      "lat": 10.7102467,
+      "lng": 106.6270939
+    },
+    {
+      "busStopID": 472,
+      "parentID": 482,
+      "routeID": 4,
+      "sequence": 10,
+      "lat": 10.7190038,
+      "lng": 106.6279192
+    }
+  ],
+  "21": [
+    {
+      "busStopID": 476,
+      "parentID": 486,
+      "routeID": 21,
+      "sequence": 1,
+      "lat": 10.7486647,
+      "lng": 106.7930546
+    },
+    {
+      "busStopID": 250,
+      "parentID": 260,
+      "routeID": 21,
+      "sequence": 2,
+      "lat": 10.7630473,
+      "lng": 106.7854658
+    },
+    {
+      "busStopID": 134,
+      "parentID": 144,
+      "routeID": 21,
+      "sequence": 3,
+      "lat": 10.7565696,
+      "lng": 106.7862215
+    },
+    {
+      "busStopID": 432,
+      "parentID": 442,
+      "routeID": 21,
+      "sequence": 4,
+      "lat": 10.7545577,
+      "lng": 106.7892283
+    },
+    {
+      "busStopID": 216,
+      "parentID": 226,
+      "routeID": 21,
+      "sequence": 5,
+      "lat": 10.7646231,
+      "lng": 106.7981457
+    },
+    {
+      "busStopID": 240,
+      "parentID": 250,
+      "routeID": 21,
+      "sequence": 6,
+      "lat": 10.7750522,
+      "lng": 106.7983569
+    },
+    {
+      "busStopID": 344,
+      "parentID": 354,
+      "routeID": 21,
+      "sequence": 7,
+      "lat": 10.7694517,
+      "lng": 106.7848147
+    },
+    {
+      "busStopID": 460,
+      "parentID": 470,
+      "routeID": 21,
+      "sequence": 8,
+      "lat": 10.7450211,
+      "lng": 106.7935883
+    },
+    {
+      "busStopID": 451,
+      "parentID": 461,
+      "routeID": 21,
+      "sequence": 9,
+      "lat": 10.7408012,
+      "lng": 106.7954941
+    },
+    {
+      "busStopID": 308,
+      "parentID": 318,
+      "routeID": 21,
+      "sequence": 10,
+      "lat": 10.7298831,
+      "lng": 106.7978882
+    }
+  ],
+  "6": [
+    {
+      "busStopID": 186,
+      "parentID": 196,
+      "routeID": 6,
+      "sequence": 1,
+      "lat": 10.8760333,
+      "lng": 106.701
+    },
+    {
+      "busStopID": 165,
+      "parentID": 175,
+      "routeID": 6,
+      "sequence": 2,
+      "lat": 10.8856754,
+      "lng": 106.7166955
+    },
+    {
+      "busStopID": 142,
+      "parentID": 152,
+      "routeID": 6,
+      "sequence": 3,
+      "lat": 10.8776946,
+      "lng": 106.7179724
+    },
+    {
+      "busStopID": 215,
+      "parentID": 225,
+      "routeID": 6,
+      "sequence": 4,
+      "lat": 10.8770367,
+      "lng": 106.7145533
+    },
+    {
+      "busStopID": 483,
+      "parentID": 493,
+      "routeID": 6,
+      "sequence": 5,
+      "lat": 10.8839046,
+      "lng": 106.7203183
+    },
+    {
+      "busStopID": 291,
+      "parentID": 301,
+      "routeID": 6,
+      "sequence": 6,
+      "lat": 10.8881258,
+      "lng": 106.7040427
+    },
+    {
+      "busStopID": 247,
+      "parentID": 257,
+      "routeID": 6,
+      "sequence": 7,
+      "lat": 10.8946569,
+      "lng": 106.7086426
+    },
+    {
+      "busStopID": 467,
+      "parentID": 477,
+      "routeID": 6,
+      "sequence": 8,
+      "lat": 10.8801049,
+      "lng": 106.7074977
+    },
+    {
+      "busStopID": 151,
+      "parentID": 161,
+      "routeID": 6,
+      "sequence": 9,
+      "lat": 10.8898678,
+      "lng": 106.7192556
+    },
+    {
+      "busStopID": 414,
+      "parentID": 424,
+      "routeID": 6,
+      "sequence": 10,
+      "lat": 10.8779987,
+      "lng": 106.7107359
+    }
+  ],
+  "35": [
+    {
+      "busStopID": 358,
+      "parentID": 368,
+      "routeID": 35,
+      "sequence": 1,
+      "lat": 10.7923993,
+      "lng": 106.7332386
+    },
+    {
+      "busStopID": 181,
+      "parentID": 191,
+      "routeID": 35,
+      "sequence": 2,
+      "lat": 10.8099572,
+      "lng": 106.7297083
+    },
+    {
+      "busStopID": 456,
+      "parentID": 466,
+      "routeID": 35,
+      "sequence": 3,
+      "lat": 10.818509,
+      "lng": 106.7213734
+    },
+    {
+      "busStopID": 321,
+      "parentID": 331,
+      "routeID": 35,
+      "sequence": 4,
+      "lat": 10.8035605,
+      "lng": 106.732459
+    },
+    {
+      "busStopID": 382,
+      "parentID": 392,
+      "routeID": 35,
+      "sequence": 5,
+      "lat": 10.8069425,
+      "lng": 106.7240911
+    },
+    {
+      "busStopID": 477,
+      "parentID": 487,
+      "routeID": 35,
+      "sequence": 6,
+      "lat": 10.8172311,
+      "lng": 106.7283187
+    },
+    {
+      "busStopID": 424,
+      "parentID": 434,
+      "routeID": 35,
+      "sequence": 7,
+      "lat": 10.8045961,
+      "lng": 106.7142159
+    },
+    {
+      "busStopID": 264,
+      "parentID": 274,
+      "routeID": 35,
+      "sequence": 8,
+      "lat": 10.8045124,
+      "lng": 106.7178165
+    },
+    {
+      "busStopID": 179,
+      "parentID": 189,
+      "routeID": 35,
+      "sequence": 9,
+      "lat": 10.8089429,
+      "lng": 106.7163539
+    },
+    {
+      "busStopID": 466,
+      "parentID": 476,
+      "routeID": 35,
+      "sequence": 10,
+      "lat": 10.7942597,
+      "lng": 106.7360909
+    }
+  ],
+  "16": [
+    {
+      "busStopID": 368,
+      "parentID": 378,
+      "routeID": 16,
+      "sequence": 1,
+      "lat": 10.8691618,
+      "lng": 106.6562447
+    },
+    {
+      "busStopID": 444,
+      "parentID": 454,
+      "routeID": 16,
+      "sequence": 2,
+      "lat": 10.8716343,
+      "lng": 106.6706141
+    },
+    {
+      "busStopID": 357,
+      "parentID": 367,
+      "routeID": 16,
+      "sequence": 3,
+      "lat": 10.8795068,
+      "lng": 106.6629546
+    },
+    {
+      "busStopID": 307,
+      "parentID": 317,
+      "routeID": 16,
+      "sequence": 4,
+      "lat": 10.8735317,
+      "lng": 106.6742208
+    },
+    {
+      "busStopID": 219,
+      "parentID": 229,
+      "routeID": 16,
+      "sequence": 5,
+      "lat": 10.8789823,
+      "lng": 106.6827425
+    },
+    {
+      "busStopID": 379,
+      "parentID": 389,
+      "routeID": 16,
+      "sequence": 6,
+      "lat": 10.8823516,
+      "lng": 106.667196
+    },
+    {
+      "busStopID": 210,
+      "parentID": 220,
+      "routeID": 16,
+      "sequence": 7,
+      "lat": 10.8669421,
+      "lng": 106.6648236
+    },
+    {
+      "busStopID": 222,
+      "parentID": 232,
+      "routeID": 16,
+      "sequence": 8,
+      "lat": 10.8728319,
+      "lng": 106.6728434
+    },
+    {
+      "busStopID": 196,
+      "parentID": 206,
+      "routeID": 16,
+      "sequence": 9,
+      "lat": 10.8673523,
+      "lng": 106.6831828
+    },
+    {
+      "busStopID": 330,
+      "parentID": 340,
+      "routeID": 16,
+      "sequence": 10,
+      "lat": 10.8603681,
+      "lng": 106.679505
+    }
+  ],
+  "20": [
+    {
+      "busStopID": 462,
+      "parentID": 472,
+      "routeID": 20,
+      "sequence": 1,
+      "lat": 10.7745113,
+      "lng": 106.732758
+    },
+    {
+      "busStopID": 312,
+      "parentID": 322,
+      "routeID": 20,
+      "sequence": 2,
+      "lat": 10.78372,
+      "lng": 106.7186515
+    },
+    {
+      "busStopID": 422,
+      "parentID": 432,
+      "routeID": 20,
+      "sequence": 3,
+      "lat": 10.7816005,
+      "lng": 106.7085388
+    },
+    {
+      "busStopID": 320,
+      "parentID": 330,
+      "routeID": 20,
+      "sequence": 4,
+      "lat": 10.7712647,
+      "lng": 106.735115
+    },
+    {
+      "busStopID": 391,
+      "parentID": 401,
+      "routeID": 20,
+      "sequence": 5,
+      "lat": 10.7762771,
+      "lng": 106.730818
+    },
+    {
+      "busStopID": 446,
+      "parentID": 456,
+      "routeID": 20,
+      "sequence": 6,
+      "lat": 10.7854545,
+      "lng": 106.731151
+    },
+    {
+      "busStopID": 411,
+      "parentID": 421,
+      "routeID": 20,
+      "sequence": 7,
+      "lat": 10.7825028,
+      "lng": 106.7435376
+    },
+    {
+      "busStopID": 470,
+      "parentID": 480,
+      "routeID": 20,
+      "sequence": 8,
+      "lat": 10.7743178,
+      "lng": 106.7392085
+    },
+    {
+      "busStopID": 494,
+      "parentID": 504,
+      "routeID": 20,
+      "sequence": 9,
+      "lat": 10.7666037,
+      "lng": 106.7245187
+    },
+    {
+      "busStopID": 468,
+      "parentID": 478,
+      "routeID": 20,
+      "sequence": 10,
+      "lat": 10.7633769,
+      "lng": 106.7253623
+    }
+  ]
+}

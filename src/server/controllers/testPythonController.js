@@ -36,7 +36,7 @@ export const sendListBusStopLatLngToPython = async(req, res) => {
             return res.status(500).json({ 
                 ok: false, 
                 error: response.data.error || "Python service failed",
-                pythonResponse: response.data
+                pythonResponse: response.data,
             });
         }
         

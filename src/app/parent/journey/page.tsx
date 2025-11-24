@@ -4,7 +4,7 @@ const PORT_SERVER = 8888;
 
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import BusMap_GG from '@/components/BusMap_GG';
+import BusMap_GG from '@/components/BusMap_GG_Parent';
 import BusInfoPanel from '@/components/BusInfoPanel';
 import { Bus } from '@/lib/data_buses';
 import styles from './page.module.css';
@@ -55,9 +55,17 @@ export default function ParentJourneyPage() {
 
   // --- 1. Fetch danh sách buses của con parent ---
   useEffect(() => {
+    // Chỉ fetch khi đã có parentID (không null)
+    if (!parentID) {
+      console.log('[ParentJourneyPage] Chưa có parentID, bỏ qua fetch');
+      return;
+    }
+
     const fetchStudentBuses = async () => {
       try {
         setLoading(true);
+        console.log('[ParentJourneyPage] Fetching buses for parent:', parentID);
+        
         const response = await fetch(`http://localhost:${PORT_SERVER}/api/parents/${parentID}/student-buses`);
         
         if (!response.ok) {
@@ -66,13 +74,24 @@ export default function ParentJourneyPage() {
         
         const data = await response.json();
         
-        console.log('->_<- API Response:', data);
+        console.log('✅ API Response:', data);
+        
+        if (!data || data.length === 0) {
+          console.warn('⚠️ API trả về empty array - không có chuyến xe nào');
+          setBuses([]);
+          setAllowedBusIDs(new Set());
+          setError(null);
+          setLoading(false);
+          return;
+        }
         
         // Lưu danh sách busIDs được phép xem
         const busIDsSet = new Set<number>(data.map((item: any) => item.busID));
+        // Add 1 to sync index with admin view
+        // const busIDsSet = new Set<number>(Array.from(busIDsSet_fetch).map(id => id + 1));
         setAllowedBusIDs(busIDsSet);
         
-        console.log('->_<- Parent được xem buses:', Array.from(busIDsSet));
+        console.log('✅ Parent được xem buses:', Array.from(busIDsSet));
         
         // Convert sang định dạng Bus cho BusMap_GG
         const busesData: Bus[] = data.map((item: any) => ({
@@ -80,6 +99,7 @@ export default function ParentJourneyPage() {
           busNumber: item.licensePlate || `Xe ${item.busID}`, // Dùng licensePlate thay vì busNumber
           driverName: `Tài xế xe ${item.busID}`,
           route: item.routeName || `Tuyến ${item.routeID}`,
+          routeID: item.routeID, // Thêm routeID để BusMap_GG có thể auto-select
           status: item.tripStatus === 'RUNNING' ? 'moving' : 'stopped',
           eta: new Date(Date.now() + 30 * 60000).toLocaleTimeString('vi-VN', { 
             hour: '2-digit', 
@@ -95,10 +115,12 @@ export default function ParentJourneyPage() {
           alerts: [],
         }));
         
+        console.log('✅ Đã tạo buses data:', busesData);
+        console.log('✅ Route names từ buses:', busesData.map(b => b.route));
         setBuses(busesData);
         setError(null);
       } catch (err) {
-        console.error('Lỗi fetch student buses:', err);
+        console.error('❌ Lỗi fetch student buses:', err);
         setError('Không thể tải thông tin xe buýt. Vui lòng thử lại sau.');
       } finally {
         setLoading(false);
@@ -200,15 +222,15 @@ export default function ParentJourneyPage() {
     );
   }
 
-  if (buses.length === 0) {
-    return (
-      <div className={styles.mainContent}>
-        <div className={styles.empty}>
-          <p>Con bạn hiện chưa có chuyến xe nào đang hoạt động.</p>
-        </div>
-      </div>
-    );
-  }
+  // if (buses.length === 0) {
+  //   return (
+  //     <div className={styles.mainContent}>
+  //       <div className={styles.empty}>
+  //         <p>Con bạn hiện chưa có chuyến xe nào đang hoạt động.</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className={styles.mainContent}>
