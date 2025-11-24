@@ -5,388 +5,322 @@ import styles from '../page.module.css';
 
 interface Trip {
   tripID: number;
-  routeName: string;
-  tripDate: string;
+  routeID: number;
   startTime: string;
+  endTime: string;
   studentCount: number;
   status: string;
 }
 
-interface Alert {
+interface AlertRecord {
   alertID: number;
   tripID: number;
-  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  severity: string;
   description: string;
   createdAt: string;
   resolvedAt: string | null;
+  resolvedBy: number | null;
   routeName: string;
   affectedStudents: number;
 }
 
-interface Notification {
-  message: string;
-  type: 'success' | 'error' | 'info';
-}
-
 export default function DriverAlertsPage() {
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alerts, setAlerts] = useState(['Kẹt xe tại ngã tư Lê Lợi - 6:45 AM, 19/09/2025']);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [driverID, setDriverID] = useState<number | null>(null);
+  const [tripID, setTripID] = useState<number | null>(null);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [selectedTripID, setSelectedTripID] = useState<number | null>(null);
+  const [alertHistory, setAlertHistory] = useState<AlertRecord[]>([]);
+  const [busID, setBusID] = useState(null);
   const [alertType, setAlertType] = useState('OTHER');
   const [severity, setSeverity] = useState('WARNING');
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [fetchingTrips, setFetchingTrips] = useState(true);
-  const [notification, setNotification] = useState<Notification | null>(null);
 
-  // Get driverID from localStorage
+  // Lấy driverID từ localStorage khi component mount
   useEffect(() => {
-    const storedDriverID = localStorage.getItem('driverID');
+    const storedDriverID = localStorage.getItem('userID');
     if (storedDriverID) {
-      setDriverID(parseInt(storedDriverID));
+      const id = parseInt(storedDriverID);
+      setDriverID(id);
+      fetchDriverTrips(id);
+      fetchAlertHistory(id);
+    } else {
+      setError('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
     }
   }, []);
 
-  // Fetch driver's trips
-  useEffect(() => {
-    if (driverID) {
-      fetchTrips();
-      fetchAlertHistory();
-    }
-  }, [driverID]);
-
-  const fetchTrips = async () => {
-    if (!driverID) return;
+  // Lấy danh sách chuyến xe của driver
+  const fetchDriverTrips = async (id: number) => {
     try {
-      setFetchingTrips(true);
-      const res = await fetch(`/api/driver-alerts/my-trips/${driverID}`);
+      const res = await fetch(`/api/driver-alerts/my-trips/${id}`);
       const data = await res.json();
-      
-      if (data.success && data.data && data.data.length > 0) {
-        // Hiển thị tất cả chuyến xe từ ngày hôm nay trở đi (không lọc by status)
-        const filteredTrips = data.data.filter((trip: Trip) => {
-          const tripDate = new Date(trip.tripDate);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          return tripDate >= today;
-        });
-        
-        if (filteredTrips.length > 0) {
-          setTrips(filteredTrips);
-        } else {
-          // Nếu không có chuyến nào từ hôm nay, hiển thị tất cả chuyến (để test)
-          setTrips(data.data.slice(0, 20));
-          showNotification('⚠️ Không có chuyến xe từ hôm nay, hiển thị tất cả chuyến để test', 'info');
+      if (data.success && data.data) {
+        setTrips(data.data);
+        // Auto select first active trip
+        const activeTrip = data.data.find((t: Trip) => t.status === 'ONGOING' || t.status === 'IN_PROGRESS');
+        if (activeTrip) {
+          setTripID(activeTrip.tripID);
         }
-      } else {
-        setTrips([]);
-        showNotification('Không có chuyến xe', 'info');
       }
     } catch (err) {
       console.error('Error fetching trips:', err);
-      showNotification('Lỗi tải danh sách chuyến xe', 'error');
-    } finally {
-      setFetchingTrips(false);
     }
   };
 
-  const fetchAlertHistory = async () => {
-    if (!driverID) return;
+  // Lấy lịch sử cảnh báo
+  const fetchAlertHistory = async (id: number) => {
     try {
-      const res = await fetch(`/api/driver-alerts/history/${driverID}`);
+      const res = await fetch(`/api/driver-alerts/history/${id}`);
       const data = await res.json();
-      
-      if (data.success) {
-        setAlerts(data.data || []);
+      if (data.success && data.data) {
+        setAlertHistory(data.data);
       }
     } catch (err) {
       console.error('Error fetching alert history:', err);
     }
   };
 
-  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
-  };
-
   const handleAlertSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!selectedTripID || !alertMessage.trim()) {
-      showNotification('Vui lòng chọn chuyến xe và nhập nội dung cảnh báo', 'error');
+    if (!alertMessage.trim()) {
+      setError('Vui lòng nhập mô tả sự cố');
       return;
     }
 
-    if (!driverID) {
-      showNotification('Không tìm thấy ID tài xế', 'error');
-      return;
-    }
+    setLoading(true);
+    setError('');
 
     try {
-      setLoading(true);
-      const res = await fetch('/api/driver-alerts/send', {
+      const response = await fetch('/api/driver-alerts/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          driverID,
-          tripID: selectedTripID,
+          driverID: parseInt(String(driverID)),
+          tripID: parseInt(String(tripID)),
+          busID: busID ? parseInt(String(busID)) : null,
           alertType,
-          message: alertMessage,
           severity,
+          description: alertMessage,
         }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (data.success) {
-        showNotification(`✅ Cảnh báo đã gửi tới ${data.data.notificationCount} phụ huynh`, 'success');
-        setAlertMessage('');
-        setSelectedTripID(null);
-        setAlertType('OTHER');
-        setSeverity('WARNING');
-        // Refresh alert history
-        fetchAlertHistory();
-      } else {
-        showNotification(data.message || 'Lỗi gửi cảnh báo', 'error');
+      if (!response.ok) {
+        throw new Error(data.message || 'Lỗi gửi cảnh báo');
+      }
+
+      // Thêm vào danh sách hiển thị
+      const newAlert = `${alertMessage} - ${new Date().toLocaleString('vi-VN')} ✅`;
+      setAlerts(prev => [newAlert, ...prev]);
+      setAlertMessage('');
+
+      // Hiển thị thông báo thành công
+      alert(`Cảnh báo đã gửi tới ${data.data.notificationCount} phụ huynh`);
+      
+      // Refresh lịch sử
+      if (driverID) {
+        fetchAlertHistory(driverID);
       }
     } catch (err) {
-      console.error('Error sending alert:', err);
-      showNotification('Lỗi gửi cảnh báo', 'error');
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
+      setError(`Lỗi: ${errorMessage}`);
+      console.error('Alert submission error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'CRITICAL':
-        return '#FF5252';
-      case 'WARNING':
-        return '#FF9800';
-      case 'INFO':
-        return '#2196F3';
-      default:
-        return '#999';
+  // Đánh dấu alert đã giải quyết
+  const handleResolveAlert = async (alertID: number) => {
+    console.log('Resolve alert:', { alertID, driverID });
+    
+    if (!driverID) {
+      alert('Lỗi: Không tìm thấy ID tài xế. Vui lòng đăng nhập lại.');
+      return;
     }
-  };
+    
+    try {
+      const response = await fetch(`/api/driver-alerts/resolve/${alertID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ resolvedBy: driverID }),
+      });
 
-  const getSeverityLabel = (severity: string) => {
-    switch (severity) {
-      case 'CRITICAL':
-        return '🔴 Nghiêm trọng';
-      case 'WARNING':
-        return '🟠 Cảnh báo';
-      case 'INFO':
-        return '🔵 Thông tin';
-      default:
-        return severity;
+      const data = await response.json();
+      console.log('Resolve response:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Lỗi');
+      }
+
+      alert('Cảnh báo đã được đánh dấu là đã giải quyết');
+      // Refresh lịch sử
+      if (driverID) {
+        fetchAlertHistory(driverID);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
+      alert(`Lỗi: ${errorMessage}`);
+      console.error('Resolve alert error:', err);
     }
   };
 
   return (
     <div className={styles.driverContainer}>
-      {notification && (
-        <div
-          style={{
-            padding: '1rem',
-            marginBottom: '1rem',
-            borderRadius: '8px',
-            backgroundColor:
-              notification.type === 'success'
-                ? '#E8F5E9'
-                : notification.type === 'error'
-                ? '#FFEBEE'
-                : '#E3F2FD',
-            color:
-              notification.type === 'success'
-                ? '#2E7D32'
-                : notification.type === 'error'
-                ? '#C62828'
-                : '#1565C0',
-            border: `1px solid ${
-              notification.type === 'success'
-                ? '#4CAF50'
-                : notification.type === 'error'
-                ? '#F44336'
-                : '#2196F3'
-            }`,
-          }}
-        >
-          {notification.message}
-        </div>
-      )}
-
       <div className={styles.alerts}>
-        <h3>📢 Gửi cảnh báo</h3>
-        
+        <h3>Gửi cảnh báo</h3>
         <form className={styles.alertForm} onSubmit={handleAlertSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label>Chuyến xe (đang chạy):</label>
-            <select
-              value={selectedTripID || ''}
-              onChange={(e) => setSelectedTripID(e.target.value ? parseInt(e.target.value) : null)}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                marginTop: '0.5rem',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                fontSize: '1rem',
-                backgroundColor: !selectedTripID ? '#f9f9f9' : 'white',
-              }}
-              disabled={fetchingTrips || trips.length === 0}
-            >
-              <option value="">-- Chọn chuyến xe --</option>
-              {trips.map((trip) => {
-                const tripDate = new Date(trip.tripDate);
-                const dateStr = tripDate.toLocaleDateString('vi-VN', { 
-                  month: '2-digit', 
-                  day: '2-digit' 
-                });
-                return (
-                  <option key={trip.tripID} value={trip.tripID}>
-                    {trip.routeName} • {dateStr} {trip.startTime} - {trip.endTime} ({trip.studentCount} học sinh)
-                  </option>
-                );
-              })}
-            </select>
-            {fetchingTrips && (
-              <p style={{ color: '#2196F3', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                ⏳ Đang tải danh sách chuyến xe...
-              </p>
-            )}
-            {trips.length === 0 && !fetchingTrips && (
-              <p style={{ color: '#FF9800', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                ⚠️ Không có chuyến xe trong ngày hôm nay ({new Date().toLocaleDateString('vi-VN')})
-              </p>
-            )}
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label>Loại sự cố:</label>
-            <select
-              value={alertType}
-              onChange={(e) => setAlertType(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                marginTop: '0.5rem',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                fontSize: '1rem',
-              }}
-            >
-              <option value="TRAFFIC">🚦 Tắc đường</option>
-              <option value="ENGINE_BREAKDOWN">🚗 Xe hỏng</option>
-              <option value="ACCIDENT">⚠️ Tai nạn</option>
-              <option value="DELAY">⏱️ Trễ giờ</option>
-              <option value="OTHER">📢 Thông báo khác</option>
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label>Mức độ:</label>
-            <select
-              value={severity}
-              onChange={(e) => setSeverity(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                marginTop: '0.5rem',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                fontSize: '1rem',
-              }}
-            >
-              <option value="INFO">ℹ️ Thông tin</option>
-              <option value="WARNING">⚠️ Cảnh báo</option>
-              <option value="CRITICAL">🔴 Nghiêm trọng</option>
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label htmlFor="alert-message">Mô tả sự cố:</label>
-            <textarea 
-              id="alert-message" 
-              placeholder="Vd: Kẹt xe, hỏng xe..."
-              value={alertMessage}
-              onChange={(e) => setAlertMessage(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                marginTop: '0.5rem',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                minHeight: '80px',
-                fontSize: '1rem',
-              }}
-            />
-          </div>
-
-          <button 
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              backgroundColor: loading ? '#ccc' : '#E63946',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}
+          <label htmlFor="trip-id">Chuyến xe (đang chạy):</label>
+          <select 
+            id="trip-id" 
+            value={tripID ?? ''}
+            onChange={(e) => setTripID(parseInt(e.target.value) || null)}
+            disabled={loading || trips.length === 0}
           >
-            {loading ? '⏳ Đang gửi...' : '📤 Gửi cảnh báo'}
+            <option value="">-- Chọn chuyến xe --</option>
+            {trips.map((trip) => (
+              <option key={trip.tripID} value={trip.tripID}>
+                Chuyến {trip.tripID} - Route {trip.routeID} ({trip.studentCount} học sinh) - {trip.status}
+              </option>
+            ))}
+          </select>
+
+          {trips.length === 0 && (
+            <div style={{ color: 'orange', marginBottom: '10px', fontSize: '0.9em' }}>
+              Không có chuyến xe đang chạy
+            </div>
+          )}
+
+          <label htmlFor="alert-type">Loại sự cố:</label>
+          <select 
+            id="alert-type" 
+            value={alertType}
+            onChange={(e) => setAlertType(e.target.value)}
+          >
+            <option value="ENGINE_BREAKDOWN">Hỏng máy</option>
+            <option value="TRAFFIC_ACCIDENT">Tai nạn giao thông</option>
+            <option value="TRAFFIC_DELAY">Tắc đường</option>
+            <option value="VEHICLE_BREAKDOWN">Sự cố xe</option>
+            <option value="DELAYED_START">Khởi hành muộn</option>
+            <option value="OTHER">Khác</option>
+          </select>
+
+          <label htmlFor="severity">Mức độ:</label>
+          <select 
+            id="severity" 
+            value={severity}
+            onChange={(e) => setSeverity(e.target.value)}
+          >
+            <option value="INFO">Thông tin</option>
+            <option value="WARNING">Cảnh báo</option>
+            <option value="CRITICAL">Nghiêm trọng</option>
+          </select>
+
+          <label htmlFor="alert-message">Mô tả sự cố:</label>
+          <textarea 
+            id="alert-message" 
+            placeholder="Ví dụ: Kẹt xe, hỏng xe"
+            value={alertMessage}
+            onChange={(e) => setAlertMessage(e.target.value)}
+            disabled={loading}
+          />
+
+          {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+
+          <button type="submit" disabled={loading}>
+            {loading ? 'Đang gửi...' : 'Gửi cảnh báo'}
           </button>
         </form>
         
-        <h3 style={{ marginTop: '2rem', marginBottom: '1rem' }}>📋 Lịch sử cảnh báo (50 gần nhất)</h3>
-        {alerts.length === 0 ? (
-          <p style={{ color: '#999', fontStyle: 'italic' }}>Chưa có cảnh báo nào</p>
+        <h3 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Lịch sử cảnh báo (50 gần nhất)</h3>
+        {alertHistory.length === 0 ? (
+          <p style={{ color: '#666' }}>Chưa có cảnh báo nào</p>
         ) : (
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {alerts.map((alert) => (
-              <div
-                key={alert.alertID}
-                style={{
-                  padding: '1rem',
-                  borderLeft: `4px solid ${getSeverityColor(alert.severity)}`,
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '4px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <div style={{ flex: 1 }}>
-                    <strong style={{ fontSize: '1.05rem' }}>{alert.routeName}</strong>
-                    <p style={{ margin: '0.25rem 0', fontSize: '0.95rem' }}>{alert.description}</p>
-                    <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
-                      <span>Mức độ: {getSeverityLabel(alert.severity)}</span>
-                      {' • '}
-                      <span>Học sinh: {alert.affectedStudents}</span>
-                    </div>
-                    <div style={{ fontSize: '0.8em', color: '#999', marginTop: '0.5rem' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '0.9em',
+              marginTop: '1rem'
+            }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>Chuyến</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>Mô tả</th>
+                  <th style={{ padding: '8px', textAlign: 'center' }}>Mức độ</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>Thời gian gửi</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>Trạng thái</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>Giải quyết lúc</th>
+                  <th style={{ padding: '8px', textAlign: 'center' }}>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {alertHistory.map((alert) => (
+                  <tr key={alert.alertID} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ padding: '8px' }}>#{alert.tripID}</td>
+                    <td style={{ padding: '8px' }}>{alert.description}</td>
+                    <td style={{
+                      padding: '8px',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      color: alert.severity === 'CRITICAL' ? 'red' : alert.severity === 'WARNING' ? 'orange' : 'green'
+                    }}>
+                      {alert.severity}
+                    </td>
+                    <td style={{ padding: '8px' }}>
                       {new Date(alert.createdAt).toLocaleString('vi-VN')}
-                      {alert.resolvedAt && ` • Giải quyết: ${new Date(alert.resolvedAt).toLocaleString('vi-VN')}`}
-                    </div>
-                  </div>
-                  {alert.resolvedAt ? (
-                    <span style={{ backgroundColor: '#E8F5E9', color: '#2E7D32', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', whiteSpace: 'nowrap', marginLeft: '1rem' }}>
-                      ✅ Đã giải quyết
-                    </span>
-                  ) : (
-                    <span style={{ backgroundColor: '#FFF3E0', color: '#E65100', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.8rem', whiteSpace: 'nowrap', marginLeft: '1rem' }}>
-                      ⏳ Đang xử lý
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td style={{ padding: '8px' }}>
+                      {alert.resolvedAt ? (
+                        <span style={{ color: 'green' }}>✅ Đã giải quyết</span>
+                      ) : (
+                        <span style={{ color: 'orange' }}>⏳ Đang xử lý</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '8px' }}>
+                      {alert.resolvedAt ? (
+                        <span style={{ fontSize: '0.85em' }}>
+                          {new Date(alert.resolvedAt).toLocaleString('vi-VN')}
+                          {alert.resolvedBy && <div style={{ color: '#666' }}>by ID: {alert.resolvedBy}</div>}
+                        </span>
+                      ) : (
+                        <span style={{ color: '#ccc' }}>-</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                      {!alert.resolvedAt && (
+                        <button
+                          onClick={() => handleResolveAlert(alert.alertID)}
+                          style={{
+                            padding: '4px 8px',
+                            backgroundColor: '#4CAF50',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '0.85em'
+                          }}
+                        >
+                          Đã xử lý
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
+        
+        <p className={styles.contactLinks}>
+          <a href="mailto:support@ssb1.0.edu.vn">Liên hệ hỗ trợ</a>
+        </p>
       </div>
     </div>
   );
