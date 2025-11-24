@@ -49,8 +49,13 @@ export default function LoginPage() {
 
       // Lưu thông tin vào localStorage
       localStorage.setItem('userRole', data.role);
-      localStorage.setItem('userID', data.userID.toString());
+      // localStorage.setItem('userID', data.userID.toString());
+      // Convert userID to string to avoid null issue
+      localStorage.setItem('userID', data.userID ? data.userID.toString() : "");
       localStorage.setItem('fullName', data.fullName);
+
+      //  Debug log: Retrieved from localStorage - role: parent parentID: null
+      console.log('->_<- Saved to localStorage - role:', data.role, 'userID:', data.userID, 'fullName:', data.fullName);
       
       if (data.role === 'driver' && data.driverID) {
         localStorage.setItem('driverID', data.driverID.toString());

@@ -39,7 +39,8 @@ export default function DriverPage() {
 
   useEffect(() => {
     const role = localStorage.getItem('userRole');
-    const storedDriverID = localStorage.getItem('driverID');
+    const storedDriverID = localStorage.getItem('userID');
+    // const storedDriverID = localStorage.getItem('driverID');
     
     if (role !== 'driver' || !storedDriverID) {
       alert('Vui lòng đăng nhập với tài khoản tài xế!');

@@ -28,8 +28,22 @@ export default function ParentJourneyPage() {
   const [parentID, setParentID] = useState<number | null>(null);
 
   useEffect(() => {
+
+    // From localStorage: 
+    // Lưu thông tin vào localStorage
+      // localStorage.setItem('userRole', data.role);
+      // Convert userID to string to avoid null issue
+      // localStorage.setItem('userID', data.userID ? data.userID.toString() : "");
+      // localStorage.setItem('fullName', data.fullName);
+
     const role = localStorage.getItem('userRole');
-    const storedParentID = localStorage.getItem('parentID');
+    const storedParentID = localStorage.getItem('userID');  // use 'userID', NOT parentID
+
+    // const role = localStorage.getItem('userRole') || 'parent';
+    // const storedParentID = localStorage.getItem('parentID') || "11";
+
+    console.log('->_<- Retrieved from localStorage - role:', role, 'parentID:', storedParentID);   
+
     if (role !== 'parent' || !storedParentID) {
       alert('Vui lòng đăng nhập với tài khoản phụ huynh!');
       router.push('/login');
