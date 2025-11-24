@@ -16,7 +16,7 @@ import { Bus } from '@/lib/data_buses';
 import styles from './page.module.css';
 // Add socket.io-client for client
 import { io } from 'socket.io-client';
-import MapRealtime from '@/components/MapRealtime';
+// import MapRealtime from '@/components/MapRealtime'; // REMOVED: Component test cũ gây nhiễu socket
 import BusMap_GG from '@/components/BusMap_GG';
 
 // import MapForm from '@/components/MapForm';
@@ -189,10 +189,11 @@ export default function TrackPage() {
 
         </div>
 
-        {/* Testing */}
+        {/* REMOVED: MapRealtime component test - gây nhiễu socket với fake data
         <div style={{ display: 'none' }}>
           <MapRealtime />
         </div>
+        */}
 
         <div className={styles.panelArea}>
           {/* Button Di chuyển */}

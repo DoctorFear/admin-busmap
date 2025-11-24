@@ -1,4 +1,13 @@
-import { getAllTrips, createTrip, updateTrip, deleteTrip, getTripsByDriverID, updateTripStatusWithTime, getTripStatus } from "../models/tripModel.js";
+import { 
+  getAllTrips, 
+  createTrip, 
+  updateTrip, 
+  deleteTrip, 
+  getTripsByDriverID, 
+  updateTripStatusWithTime, 
+  getTripStatus,
+  getActiveBusAssignments 
+} from "../models/tripModel.js";
 
 export const getSchedules = (req, res) => {
   getAllTrips((err, result) => {
@@ -100,6 +109,40 @@ export const checkTripStatus = (req, res) => {
       status,
       message: statusMessages[status],
       tripCompleted: status === "COMPLETED",
+    });
+  });
+};
+
+// ====================================================================
+// LẤY DANH SÁCH BUSES ĐƯỢC ASSIGN CHO ROUTES HÔM NAY
+// ====================================================================
+/**
+ * GET /api/trips/active-buses
+ * 
+ * RESPONSE:
+ * {
+ *   ok: true,
+ *   data: [
+ *     { routeID: 1, busID: 2, licensePlate: "51A-P-66560", ... },
+ *     { routeID: 2, busID: 5, licensePlate: "51B-12345", ... },
+ *     ...
+ *   ]
+ * }
+ */
+export const getActiveBuses = (req, res) => {
+  getActiveBusAssignments((err, results) => {
+    if (err) {
+      console.error("[scheduleController] Lỗi khi lấy active buses:", err);
+      return res.status(500).json({ 
+        ok: false, 
+        error: "Lỗi truy vấn database" 
+      });
+    }
+    
+    console.log(`[scheduleController] Trả về ${results.length} active bus assignments`);
+    res.json({ 
+      ok: true, 
+      data: results 
     });
   });
 };

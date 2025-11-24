@@ -280,11 +280,17 @@ export default function BusMap_GG({
   }, [buses, routes]);
 
   // ====================================================================
-  // [2] TỰ ĐỘNG TẠO BUS CHO MỖI ROUTE ĐƯỢC CHỌN
+  // [2] TỰ ĐỘNG TẠO BUS CHO MỖI ROUTE ĐƯỢC CHỌN (CHỈ CHO ADMIN, KHÔNG CHO PARENT)
   // ====================================================================
   // Khi chọn route → tạo bus ở điểm bắt đầu (SGU)
   // Mỗi route có 1 bus riêng
   useEffect(() => {
+    // Nếu có buses prop từ parent → không tự tạo buses
+    if (buses && buses.length > 0) {
+      console.log("[2] Có buses prop từ parent, skip auto-create buses");
+      return;
+    }
+    
     console.log("[2] Kiểm tra buses cho routes:", selectedRouteIds);
     
     selectedRouteIds.forEach((routeId) => {
@@ -322,7 +328,7 @@ export default function BusMap_GG({
         console.log(`[2] Xóa bus của tuyến ${routeId}`);
       }
     });
-  }, [selectedRouteIds, routes]);
+  }, [selectedRouteIds, routes, buses]); // ---UPDATED: Thêm buses vào dependency---
 
 
   // ====================================================================

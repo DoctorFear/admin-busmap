@@ -46,3 +46,4 @@ next-env.d.ts
 
 # docs and fix log
 /zdoc_and_fix
+/scripts

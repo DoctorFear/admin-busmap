@@ -102,3 +102,53 @@ export const updateTripStatusWithTime = (tripID, status, datetime, callback) => 
 
   db.query(sql, params, callback);
 };
+
+// ====================================================================
+// LẤY DANH SÁCH BUSES ĐANG ĐƯỢC ASSIGN CHO ROUTES HÔM NAY
+// ====================================================================
+/**
+ * Lấy danh sách buses đang được assign cho routes hôm nay
+ * 
+ * LOGIC:
+ * - Lấy từ bảng Trip: assignedBusID, routeID
+ * - Filter: tripDate = hôm nay, status IN ('PLANNED', 'RUNNING')
+ * - JOIN với Bus để lấy thông tin bus (licensePlate, model, ...)
+ * - Mỗi route có thể có nhiều trips, nhưng mỗi trip chỉ có 1 bus
+ * 
+ * RETURN:
+ * Array of { routeID, busID, licensePlate, model, capacity, ... }
+ */
+export const getActiveBusAssignments = (callback) => {
+  const sql = `
+    SELECT 
+      t.routeID,
+      t.assignedBusID AS busID,
+      b.licensePlate,
+      b.model,
+      b.capacity,
+      b.status AS busStatus,
+      r.routeName,
+      r.description AS routeDescription,
+      t.tripID,
+      t.tripDate,
+      t.startTime,
+      t.endTime,
+      t.status AS tripStatus
+    FROM Trip t
+    INNER JOIN Bus b ON t.assignedBusID = b.busID
+    INNER JOIN Route r ON t.routeID = r.routeID
+    WHERE t.status IN ('PLANNED', 'RUNNING')
+      AND t.assignedBusID IS NOT NULL
+    ORDER BY t.routeID ASC
+  `;
+  
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("[tripModel] Lỗi khi query active bus assignments:", err);
+      return callback(err, null);
+    }
+    
+    console.log(`[tripModel] Tìm thấy ${results.length} bus assignments hôm nay`);
+    callback(null, results);
+  });
+};

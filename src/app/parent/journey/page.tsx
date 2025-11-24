@@ -27,6 +27,8 @@ export default function ParentJourneyPage() {
   // Lấy parentID từ localStorage
   const [parentID, setParentID] = useState<number | null>(null);
 
+
+
   useEffect(() => {
 
     // From localStorage: 
@@ -57,7 +59,7 @@ export default function ParentJourneyPage() {
   useEffect(() => {
     // Chỉ fetch khi đã có parentID (không null)
     if (!parentID) {
-      console.log('[ParentJourneyPage] Chưa có parentID, bỏ qua fetch');
+      // console.log('[ParentJourneyPage] Chưa có parentID, bỏ qua fetch');
       return;
     }
 
@@ -89,7 +91,7 @@ export default function ParentJourneyPage() {
         const busIDsSet = new Set<number>(data.map((item: any) => item.busID));
         setAllowedBusIDs(busIDsSet);
         
-        console.log('✅ Parent được xem buses:', Array.from(busIDsSet));
+        console.log('----------- Parent được xem buses -----------\n', Array.from(busIDsSet), '\n----------------------');
         
         // Convert sang định dạng Bus cho BusMap_GG
         const busesData: Bus[] = data.map((item: any) => ({
@@ -105,8 +107,8 @@ export default function ParentJourneyPage() {
           }),
           x: 0,
           y: 0,
-          lat: 10.759983, // Default SGU, sẽ được cập nhật bởi Socket.IO
-          lng: 106.682257,
+          lat: 10.759983082120561, // Default SGU, sẽ được cập nhật bởi Socket.IO
+          lng: 106.68225725256899,
           lastUpdate: new Date(),
           isTracking: true,
           isOnline: true,

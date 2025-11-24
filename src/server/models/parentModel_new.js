@@ -91,54 +91,33 @@ export const deleteParent = (id, callback) => {
  * 6. Trả về thông tin: busID, licensePlate, routeID, routeName, tripStatus
  */
 export const getStudentBusesByParent = (parentId, callback) => {
-  const sql_old = `
+  const sql = `
     SELECT DISTINCT
-      b.busID,
+      t.assignedBusID AS busID,
       b.licensePlate,
-      b.capacity,
-      b.model,
-      b.status AS busStatus,
-      r.routeID,
+      bs.routeID,
       r.routeName,
       r.description AS routeDescription,
-      r.estimatedTime,
       t.tripID,
       t.tripDate,
       t.startTime,
       t.endTime,
       t.status AS tripStatus,
       s.studentID,
-      s.fullName AS studentName,
-      br.status AS boardingStatus
+      s.fullName AS studentName
     FROM Student s
     INNER JOIN BoardingRecord br ON s.studentID = br.studentID
     INNER JOIN Trip t ON br.tripID = t.tripID
     INNER JOIN Bus b ON t.assignedBusID = b.busID
-    INNER JOIN Route r ON t.routeID = r.routeID
+    INNER JOIN BusStop bs ON bs.parentID = s.parentUserID
+    INNER JOIN Route r ON bs.routeID = r.routeID
     WHERE s.parentUserID = ?
       AND t.status IN ('PLANNED', 'RUNNING')
       AND t.tripDate = CURDATE()
     ORDER BY t.startTime
     LIMIT 1
   `;
-  const sql = `
-    SELECT DISTINCT
-      bs.routeID, 
-      t.assignedBusID AS busID,
-      
-      b.licensePlate,
-      r.routeName,
-      r.description AS routeDescription,
-      t.status AS tripStatus
-
-    FROM BusStop bs
-    JOIN Trip t ON bs.routeID = t.routeID
-    JOIN Bus b ON t.assignedBusID = b.busID
-    JOIN Route r ON bs.routeID = r.routeID
-    JOIN Student s ON s.parentUserID = ?
-    WHERE t.status IN ('PLANNED', 'RUNNING')
-    LIMIT 1
-  `;
+  
   db.query(sql, [parentId], (err, results) => {
     if (err) return callback(err, null);
     callback(null, results);
