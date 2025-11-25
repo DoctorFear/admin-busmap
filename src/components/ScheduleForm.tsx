@@ -211,7 +211,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
     return { isDuplicate: false, matchedRouteID: null };
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm()) return;
     
     // ====================================================================
@@ -238,10 +238,10 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
     }
     
     // ====================================================================
-    // ROUTE HỢP LỆ - TIẾP TỤC LƯU
+    // ROUTE HỢP LỆ - GỬI LÊN SERVER
     // ====================================================================
     console.log("=".repeat(60));
-    console.log("[OK] ROUTE HỢP LỆ - KHÔNG TRÙNG LẶP");
+    console.log("[OK] ROUTE HỢP LỆ - BẮT ĐẦU LƯU VÀO DATABASE");
     console.log("=".repeat(60));
     console.log("[ScheduleForm] Submit data:", {
       routeName: formData.routeName,
@@ -255,8 +255,64 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
     });
     console.log("=".repeat(60));
     
-    onSubmit(formData);
-    setNotification(initialData ? 'Cập nhật lịch trình thành công!' : 'Tạo lịch trình thành công!', 'success');
+    try {
+      // Gửi request lên server
+      const response = await fetch(`${API_BASE}/api/routes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          routeName: formData.routeName,
+          waypoints: formData.waypoints,
+          startTime: formData.startTime,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          days: formData.days
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Lỗi khi tạo route');
+      }
+
+      console.log("=".repeat(60));
+      console.log("[OK] [OK] [OK] LƯU ROUTE THÀNH CÔNG!");
+      console.log("=".repeat(60));
+      console.log("Response từ server:", result);
+      console.log("  - Route ID:", result.data.routeID);
+      console.log("  - Route Name:", result.data.routeName);
+      console.log("  - Total Bus Stops:", result.data.totalBusStops);
+      console.log("=".repeat(60));
+
+      setNotification('Tạo lịch trình thành công!', 'success');
+      
+      // Refresh danh sách routes hiện có
+      fetch(`${API_BASE}/api/routes/bus-stops`)
+        .then((res) => res.json())
+        .then((data) => {
+          setExistingRoutes(data);
+          console.log("[ScheduleForm] Đã refresh danh sách routes");
+        })
+        .catch((err) => console.error("Error refreshing routes:", err));
+
+      // Reset form hoặc gọi callback
+      onSubmit(formData);
+      
+    } catch (error) {
+      console.error("=".repeat(60));
+      console.error("[X] LỖI KHI LƯU ROUTE:");
+      console.error("=".repeat(60));
+      console.error(error);
+      console.error("=".repeat(60));
+      
+      setNotification(
+        `Lỗi khi lưu route: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'error'
+      );
+    }
   };
 
   const handleDayToggle = (day: string) => {
