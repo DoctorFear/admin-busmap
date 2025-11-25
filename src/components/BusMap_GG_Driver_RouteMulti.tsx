@@ -24,6 +24,7 @@ const containerStyle = { width: "100%", height: "700px" };  // Map container sty
 
 // Mảng màu cho các cluster (mỗi cụm một màu riêng biệt cho markers)
 const ROUTE_COLORS = [
+  "#f44336", // Đỏ
   "#008cffff", // Xanh dương
   "#26d22bff", // Xanh lá
   "#ff9800", // Cam
@@ -31,9 +32,8 @@ const ROUTE_COLORS = [
   "#00bcd4", // Cyan
   "#ff5722", // Đỏ cam
   "#795548", // Nâu
+  "#607d8b", // Xanh xám
   "#e91e63", // Hồng
-  // "#607d8b", // Xanh xám
-  // "#f44336", // Đỏ
 ];
 
 
@@ -605,15 +605,17 @@ export default function BusMap_GG({
   // [5] TẠO POLYLINES CHO CÁC TUYẾN ĐỂ RENDER TRÊN MAP
   // ====================================================================
   // 
-  // CHIẾN LƯỢC MỚI (DRIVER MODE):
-  // - CHỈ RENDER polylines của routes ĐƯỢC CHỌN
-  // - Routes KHÔNG ĐƯỢC CHỌN sẽ KHÔNG được render (không có trong mảng polylines)
+  // CHIẾN LƯỢC ĐƠN GIẢN:
+  // - Render TẤT CẢ polylines có trong directionsPaths
+  // - Nếu tuyến ĐƯỢC CHỌN (trong selectedRouteIds) → dùng màu thường
+  // - Nếu tuyến KHÔNG ĐƯỢC CHỌN (bỏ chọn) → đổi sang màu XÁM
   // 
   // FLOW:
-  // 1. Duyệt qua selectedRouteIds (chỉ routes được chọn)
-  // 2. Lấy path từ directionsPaths
-  // 3. Tạo polyline với màu và opacity 0.9
-  // 4. Routes không được chọn → KHÔNG RENDER
+  // 1. Duyệt qua TẤT CẢ routes có path trong directionsPaths
+  // 2. Kiểm tra route đó có được chọn không (trong selectedRouteIds)
+  // 3. Nếu ĐƯỢC CHỌN → màu bình thường (đỏ, xanh, ...)
+  //    Nếu BỎ CHỌN → màu xám (#999999)
+  // 4. Render polyline với màu tương ứng
   //
   const polylines = useMemo(() => {
     console.log("[5] Bắt đầu tạo polylines...", {
@@ -623,10 +625,10 @@ export default function BusMap_GG({
       totalPaths: Object.keys(directionsPaths).length,
     });
 
-    // CHỈ duyệt qua ROUTES ĐƯỢC CHỌN (selectedRouteIds)
-    // Routes không được chọn sẽ KHÔNG được render
-    const out = selectedRouteIds
-      .map((id) => {
+    // Duyệt qua TẤT CẢ routes có path (không chỉ selectedRouteIds)
+    const out = Object.keys(directionsPaths)
+      .map((idStr) => {
+        const id = parseInt(idStr);
         const path = directionsPaths[id];
         
         // Validate path
@@ -636,27 +638,44 @@ export default function BusMap_GG({
         }
         
         // ====================================================================
-        // GÁN MÀU CHO ROUTE - MỖI ROUTE MỘT MÀU RIÊNG DỰA VÀO ROUTE ID
-        // VD: Route 18 → màu index 18, Route 39 → màu index 39
+        // KIỂM TRA: Tuyến này có được chọn không?
         // ====================================================================
-        const color = ROUTE_COLORS[id % ROUTE_COLORS.length];
-        const opacity = 0.9; // Hiển thị rõ ràng
+        const isSelected = selectedRouteIds.includes(id);
         
-        console.log(`[5] ->_<- Tuyến ${id}: ${path.length} điểm, màu ${color} (routeID ${id} % ${ROUTE_COLORS.length})`);
+        // ====================================================================
+        // GÁN MÀU VÀ OPACITY:
+        // - Nếu ĐƯỢC CHỌN → dùng màu từ ROUTE_COLORS + opacity 0.8
+        // - Nếu BỎ CHỌN → opacity 0 (trong suốt hoàn toàn)
+        // ====================================================================
+        let color: string;
+        let opacity: number;
+        
+        if (isSelected) {
+          // Tuyến được chọn → màu bình thường + opacity 0.8
+          const selectedIndex = selectedRouteIds.indexOf(id);
+          color = ROUTE_COLORS[selectedIndex % ROUTE_COLORS.length];
+          opacity = 0.8; // Hiển thị rõ
+        } else {
+          // Tuyến bỏ chọn → opacity 0 (trong suốt hoàn toàn)
+          color = "#999999"; // Màu không quan trọng vì opacity = 0
+          opacity = 0; // Trong suốt
+        }
+        
+        console.log(`[5] ->_<- Tuyến ${id}: ${path.length} điểm, ${isSelected ? 'CHỌN' : 'BỎ CHỌN'} → opacity ${opacity}`);
         
         // Trả về object chứa thông tin polyline
         return { 
           id,           // ID của tuyến
           path,         // Array of {lat, lng} từ Directions API
-          color,        // Màu của polyline - MỖI ROUTE MỘT MÀU RIÊNG
-          opacity,      // Độ trong suốt = 0.9
-          isSelected: true, // Luôn true vì chỉ render routes được chọn
+          color,        // Màu của polyline
+          opacity,      // Độ trong suốt (0 = ẩn, 0.8 = hiện)
+          isSelected,   // Trạng thái chọn/bỏ chọn (để log)
         };
       })
       .filter(Boolean) as { id: number; path: { lat: number; lng: number }[]; color: string; opacity: number; isSelected: boolean }[];
     
-    console.log("[5] ->_<- Đã tạo", out.length, "polylines (CHỈ ROUTES ĐƯỢC CHỌN):", 
-      out.map(p => `ID=${p.id} màu=${p.color}`));
+    console.log("[5] ->_<- Đã tạo", out.length, "polylines:", 
+      out.map(p => `ID=${p.id} ${p.isSelected ? 'CHỌN' : 'XÁM'}`));
     return out;
   }, [selectedRouteIds, directionsPaths]);
 
@@ -804,33 +823,37 @@ export default function BusMap_GG({
         {/* [7] VẼ POLYLINE (ĐƯỜNG ĐI) CHO MỖI TUYẾN */}
         {/* ============================================================ */}
         {/* 
-        CHIẾN LƯỢC MỚI (DRIVER MODE):
-        - CHỈ render polylines của routes ĐƯỢC CHỌN
-        - Routes KHÔNG ĐƯỢC CHỌN sẽ KHÔNG được render (không có trong DOM)
+        CHIẾN LƯỢC ĐƠN GIẢN:
+        - Render TẤT CẢ polylines (cả được chọn và bỏ chọn)
+        - Nếu ĐƯỢC CHỌN → màu bình thường (đỏ, xanh, lục, ...)
+        - Nếu BỎ CHỌN → màu XÁM (#999999) để làm mờ đi
         
         CÁCH HOẠT ĐỘNG:
-        1. Nhận polyline objects từ useMemo [5] - CHỈ chứa routes được chọn
-        2. Render Polyline với màu và opacity 0.9
-        3. Routes không được chọn → KHÔNG có trong mảng → KHÔNG render
+        1. Nhận polyline object từ useMemo [5]
+        2. polyline.color đã được tính sẵn:
+           - Tuyến được chọn → màu từ ROUTE_COLORS
+           - Tuyến bỏ chọn → màu xám (#999999)
+        3. Render Polyline với màu tương ứng
+        4. TẤT CẢ polylines đều LUÔN HIỆN, chỉ khác màu
         
         PROPS:
         - key: ID duy nhất của polyline
         - path: Array of {lat, lng} - đường đi từ Directions API
-        - options.strokeColor: Màu đường
-        - options.strokeOpacity: Độ trong suốt = 0.9 (hiển thị rõ)
+        - options.strokeColor: Màu đường (bình thường hoặc xám)
+        - options.strokeOpacity: Độ trong suốt (0.8 = 80% đậm)
         - options.strokeWeight: Độ dày đường (5px)
         */}
-        {(console.log("[7] ->_<- Render", polylines.length, "polylines (CHỈ ROUTES ĐƯỢC CHỌN):", 
+        {(console.log("[7] ->_<- Render", polylines.length, "polylines:", 
           polylines.map(p => `ID=${p.id} màu=${p.color}`)), null)}
         {polylines.map((pl) => {
-          console.log(`[7.1] Render polyline tuyến ${pl.id}: màu = ${pl.color}, opacity = ${pl.opacity}`);
+          console.log(`[7.1] Render polyline tuyến ${pl.id}: opacity = ${pl.opacity} (${pl.isSelected ? 'CHỌN' : 'ẨN'})`);
           return (
             <Polyline
               key={`polyline-${pl.id}`}
               path={pl.path}
               options={{
                 strokeColor: pl.color,        // Màu của polyline
-                strokeOpacity: pl.opacity,    // Độ trong suốt = 0.9
+                strokeOpacity: pl.opacity,    // Độ trong suốt ĐỘNG (0 = ẩn, 0.8 = hiện)
                 strokeWeight: 5,              // Độ dày đường (5px)
               }}
             />
