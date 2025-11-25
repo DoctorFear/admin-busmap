@@ -162,7 +162,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
 
     // Nếu không có parentID nào → không thể trùng (vì route mới toàn địa chỉ tự do)
     if (newParentIDs.length === 0) {
-      console.log("[Check Duplicate] [X] Route mới không có parentID nào → Không trùng");
+      console.log("[Check Duplicate] ❌ Route mới không có parentID nào → Không trùng");
       return { isDuplicate: false, matchedRouteID: null };
     }
 
@@ -189,13 +189,13 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
       // 1. Số lượng waypoints bằng nhau
       // 2. Tất cả parentID giống nhau (đã sort)
       if (sortedExistingParentIDs.length === newParentIDs.length) {
-        console.log(`[Check Duplicate]   [OK] Số lượng bằng nhau (${sortedExistingParentIDs.length})`);
+        console.log(`[Check Duplicate]   ✓ Số lượng bằng nhau (${sortedExistingParentIDs.length})`);
         
         const isIdentical = sortedExistingParentIDs.every((id, index) => id === newParentIDs[index]);
         
         if (isIdentical) {
-          console.log(`[Check Duplicate]   [OK] Tất cả parentID giống nhau`);
-          console.log(`[Check Duplicate] [!!!]  TRÙNG LẶP VỚI ROUTE ${routeID}!`);
+          console.log(`[Check Duplicate]   ✓ Tất cả parentID giống nhau`);
+          console.log(`[Check Duplicate] ⚠️  TRÙNG LẶP VỚI ROUTE ${routeID}!`);
           console.log("[Check Duplicate] ===== KẾT THÚC KIỂM TRA =====");
           return { isDuplicate: true, matchedRouteID: parseInt(routeID) };
         } else {
@@ -206,7 +206,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
       }
     }
 
-    console.log("[Check Duplicate] [OK] Không trùng với route nào");
+    console.log("[Check Duplicate] ✓ Không trùng với route nào");
     console.log("[Check Duplicate] ===== KẾT THÚC KIỂM TRA =====");
     return { isDuplicate: false, matchedRouteID: null };
   };
@@ -221,7 +221,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
     
     if (duplicateCheck.isDuplicate) {
       console.log("=".repeat(60));
-      console.log("[X] CẢNH BÁO: ROUTE TRÙNG LẶP!");
+      console.log("❌ CẢNH BÁO: ROUTE TRÙNG LẶP!");
       console.log("=".repeat(60));
       console.log("Route mới TRÙNG với Route ID:", duplicateCheck.matchedRouteID);
       console.log("Thông tin route mới:");
@@ -241,7 +241,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
     // ROUTE HỢP LỆ - TIẾP TỤC LƯU
     // ====================================================================
     console.log("=".repeat(60));
-    console.log("[OK] ROUTE HỢP LỆ - KHÔNG TRÙNG LẶP");
+    console.log("✓ ROUTE HỢP LỆ - KHÔNG TRÙNG LẶP");
     console.log("=".repeat(60));
     console.log("[ScheduleForm] Submit data:", {
       routeName: formData.routeName,

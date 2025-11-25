@@ -1,6 +1,6 @@
 import { getBusStopsByRoute } from "../models/busStopModel.js";
 import { getRouteDetailsWithCoords } from "../models/routeDetailModel.js";
-import { getAllRoutes } from "../models/routeModel.js";
+import { getAllRoutes, getAllRoutesToCheckExistedInBusStop } from "../models/routeModel.js";
 
 export const getRouteStops = (req, res) => {
   const routeID = req.params.id;
@@ -63,6 +63,24 @@ export const getRoutes = (_req, res) => {
       routeID: r.routeID,
       routeName: r.routeName,
       estimatedTime: r.estimatedTime,
+    }));
+    res.json(routes);
+  });
+};
+
+
+
+// Lấy toàn bộ routes trong BusStop để kiểm tra route mới thêm vào có tồn tại không
+export const getAllRoutesToCheckExistedInBusStopController = (_req, res) => {
+  console.log("[RouteController] Getting all routes in BusStop to check existed routes...");
+  getAllRoutesToCheckExistedInBusStop((err, results) => {
+    if (err) {
+      console.error("- Lỗi khi truy vấn tất cả routes trong BusStop:", err);
+      return res.status(500).json({ error: "Lỗi server khi lấy tất cả tuyến đường" });
+    }
+    const routes = (results || []).map((r) => ({
+      routeID: r.routeID,
+      parentID: r.parentID,
     }));
     res.json(routes);
   });
