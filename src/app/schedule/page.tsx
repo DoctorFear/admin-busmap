@@ -18,6 +18,9 @@ import styles from './page.module.css';
 // import BusMap_GG from '@/components/BusMap_GG';
 
 export default function SchedulePage() {
+
+  console.log("Render SchedulePage");
+
   // const [schedules, setSchedules] = useState<ScheduleItem[]>(mockSchedules); // sử dụng dữ liệu mẫu
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   useEffect(() => {

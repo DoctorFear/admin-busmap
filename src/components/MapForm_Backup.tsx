@@ -19,14 +19,6 @@ interface Coordinate {
   lng: number;
 }
 
-
-
-const center = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
-const API_BASE = "http://localhost:8888";
-const containerStyle = { width: "100%", height: "700px" };
-
-
-
 export default function MapForm({ roads }: MapFormProps) {
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
@@ -152,8 +144,7 @@ export default function MapForm({ roads }: MapFormProps) {
 
       {/* googleApiKey have loaded in app/layout.tsx */}
       <GoogleMap
-        // mapContainerStyle={{ width: "100%", height: "800px" }}
-        mapContainerStyle={containerStyle}
+        mapContainerStyle={{ width: "100%", height: "800px" }}
         center={mapCenter}
         zoom={13}
       >
