@@ -62,17 +62,19 @@ router.post('/send', async (req, res) => {
     const [alertResult] = await db.promise().query(alertQuery, [tripID, driverID, finalSeverity, alertMessage]);
     const alertID = alertResult.insertId;
 
-    // Step 3: Create Notification records for each parent
+
+    // Step 3: Create Notification records for each parent and admin
     const notifications = [];
     const notificationQuery = `
       INSERT INTO Notification (toUserID, fromUserID, type, title, content, sentAt)
       VALUES (?, ?, ?, ?, ?, NOW())
     `;
 
-    for (const parent of parentUsers) {
-      const notificationTitle = getAlertTitle(alertType);
-      const notificationContent = `Cảnh báo từ tài xế: ${alertMessage}\nChuyến xe: ${tripID}\nMức độ: ${severity}`;
+    const notificationTitle = getAlertTitle(alertType);
+    const notificationContent = `Cảnh báo từ tài xế: ${alertMessage}\nChuyến xe: ${tripID}\nMức độ: ${severity}`;
 
+    // Gửi cho từng parent
+    for (const parent of parentUsers) {
       await db.promise().query(notificationQuery, [
         parent.parentUserID,
         driverID,
@@ -88,6 +90,22 @@ router.post('/send', async (req, res) => {
         phone: parent.phone
       });
     }
+
+    // Gửi cho admin (userID = 1)
+    await db.promise().query(notificationQuery, [
+      1, // admin userID
+      driverID,
+      'INCIDENT',
+      notificationTitle,
+      notificationContent
+    ]);
+
+    notifications.push({
+      parentUserID: 1,
+      parentName: 'Admin',
+      email: '',
+      phone: ''
+    });
 
     // Response
     return res.status(200).json({
@@ -125,7 +143,7 @@ router.get('/my-trips/:driverID', (req, res) => {
       t.endTime,
       t.status,
       r.routeName,
-      COUNT(br.studentID) as studentCount,
+      COUNT(DISTINCT br.studentID) as studentCount,
       GROUP_CONCAT(DISTINCT s.fullName) as studentNames
     FROM Trip t
     LEFT JOIN Route r ON t.routeID = r.routeID
@@ -229,9 +247,36 @@ router.put('/resolve/:alertID', async (req, res) => {
       });
     }
 
+    // Lấy thông tin alert để gửi notification
+    const [alertRows] = await db.promise().query(
+      `SELECT tripID, description, severity FROM Alert WHERE alertID = ?`,
+      [alertID]
+    );
+    if (!alertRows || alertRows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy thông tin cảnh báo' });
+    }
+    const { tripID, description, severity } = alertRows[0];
+
+    // Lấy danh sách parent liên quan đến trip
+    const [parentRows] = await db.promise().query(
+      `SELECT DISTINCT s.parentUserID FROM BoardingRecord br JOIN Student s ON br.studentID = s.studentID WHERE br.tripID = ? AND s.parentUserID IS NOT NULL`,
+      [tripID]
+    );
+
+    // Gửi notification cho admin
+    const notificationQuery = `INSERT INTO Notification (toUserID, fromUserID, type, title, content, sentAt) VALUES (?, ?, ?, ?, ?, NOW())`;
+    const notificationTitle = 'Cảnh báo đã được xử lý';
+    const notificationContent = `Cảnh báo đã được xử lý cho chuyến xe: ${tripID}`;
+    await db.promise().query(notificationQuery, [1, resolvedBy, 'INCIDENT', notificationTitle, notificationContent]);
+
+    // Gửi notification cho từng parent
+    for (const parent of parentRows) {
+      await db.promise().query(notificationQuery, [parent.parentUserID, resolvedBy, 'INCIDENT', notificationTitle, notificationContent]);
+    }
+
     res.json({
       success: true,
-      message: 'Cảnh báo đã được đánh dấu là đã giải quyết',
+      message: 'Cảnh báo đã được đánh dấu là đã giải quyết và gửi thông báo cho admin, parent',
       data: { alertID, resolvedAt: new Date(), resolvedBy }
     });
   } catch (error) {

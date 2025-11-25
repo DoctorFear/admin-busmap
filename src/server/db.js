@@ -2,9 +2,9 @@
 // - Mọi người có thể chỉnh các constant cho phù hợp với MySQL của máy mình
 import mysql from 'mysql2';
 
-const SQL_DATABASE_NAME = 'SchoolBusManagement_VFinal';
+const SQL_DATABASE_NAME = 'schoolbusmanagement';
 const SQL_USER = 'root';
-const SQL_PASSWORD = ''; // Thay đổi nếu cần
+const SQL_PASSWORD = 'your_password'; // Thay đổi nếu cần
 
 
 
