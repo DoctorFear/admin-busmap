@@ -7,6 +7,8 @@ import initTrackingSocket from "./sockets/trackingSocket.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import path from 'path';
+import fs from "fs";
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -33,6 +35,13 @@ app.use(cors({
 
 app.use(cookieParser());
 app.use(express.json());
+
+// --------- Serve static uploads ----------
+const uploadDir = path.join('public', 'uploads', 'students');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+app.use('/uploads', express.static(path.join('public', 'uploads')));
 
 // ---------- Session ----------
 app.use(session({

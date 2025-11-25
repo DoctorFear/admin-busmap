@@ -1,9 +1,13 @@
+import multer from 'multer';
+import path from 'path';
+
 import { 
   getStudentsByDriverID, 
   getTripIDByStudent,
   updateStudentStatus,
   checkTripCompletion,
-  getStudentInfoByParentId
+  getStudentInfoByParentId,
+  updateStudentPhoto
 } from "../models/studentsModel.js";
 
 import { 
@@ -135,3 +139,53 @@ export const getStudentsByParent = (req, res) => {
     res.status(200).json(students);
   });
 };
+
+
+
+// Config multer để upload ảnh
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/students/'); // Tạo folder này
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `student_${Date.now()}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Max 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Chỉ chấp nhận file ảnh (JPEG, PNG)'));
+    }
+  }
+});
+
+// upload ảnh
+export const uploadStudentPhoto = (req, res) => {
+  const studentId = req.params.studentId;
+  
+  if (!req.file) {
+    return res.status(400).json({ error: 'Không có file được upload' });
+  }
+  
+  const photoUrl = `/uploads/students/${req.file.filename}`;
+  
+  updateStudentPhoto(studentId, photoUrl, (err) => {
+    if (err) {
+      console.error('Lỗi update photo:', err);
+      return res.status(500).json({ error: 'Lỗi khi lưu ảnh' });
+    }
+    res.json({ message: 'Upload ảnh thành công!', photoUrl });
+  });
+};
+// Export upload 
+export { upload };

@@ -139,3 +139,9 @@ export const getStudentInfoByParentId = (parentId, callback) => {
     callback(null, results[0]);
   });
 };
+
+// Update photoUrl
+export const updateStudentPhoto = (studentId, photoUrl, callback) => {
+  const sql = 'UPDATE Student SET photoUrl = ? WHERE studentID = ?';
+  db.query(sql, [photoUrl, studentId], callback);
+};
