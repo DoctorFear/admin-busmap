@@ -20,4 +20,8 @@ router.delete("/:id", removeSchedule);
 router.get("/driver/:driverID", getSchedulesByDriverID);
 router.put("/status/:tripID", checkTripStatus);
 router.post("/start/:tripID", startTrip); 
+
+
+// Admin, schedule (create, read, update, delete)
+
 export default router;

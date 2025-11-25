@@ -1,3 +1,84 @@
+
+import db from "./db.js";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import initTrackingSocket from "./sockets/trackingSocket.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+
+// Routes
+import authRoutes from "./routes/authRoutes.js";
+import busRoutes from "./routes/busRoutes.js";
+import scheduleRoutes from "./routes/scheduleRoutes.js";
+import studentsRoutes from "./routes/studentsRoutes.js";
+import routeRoutes from "./routes/routeRoutes.js";
+import parentRoutes from "./routes/parentRoutes.js";
+import driverRoutes from "./routes/driverRoutes.js";
+import assignmentRoutes from "./routes/assignmentRoutes.js";
+import overviewRoutes from "./routes/overviewRoutes.js";
+import driverAlertRoutes from "./routes/driverAlertRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import routePythonService from "./routes/routePythonService.js";
+
+const app = express();
+const PORT = 8888;
+
+// ---------- Middleware ----------
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true, // quan trọng để gửi cookie
+}));
+
+app.use(cookieParser());
+app.use(express.json());
+
+// ---------- Session ----------
+app.use(session({
+    secret: process.env.SESSION_SECRET || "mysecretkey",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 2 * 60 * 60 * 1000, // 2 giờ
+        httpOnly: true,
+        secure: false,   // true nếu HTTPS
+        sameSite: "lax" // bắt buộc để cookie cross-origin
+    }
+}));
+
+// ---------- Routes ----------
+app.use('/api/auth', authRoutes);
+app.use('/api/buses', busRoutes);
+app.use("/api/schedules", scheduleRoutes);
+app.use("/api/students", studentsRoutes);
+app.use("/api/routes", routeRoutes);
+app.use('/api/parents', parentRoutes);
+app.use('/api/drivers', driverRoutes);
+app.use('/api/assignments', assignmentRoutes);
+app.use('/api/overview', overviewRoutes);
+app.use('/api/driver-alerts', driverAlertRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use("/test-python", routePythonService);
+
+// ---------- HTTP + Socket ----------
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: { origin: "*" }
+});
+initTrackingSocket(io);
+
+// ---------- Start server ----------
+httpServer.listen(PORT, () => {
+    console.log(`Server + Socket running at http://localhost:${PORT}`);
+});
+
+
+
+
+
+// ----------------------------------------- OLD VERSION ----------------------------------------- \\
+
 // // 1. Import 
 // import db from "./db.js"
 // import express from "express";      // Nếu Node chưa cấu hình, có thể dùng: const express = require('express')
@@ -119,77 +200,3 @@
 //     console.log(`\n🖥 Server + Socket: running at http://localhost:${PORT}`);
 // })
 // server.js
-import db from "./db.js";
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import initTrackingSocket from "./sockets/trackingSocket.js";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import session from "express-session";
-
-// Routes
-import authRoutes from "./routes/authRoutes.js";
-import busRoutes from "./routes/busRoutes.js";
-import scheduleRoutes from "./routes/scheduleRoutes.js";
-import studentsRoutes from "./routes/studentsRoutes.js";
-import routeRoutes from "./routes/routeRoutes.js";
-import parentRoutes from "./routes/parentRoutes.js";
-import driverRoutes from "./routes/driverRoutes.js";
-import assignmentRoutes from "./routes/assignmentRoutes.js";
-import overviewRoutes from "./routes/overviewRoutes.js";
-import driverAlertRoutes from "./routes/driverAlertRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
-import routePythonService from "./routes/routePythonService.js";
-
-const app = express();
-const PORT = 8888;
-
-// ---------- Middleware ----------
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true, // quan trọng để gửi cookie
-}));
-
-app.use(cookieParser());
-app.use(express.json());
-
-// ---------- Session ----------
-app.use(session({
-    secret: process.env.SESSION_SECRET || "mysecretkey",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 2 * 60 * 60 * 1000, // 2 giờ
-        httpOnly: true,
-        secure: false,   // true nếu HTTPS
-        sameSite: "lax" // bắt buộc để cookie cross-origin
-    }
-}));
-
-// ---------- Routes ----------
-app.use('/api/auth', authRoutes);
-app.use('/api/buses', busRoutes);
-app.use("/api/schedules", scheduleRoutes);
-app.use("/api/students", studentsRoutes);
-app.use("/api/routes", routeRoutes);
-app.use('/api/parents', parentRoutes);
-app.use('/api/drivers', driverRoutes);
-app.use('/api/assignments', assignmentRoutes);
-app.use('/api/overview', overviewRoutes);
-app.use('/api/driver-alerts', driverAlertRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use("/test-python", routePythonService);
-
-// ---------- HTTP + Socket ----------
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: { origin: "*" }
-});
-initTrackingSocket(io);
-
-// ---------- Start server ----------
-httpServer.listen(PORT, () => {
-    console.log(`Server + Socket running at http://localhost:${PORT}`);
-});
-
