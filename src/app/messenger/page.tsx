@@ -218,7 +218,7 @@ export default function MessagingPage() {
       />
 
       {/* THÔNG BÁO NHẬN ĐƯỢC */}
-      <div style={{ marginTop: '2rem', padding: '1rem' }}>
+      {/* <div style={{ marginTop: '2rem', padding: '1rem' }}>
         <h3>
           Thông báo nhận được (
           {notifications.filter((n) => !n.readAt).length} chưa đọc)
@@ -277,7 +277,7 @@ export default function MessagingPage() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

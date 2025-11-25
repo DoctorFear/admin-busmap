@@ -149,6 +149,7 @@ export default function Dashboard() {
       {/* Notification block at top */}
       <div style={{
         background: '#faf7ff',
+        // background: 'rgb(255, 185, 185)',
         borderRadius: '10px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         padding: '24px 18px 12px 18px',
@@ -178,7 +179,8 @@ export default function Dashboard() {
               <div
                 key={notif.notificationID}
                 style={{
-                  background: '#eaf3fb',
+                  // background: '#eaf3fb',
+                  background: 'rgb(255, 185, 185)',
                   borderRadius: '6px',
                   padding: '16px',
                   boxShadow: '0 1px 2px rgba(0,0,0,0.03)',

@@ -28,7 +28,8 @@
 .notificationItem {
   padding: 1rem;
   border-left: 4px solid #3F51B5;
-  background-color: #f3f4f6;
+  /* background-color: #f3f4f6; */
+  background-color: rgb(255, 185, 185);
   margin-bottom: 1rem;
   border-radius: 0 5px 5px 0;
   color: #212222;

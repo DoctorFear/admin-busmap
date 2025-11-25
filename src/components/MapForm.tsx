@@ -254,9 +254,9 @@ export default function MapForm({ roads, parents = [], onWaypointsChange }: MapF
           {loading ? (
             <span style={{ color: "#888" }}>⏳ Đang tải tuyến đường thật...</span>
           ) : isRouteValid ? (
-            <span className={styles.valid}>✓ Tuyến hợp lệ (SGU → Waypoints → SGU)</span>
+            <span className={styles.valid}>🟢 Tuyến hợp lệ (SGU → Waypoints → SGU)</span>
           ) : (
-            <span className={styles.invalid}>Chưa có tuyến đường</span>
+            <span className={styles.invalid}>🟡 Chưa có tuyến đường</span>
           )}
         </div>
         <label className={styles.optimizeToggle}>
