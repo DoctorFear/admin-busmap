@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import RoadInput from './RoadInput';
 import MapForm from './MapForm';
 import styles from '../styles/ScheduleForm.module.css';
@@ -14,16 +14,6 @@ interface ScheduleItem {
   startTime: string;
   endTime: string;
   days: string[];
-  waypoints?: WaypointData[];  // Thêm waypoints data để lưu vào DB
-}
-
-// Interface cho dữ liệu waypoint sẽ lưu vào database
-interface WaypointData {
-  parentID: number | null;
-  address: string;
-  lat: number;
-  lng: number;
-  sequence: number;
 }
 
 interface ScheduleFormProps {
@@ -78,7 +68,6 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
       startTime: '',
       endTime: '',
       days: [],
-      waypoints: [],
     }
   );
   const [roadError, setRoadError] = useState('');
@@ -126,14 +115,6 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
 
   const handleSubmit = () => {
     if (!validateForm()) return;
-    
-    // Log dữ liệu để kiểm tra trước khi submit
-    console.log("[ScheduleForm] Submit data:", {
-      ...formData,
-      waypointsCount: formData.waypoints?.length || 0,
-      waypoints: formData.waypoints
-    });
-    
     onSubmit(formData);
     setNotification(initialData ? 'Cập nhật lịch trình thành công!' : 'Tạo lịch trình thành công!', 'success');
   };
@@ -146,12 +127,6 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
         : [...formData.days, day],
     });
   };
-
-  // FIXED: useCallback để tránh tạo function mới mỗi lần render
-  const handleWaypointsChange = useCallback((waypoints: WaypointData[]) => {
-    console.log("[ScheduleForm] Nhận waypoints từ MapForm:", waypoints);
-    setFormData(prev => ({ ...prev, waypoints }));
-  }, []);
 
   return (
     <div className={styles.formWrapper}>
@@ -248,11 +223,7 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
       </div>
 
       {/*RIGHT: GG Map */}
-      <MapForm 
-        roads={formData.roads} 
-        parents={parents}
-        onWaypointsChange={handleWaypointsChange}
-      />
+      <MapForm roads={formData.roads} />
 
     </div>
   );

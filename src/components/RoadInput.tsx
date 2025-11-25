@@ -130,7 +130,8 @@ export default function RoadInput({ roads, onAddRoad, onRemoveRoad, onReorderRoa
                     </li>
                   ))
                 ) : (
-                  <li className={styles.dropdownItemEmpty}>Không tìm thấy địa chỉ phù hợp</li>
+                  // <li className={styles.dropdownItemEmpty}>Không tìm thấy địa chỉ phù hợp</li>
+                  <li className={styles.dropdownItemEmpty}>Bạn đang nhập địa chỉ mới</li>
                 )}
               </ul>
             </div>

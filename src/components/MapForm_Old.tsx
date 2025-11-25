@@ -12,35 +12,11 @@ import styles from "../styles/MapForm.module.css";
 
 interface MapFormProps {
   roads: string[];
-  parents?: Parent[];
-  onWaypointsChange?: (waypoints: WaypointData[]) => void;
 }
 
 interface Coordinate {
   lat: number;
   lng: number;
-}
-
-// Interface cho Parent data
-interface Parent {
-  userID: number;
-  name: string;
-  username: string;
-  password: string;
-  phone: string;
-  studentName: string;
-  address: string;
-  lat?: string;
-  lng?: string;
-}
-
-// Interface cho dữ liệu waypoint sẽ lưu vào database
-interface WaypointData {
-  parentID: number | null;  // null nếu không phải địa chỉ parent
-  address: string;          // Địa chỉ text đầy đủ
-  lat: number;              // Tọa độ latitude
-  lng: number;              // Tọa độ longitude
-  sequence: number;         // Thứ tự waypoint (1, 2, 3, ...)
 }
 
 // --------------------------------- Google Map settings --------------------------------- \\
@@ -53,14 +29,11 @@ const containerStyle = { width: "100%", height: "850px" };
 // -------------------------------------------------------------------------------------- \\
 
 
-export default function MapForm({ roads, parents = [], onWaypointsChange }: MapFormProps) {
+export default function MapForm({ roads }: MapFormProps) {
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [optimizeWaypoints, setOptimizeWaypoints] = useState(false);
-  
-  // Lưu thông tin waypoints để chuẩn bị cho database
-  const [waypointsData, setWaypointsData] = useState<WaypointData[]>([]);
 
   // Get GG_MAPS_KEY from env.local
   const googleApiKey = process.env.NEXT_PUBLIC_GG_MAPS_KEY as string;
@@ -93,66 +66,30 @@ export default function MapForm({ roads, parents = [], onWaypointsChange }: MapF
    * - Origin: SGU_ADDRESS (tự động)
    * - Destination: SGU_ADDRESS (tự động)
    * - Waypoints: các địa chỉ người dùng nhập
-   * 
-   * IMPORTANT: Xây dựng waypointsData để lưu vào database
    */
   useEffect(() => {
     const fetchRoute = async () => {
       setLoading(true);
       const coords: Coordinate[] = [];
-      const waypointsInfo: WaypointData[] = [];
 
       // Geocode các địa chỉ người dùng nhập (sẽ là waypoints)
-      for (let i = 0; i < roads.length; i++) {
-        const road = roads[i];
-        
-        // Kiểm tra xem địa chỉ này có phải của parent không
-        const matchedParent = parents.find(p => p.address === road);
-        
-        let coord: Coordinate | null = null;
-        
-        if (matchedParent && matchedParent.lat && matchedParent.lng) {
-          // Nếu là địa chỉ parent và đã có lat/lng → dùng luôn
-          coord = {
-            lat: parseFloat(matchedParent.lat),
-            lng: parseFloat(matchedParent.lng)
-          };
-          console.log(`[MapForm] Dùng tọa độ parent cho: ${road}`);
-        } else {
-          // Không phải parent hoặc parent không có lat/lng → geocode
-          coord = await geocodeRoad(road);
-        }
-        
-        if (coord) {
-          coords.push(coord);
-          
-          // Tạo waypoint data để lưu vào DB
-          waypointsInfo.push({
-            parentID: matchedParent ? matchedParent.userID : null,
-            address: road,
-            lat: coord.lat,
-            lng: coord.lng,
-            sequence: i + 1  // Sequence bắt đầu từ 1
-          });
-        }
+      for (const road of roads) {
+        const c = await geocodeRoad(road);
+        if (c) coords.push(c);
       }
 
       setCoordinates(coords);
-      setWaypointsData(waypointsInfo);
-      
-      console.log("[MapForm] Waypoints data chuẩn bị cho DB:", waypointsInfo);
-      
       setLoading(false);
     };
 
     fetchRoute();
-  }, [roads, parents]);
+  }, [roads]);
 
   /**
    * [3] Tính trung tâm bản đồ
    */
   const mapCenter = useMemo(() => {
-    if (coordinates.length === 0) return SGU_LAT_LNG; // FIXED: Dùng constant thay vì tạo object mới
+    if (coordinates.length === 0) return { lat: 10.7765, lng: 106.7009 };
     const avgLat =
       coordinates.reduce((sum, c) => sum + c.lat, 0) / coordinates.length;
     const avgLng =
@@ -168,12 +105,6 @@ export default function MapForm({ roads, parents = [], onWaypointsChange }: MapF
    * - Waypoints: tất cả địa chỉ người dùng nhập
    */
   useEffect(() => {
-    // Không route nếu không có coordinates
-    if (coordinates.length === 0) {
-      setDirections(null);
-      return;
-    }
-
     const service = new google.maps.DirectionsService();
 
     // Origin và Destination đều là SGU
@@ -206,40 +137,13 @@ export default function MapForm({ roads, parents = [], onWaypointsChange }: MapF
         if (status === "OK" && result) {
           setDirections(result);
           console.log("[MapForm] Route thành công!");
-          
-          // ====================================================================
-          // CẬP NHẬT SEQUENCE SAU KHI OPTIMIZE (NẾU CÓ)
-          // ====================================================================
-          if (optimizeWaypoints && result.routes[0]?.waypoint_order && waypointsData.length > 0) {
-            // Google trả về thứ tự tối ưu trong waypoint_order
-            const optimizedOrder = result.routes[0].waypoint_order;
-            console.log("[MapForm] Google optimized order:", optimizedOrder);
-            
-            // Sắp xếp lại waypointsData theo thứ tự tối ưu
-            const reorderedWaypoints = optimizedOrder.map((originalIndex, newIndex) => ({
-              ...waypointsData[originalIndex],
-              sequence: newIndex + 1  // Sequence mới sau khi tối ưu
-            }));
-            
-            console.log("[MapForm] Waypoints sau khi tối ưu:", reorderedWaypoints);
-            
-            // Gửi dữ liệu về parent component
-            if (onWaypointsChange) {
-              onWaypointsChange(reorderedWaypoints);
-            }
-          } else if (waypointsData.length > 0) {
-            // Không optimize → giữ nguyên thứ tự
-            if (onWaypointsChange) {
-              onWaypointsChange(waypointsData);
-            }
-          }
         } else {
           console.warn("[MapForm] Lỗi Directions API:", status);
           setDirections(null);
         }
       }
     );
-  }, [coordinates, optimizeWaypoints]); // FIXED: Bỏ waypointsData và onWaypointsChange khỏi dependencies
+  }, [coordinates, optimizeWaypoints]);
 
   const isRouteValid = directions !== null;
 

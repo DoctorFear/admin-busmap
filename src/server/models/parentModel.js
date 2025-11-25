@@ -10,10 +10,13 @@ export const getAllParents = (callback) => {
       u.passwordHash AS password,
       u.phone,
       s.fullName AS studentName,
-      p.address
+      p.address,
+      bs.lat, 
+      bs.lng
     FROM Users u
     JOIN Student s ON s.parentUserID = u.userID
     JOIN Parent p ON p.parentID = u.userID
+    JOIN BusStop bs ON bs.parentID = u.userID
     WHERE u.role = 'parent'
     ORDER BY u.fullName
   `;
