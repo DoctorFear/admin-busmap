@@ -21,6 +21,7 @@ interface Coordinate {
 
 // --------------------------------- Google Map settings --------------------------------- \\
 const SGU_ADDRESS = "Trường Đại học Sài Gòn, 273 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh 700000, Việt Nam";
+const SGU_NEAR_ADDRESS_FOR_MARKER = "286 An Dương Vương, Phường 2, 5, Thành phố Hồ Chí Minh, Việt Nam";
 const SGU_LAT_LNG = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
 
 const API_BASE = "http://localhost:8888";
@@ -108,7 +109,8 @@ export default function MapForm({ roads }: MapFormProps) {
 
     // Origin và Destination đều là SGU
     const origin = SGU_ADDRESS;
-    const destination = SGU_ADDRESS;
+    const destination = SGU_NEAR_ADDRESS_FOR_MARKER; 
+    // const destination = SGU_ADDRESS; 
     
     // Waypoints: tất cả địa chỉ người dùng nhập (hoặc empty nếu chưa có)
     const waypoints = coordinates.map((coord) => ({ 
