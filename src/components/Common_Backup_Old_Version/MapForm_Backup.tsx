@@ -19,20 +19,10 @@ interface Coordinate {
   lng: number;
 }
 
-// --------------------------------- Google Map settings --------------------------------- \\
-const SGU_ADDRESS = "Trường Đại học Sài Gòn, 273 An Dương Vương, Phường Chợ Quán, Thành phố Hồ Chí Minh 700000, Việt Nam";
-const SGU_LAT_LNG = { lat: 10.759983082120561, lng: 106.68225725256899 }; // Center: SGU
-
-const API_BASE = "http://localhost:8888";
-const containerStyle = { width: "100%", height: "850px" };
-// -------------------------------------------------------------------------------------- \\
-
-
 export default function MapForm({ roads }: MapFormProps) {
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [optimizeWaypoints, setOptimizeWaypoints] = useState(false);
 
   // Get GG_MAPS_KEY from env.local
   const googleApiKey = process.env.NEXT_PUBLIC_GG_MAPS_KEY as string;
@@ -61,23 +51,29 @@ export default function MapForm({ roads }: MapFormProps) {
 
   /**
    * [2] Khi danh sách roads thay đổi → geocode và vẽ tuyến
-   * UPDATED: Chỉ cần 1 địa chỉ (hoặc 0) để route
-   * - Origin: SGU_ADDRESS (tự động)
-   * - Destination: SGU_ADDRESS (tự động)
-   * - Waypoints: các địa chỉ người dùng nhập
    */
   useEffect(() => {
+    if (roads.length < 2) {
+      setDirections(null);
+      return;
+    }
+
     const fetchRoute = async () => {
       setLoading(true);
       const coords: Coordinate[] = [];
 
-      // Geocode các địa chỉ người dùng nhập (sẽ là waypoints)
       for (const road of roads) {
         const c = await geocodeRoad(road);
         if (c) coords.push(c);
       }
 
-      setCoordinates(coords);
+      if (coords.length >= 2) {
+        setCoordinates(coords);
+      } else {
+        console.warn("Không đủ điểm hợp lệ để vẽ tuyến");
+        setCoordinates([]);
+      }
+
       setLoading(false);
     };
 
@@ -98,30 +94,17 @@ export default function MapForm({ roads }: MapFormProps) {
 
   /**
    * [4] Khi có đủ điểm → gọi DirectionsService để vẽ đường thật
-   * UPDATED:
-   * - Origin: SGU_ADDRESS (cố định)
-   * - Destination: SGU_ADDRESS (cố định)
-   * - Waypoints: tất cả địa chỉ người dùng nhập
    */
   useEffect(() => {
+    if (coordinates.length < 2) return;
+
+    const origin = coordinates[0];
+    const destination = coordinates[coordinates.length - 1];
+    const waypoints = coordinates
+      .slice(1, -1)
+      .map((coord) => ({ location: coord }));
+
     const service = new google.maps.DirectionsService();
-
-    // Origin và Destination đều là SGU
-    const origin = SGU_ADDRESS;
-    const destination = SGU_ADDRESS;
-    
-    // Waypoints: tất cả địa chỉ người dùng nhập (hoặc empty nếu chưa có)
-    const waypoints = coordinates.map((coord) => ({ 
-      location: coord,
-      stopover: true 
-    }));
-
-    console.log("[MapForm] Routing with:", {
-      origin,
-      destination,
-      waypoints: waypoints.length,
-      optimize: optimizeWaypoints
-    });
 
     service.route(
       {
@@ -129,19 +112,17 @@ export default function MapForm({ roads }: MapFormProps) {
         destination,
         waypoints,
         travelMode: google.maps.TravelMode.DRIVING,
-        optimizeWaypoints: optimizeWaypoints,
+        optimizeWaypoints: true,
       },
       (result, status) => {
         if (status === "OK" && result) {
           setDirections(result);
-          console.log("[MapForm] Route thành công!");
         } else {
-          console.warn("[MapForm] Lỗi Directions API:", status);
-          setDirections(null);
+          console.warn("Lỗi Directions API:", status);
         }
       }
     );
-  }, [coordinates, optimizeWaypoints]);
+  }, [coordinates]);
 
   const isRouteValid = directions !== null;
 
@@ -152,30 +133,18 @@ export default function MapForm({ roads }: MapFormProps) {
     <div className={styles.mapContainer}>
       {/* <h3>Tuyến đường</h3> */}
       <div className={styles.validationStatus}>
-        <div>
-          {loading ? (
-            <span style={{ color: "#888" }}>⏳ Đang tải tuyến đường thật...</span>
-          ) : isRouteValid ? (
-            <span className={styles.valid}>✓ Tuyến hợp lệ (SGU → Waypoints → SGU)</span>
-          ) : (
-            <span className={styles.invalid}>Chưa có tuyến đường</span>
-          )}
-        </div>
-        <label className={styles.optimizeToggle}>
-          <input
-            type="checkbox"
-            checked={optimizeWaypoints}
-            onChange={(e) => setOptimizeWaypoints(e.target.checked)}
-          />
-          {/* <span>Tối ưu thứ tự điểm dừng</span> */}
-          <span>Tối ưu</span>
-        </label>
+        {loading ? (
+          <span style={{ color: "#888" }}>⏳ Đang tải tuyến đường thật...</span>
+        ) : isRouteValid ? (
+          <span className={styles.valid}>Tuyến đường hợp lệ (đúng lộ trình)</span>
+        ) : (
+          <span className={styles.invalid}>Tuyến đường không hợp lệ</span>
+        )}
       </div>
 
       {/* googleApiKey have loaded in app/layout.tsx */}
       <GoogleMap
-        // mapContainerStyle={{ width: "100%", height: "800px" }}
-        mapContainerStyle={containerStyle}
+        mapContainerStyle={{ width: "100%", height: "800px" }}
         center={mapCenter}
         zoom={13}
       >

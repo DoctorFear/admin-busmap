@@ -17,13 +17,12 @@ interface RoadInputProps {
   roads: string[];
   onAddRoad: (road: string) => void;
   onRemoveRoad: (road: string) => void;
-  onReorderRoad?: (fromIndex: number, toIndex: number) => void;
   error: string;
   setError: (error: string) => void;
   parents?: Parent[];
 }
 
-export default function RoadInput({ roads, onAddRoad, onRemoveRoad, onReorderRoad, error, setError, parents = [] }: RoadInputProps) {
+export default function RoadInput({ roads, onAddRoad, onRemoveRoad, error, setError, parents = [] }: RoadInputProps) {
   const [newRoad, setNewRoad] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [filteredParents, setFilteredParents] = useState<Parent[]>([]);
@@ -141,29 +140,7 @@ export default function RoadInput({ roads, onAddRoad, onRemoveRoad, onReorderRoa
       <ul className={styles.roadList}>
         {roads.map((road, index) => (
           <li key={index} className={styles.roadItem}>
-            <div className={styles.roadItemContent}>
-              {onReorderRoad && (
-                <div className={styles.reorderButtons}>
-                  <button
-                    onClick={() => onReorderRoad(index, Math.max(0, index - 1))}
-                    disabled={index === 0}
-                    className={styles.reorderButton}
-                    title="Di chuyển lên"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    onClick={() => onReorderRoad(index, Math.min(roads.length - 1, index + 1))}
-                    disabled={index === roads.length - 1}
-                    className={styles.reorderButton}
-                    title="Di chuyển xuống"
-                  >
-                    ▼
-                  </button>
-                </div>
-              )}
-              <span className={styles.roadText}>{road}</span>
-            </div>
+            {road}
             <button
               onClick={() => onRemoveRoad(road)}
               className={styles.removeButton}

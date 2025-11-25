@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import RoadInput from './RoadInput';
 import MapForm from './MapForm';
 import styles from '../styles/ScheduleForm.module.css';
@@ -23,41 +23,7 @@ interface ScheduleFormProps {
   setNotification: (message: string, type: 'success' | 'error') => void;
 }
 
-
-const API_BASE = "http://localhost:8888";
-
-
 export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotification }: ScheduleFormProps) {
-  // ----------------------------------------- Form state & handlers --------------------------------- \\
-  interface Parent {
-    userID: number;
-    name: string;
-    username: string;
-    password: string;
-    phone: string;
-    studentName: string;
-    address: string;
-  }
-  
-  const [parents, setParents] = useState<Parent[]>([]);
-
-  // ----------------------------------------- Fetch Parent data --------------------------------- \\
-  // Get all Parent: parentID and addresses from DB to select
-  useEffect(() => {
-    console.log("[1] Fetch parents data...");
-
-    fetch(`${API_BASE}/api/parents`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("[Parent] Fetch --> Number of parents:\n", data.length);
-        setParents(data);
-      })
-      .catch((err) => console.error("Fetch parents error:", err));
-  }, []); // Only for initial load
-
-  //----------------------------------------------------------------- Form state & handlers --------------------------------- \\
-
-
   const [formData, setFormData] = useState<ScheduleItem>(
     initialData || {
       id: '',
@@ -149,15 +115,8 @@ export default function ScheduleForm({ initialData, onSubmit, onCancel, setNotif
             roads={formData.roads}
             onAddRoad={(road) => setFormData({ ...formData, roads: [...formData.roads, road] })}
             onRemoveRoad={(road) => setFormData({ ...formData, roads: formData.roads.filter((r) => r !== road) })}
-            onReorderRoad={(fromIndex, toIndex) => {
-              const newRoads = [...formData.roads];
-              const [removed] = newRoads.splice(fromIndex, 1);
-              newRoads.splice(toIndex, 0, removed);
-              setFormData({ ...formData, roads: newRoads });
-            }}
             error={roadError}
             setError={setRoadError}
-            parents={parents}
           />
         </div>
         <div className={styles.formGroup}>
