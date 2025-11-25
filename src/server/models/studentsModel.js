@@ -117,3 +117,25 @@ export const checkTripCompletion = (tripID, callback) => {
   
   db.query(sql, [tripID], callback);
 };
+
+// Lấy thông tin học sinh theo parentId
+export const getStudentInfoByParentId = (parentId, callback) => {
+  const sql = `
+    SELECT 
+      s.studentID,
+      s.fullName AS studentName,
+      s.schoolName,
+      s.photoUrl,
+      p.address AS pickupPoint
+    FROM Student s
+    JOIN Parent p ON s.parentUserID = p.parentID
+    WHERE s.parentUserID = ?
+    LIMIT 1
+  `;
+  
+  db.query(sql, [parentId], (err, results) => {
+    if (err) return callback(err, null);
+    if (results.length === 0) return callback(new Error("Parent not found"), null);
+    callback(null, results[0]);
+  });
+};

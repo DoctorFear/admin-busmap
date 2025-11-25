@@ -1,17 +1,81 @@
 'use client';
 
-import React, { useState, ChangeEvent, JSX } from 'react';
+import React, { useState, useEffect, ChangeEvent, JSX } from 'react';
 import { Upload } from 'lucide-react';
 import styles from './page.module.css';
 import { useRouter } from "next/navigation";
 
+interface StudentInfo {
+  studentID: number;
+  studentName: string;
+  schoolName: string;
+  pickupPoint: string;
+  photoUrl: string;
+}
+
 export default function Information(): JSX.Element {
   const router = useRouter();
-  const [preview, setPreview] = useState<string>('/default-avatar.png'); // ảnh mặc định
-  const [pickupPoint, setPickupPoint] = useState<string>('123 Đường Lê Lợi');
+  const PORT_SERVER = 8888;
+
   // Lấy parentID từ localStorage
   const [parentID, setParentID] = useState<number | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+
+  const [preview, setPreview] = useState<string>('/default-avatar.png'); // ảnh mặc định
+  const [pickupPoint, setPickupPoint] = useState<string>('');
+  const [student, setStudent] = useState<StudentInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
   
+  // Lấy parentID
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    const storedParentID = localStorage.getItem('userID');
+
+    if (role !== "parent" || !storedParentID) {
+      alert("Vui lòng đăng nhập bằng tài khoản phụ huynh!");
+      router.push("/login");
+      return;
+    }
+    setParentID(parseInt(storedParentID));
+    setIsAuthLoading(false);
+  }, [router]);
+
+  // Lấy thông tin học sinh theo parentID
+  useEffect(() => {
+    if (!parentID) return;
+
+    const fetchStudentInfo = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:${PORT_SERVER}/api/students/parent/${parentID}`);
+
+        if (!res.ok) throw new Error("Không thể tải thông tin học sinh");
+
+        const data: StudentInfo = await res.json();
+        
+        setStudent(data);
+        setPickupPoint(data.pickupPoint || "");
+        
+        if (data.photoUrl) {
+          setPreview(data.photoUrl);
+        }
+
+        setError(null);
+      } catch (err: any) {
+        console.error("Lỗi fetch student:", err);
+        setError(err.message || "Lỗi không xác định");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentInfo();
+  }, [parentID]);
+
+  // Upload ảnh
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -24,11 +88,75 @@ export default function Information(): JSX.Element {
     setPickupPoint(e.target.value);
   };
 
-  const handleUpdate = () => {
-    // Gọi API hoặc xử lý submit
-    console.log('Điểm đón mới:', pickupPoint);
-    alert(`Điểm đón đã được cập nhật: ${pickupPoint}`);
+  // Frontend - handleUpdate (cách an toàn hơn)
+  const handleUpdate = async () => {
+    if (!parentID) {
+      alert('Không tìm thấy thông tin parent!');
+      return;
+    }
+  
+    try {
+      setUpdating(true);
+    
+      // Fetch profile hiện tại
+      const profileRes = await fetch(`http://localhost:${PORT_SERVER}/api/parents/${parentID}/profile`);
+      const currentProfile = await profileRes.json();
+    
+      // Merge với address mới
+      const res = await fetch(`http://localhost:${PORT_SERVER}/api/parents/${parentID}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: currentProfile.fullName,
+          email: currentProfile.email,
+          phone: currentProfile.phone,
+          address: pickupPoint, // CHỈ ĐỔI ADDRESS
+          workInfo: currentProfile.workInfo
+        })
+      });
+    
+      if (!res.ok) throw new Error('Không thể cập nhật');
+    
+      alert('Cập nhật điểm đón thành công!');
+    
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setUpdating(false);
+    }
   };
+
+  if (isAuthLoading) {
+    return (
+      <div className={styles.mainContent}>
+        <p>Đang tải thông tin phụ huynh...</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className={styles.mainContent}>
+        <p>Đang tải thông tin học sinh...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.mainContent}>
+        <p style={{ color: 'red' }}>Lỗi: {error}</p>
+      </div>
+    );
+  }
+
+  if (!student) {
+    return (
+      <div className={styles.mainContent}>
+        <p>Không tìm thấy thông tin học sinh.</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.mainContent}>
@@ -40,6 +168,7 @@ export default function Information(): JSX.Element {
           <div className={styles.avatarSection}>
             <img
               src={preview}
+              alt="Ảnh học sinh"
               className={styles.studentAvatar}
             />
             <label htmlFor="avatar-upload" className={styles.uploadBtn}>
@@ -57,21 +186,17 @@ export default function Information(): JSX.Element {
           {/* Bên phải: thông tin */}
           <div className={styles.studentDetails}>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", color: "#374151" }}>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "1rem" }}>
                 <span style={{ fontWeight: "bold" }}>Tên:</span>
-                <span data-no-translate>Nguyễn Văn An</span>
+                <span data-no-translate>{student.studentName}</span>
               </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div style={{ marginTop: '0.3rem', display: "flex", gap: "1rem" }}>
                 <span style={{ fontWeight: "bold" }}>Điểm đón:</span>
                 <span data-no-translate>{pickupPoint}</span>
               </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div style={{ marginTop: '0.3rem', display: "flex", gap: "1rem" }}>
                 <span style={{ fontWeight: "bold" }}>Điểm trả:</span>
-                <span data-no-translate>Trường DEF</span>
-              </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <span style={{ fontWeight: "bold" }}>Lịch trình:</span>
-                <span data-no-translate>Thứ 2–6, Xe 01, 6:30 AM – 8:00 AM</span>
+                <span data-no-translate>{student.schoolName}</span>
               </div>
             </div>
 
@@ -91,8 +216,9 @@ export default function Information(): JSX.Element {
                 className={styles.submitBtn}
                 style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}
                 onClick={handleUpdate}
+                disabled={updating}
               >
-                Cập nhật điểm đón
+                {updating ? 'Đang cập nhật...' : 'Cập nhật điểm đón'}
               </button>
             </div>
           </div>

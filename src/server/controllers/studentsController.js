@@ -2,7 +2,8 @@ import {
   getStudentsByDriverID, 
   getTripIDByStudent,
   updateStudentStatus,
-  checkTripCompletion
+  checkTripCompletion,
+  getStudentInfoByParentId
 } from "../models/studentsModel.js";
 
 import { 
@@ -119,5 +120,18 @@ export const updateStudentStatusController = (req, res) => {
         processStudentUpdate();
       }
     });
+  });
+};
+
+// Hàm lấy thông tin học sinh theo parentID
+export const getStudentsByParent = (req, res) => {
+  const parentId = req.params.parentId;
+
+  getStudentInfoByParentId(parentId, (err, students) => {
+    if (err) {
+      console.error(`Lỗi lấy thông tin học sinh cho parent ${parentId}:`, err);
+      return res.status(500).json({ error: "Lỗi truy vấn database" });
+    } 
+    res.status(200).json(students);
   });
 };
