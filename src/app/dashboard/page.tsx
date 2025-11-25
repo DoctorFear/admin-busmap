@@ -18,6 +18,17 @@ interface OverviewItem {
   status: 'Chờ đón' | 'Đang trên xe' | 'Đã trả' | 'Vắng mặt';
 }
 
+interface NotificationRecord {
+  notificationID: number;
+  toUserID: number;
+  fromUserID: number | null;
+  type: string;
+  title: string | null;
+  content: string;
+  sentAt: string;
+  readAt: string | null;
+}
+
 export default function Dashboard() {
   const [data, setData] = useState<OverviewItem[]>([]);
   const [filteredData, setFilteredData] = useState<OverviewItem[]>([]);
@@ -25,6 +36,9 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const ADMIN_USER_ID = 1; // Sửa lại đúng userID admin thực tế
 
   // LẤY DỮ LIỆU TỪ BACKEND
   const fetchOverview = async () => {
@@ -89,6 +103,41 @@ export default function Dashboard() {
     setCurrentPage(1);
   }, [searchTerm, data]);
 
+  // --- Notification logic (moved to top) ---
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoadingNotifications(true);
+        const res = await fetch(`/api/notifications/${ADMIN_USER_ID}`);
+        const data = await res.json();
+        if (data.success) {
+          setNotifications(data.data || []);
+        }
+      } catch (err) {
+        // handle error
+      } finally {
+        setLoadingNotifications(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
+  const handleMarkAsRead = async (notificationID: number) => {
+    try {
+      await fetch(`/api/notifications/${notificationID}/read`, {
+        method: 'PUT',
+      });
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.notificationID === notificationID
+            ? { ...n, readAt: new Date().toISOString() }
+            : n
+        )
+      );
+    } catch (err) {
+      // handle error
+    }
+  };
+
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
@@ -97,6 +146,63 @@ export default function Dashboard() {
 
   return (
     <div className={styles.dashboardContainer}>
+      {/* Notification block at top */}
+      <div style={{
+        background: '#faf7ff',
+        borderRadius: '10px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        padding: '24px 18px 12px 18px',
+        marginBottom: '24px',
+        width: '100%',
+        maxWidth: 'unset',
+        marginLeft: 0,
+        marginRight: 0,
+      }}>
+        <div style={{
+          fontSize: '1.15rem',
+          fontWeight: 600,
+          color: '#222',
+          marginBottom: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}>
+          <span role="img" aria-label="bell" style={{ fontSize: '1.3em' }}>🔔</span>
+          <b>Thông báo cho Admin</b>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {notifications.length === 0 ? (
+            <div style={{ color: '#aaa', fontStyle: 'italic', textAlign: 'center', padding: '12px 0' }}>Không có thông báo nào</div>
+          ) : (
+            notifications.slice(0, 10).map((notif) => (
+              <div
+                key={notif.notificationID}
+                style={{
+                  background: '#eaf3fb',
+                  borderRadius: '6px',
+                  padding: '16px',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                  borderLeft: '4px solid #4b8be4',
+                  marginBottom: '0',
+                  width: '100%',
+                }}
+              >
+                <div style={{ fontWeight: 600, color: '#2d3a4a', marginBottom: '2px', fontSize: '1.08rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span role="img" aria-label="alert" style={{ fontSize: '1.1em' }}>📢</span>
+                  <span>{notif.title}</span>
+                </div>
+                <div style={{ color: '#3b4a5a', fontSize: '0.98rem' }}>{notif.content}</div>
+                <div style={{ color: '#888', fontSize: '0.95rem', marginTop: '4px' }}>
+                  {
+                    new Date(notif.sentAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                  } {new Date(notif.sentAt).toLocaleDateString('vi-VN')}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       {/* Header + Search */}
       <div className={styles.headerRow}>
         <div className={styles.searchWrapper}>
