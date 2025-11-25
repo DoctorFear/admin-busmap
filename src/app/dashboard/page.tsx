@@ -180,7 +180,7 @@ export default function Dashboard() {
                 key={notif.notificationID}
                 style={{
                   // background: '#eaf3fb',
-                  background: 'rgb(255, 185, 185)',
+                  background: 'rgb(255, 211, 211)',
                   borderRadius: '6px',
                   padding: '16px',
                   boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
@@ -189,10 +189,13 @@ export default function Dashboard() {
                   width: '100%',
                 }}
               >
+                {/* <div style={{ fontWeight: 600, color: '#rgb(190, 0, 0)', marginBottom: '2px', fontSize: '1.08rem', display: 'flex', alignItems: 'center', gap: 6 }}> */}
                 <div style={{ fontWeight: 600, color: '#2d3a4a', marginBottom: '2px', fontSize: '1.08rem', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span role="img" aria-label="alert" style={{ fontSize: '1.1em' }}>📢</span>
                   <span>{notif.title}</span>
                 </div>
+                {/* <div style={{ color: '#rgb(190, 0, 0)', fontSize: '0.98rem' }}>{notif.content}</div> */}
+                {/* <div style={{ color: '#rgb(190, 0, 0)', fontSize: '0.95rem', marginTop: '4px' }}> */}
                 <div style={{ color: '#3b4a5a', fontSize: '0.98rem' }}>{notif.content}</div>
                 <div style={{ color: '#888', fontSize: '0.95rem', marginTop: '4px' }}>
                   {

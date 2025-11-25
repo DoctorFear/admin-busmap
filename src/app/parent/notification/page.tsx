@@ -58,7 +58,9 @@ export default function ParentNotificationPage() {
               className={`${styles.notificationItem} ${item.severity === "WARNING" || item.severity === "CRITICAL" ? styles.alert : ""}`}
               style={{ marginBottom: 12 }}
             >
-              <div style={{ fontWeight: 700, color: isAdmin ? '#1565c0' : '#b71c1c', marginBottom: 4, display: 'flex', alignItems: 'center' }}>
+              {/* rgb(190, 0, 0); */}
+              <div style={{ fontWeight: 700, color: isAdmin ? '#rgb(190, 0, 0)' : '#b71c1c', marginBottom: 4, display: 'flex', alignItems: 'center' }}>
+              {/* <div style={{ fontWeight: 700, color: isAdmin ? '#1565c0' : '#b71c1c', marginBottom: 4, display: 'flex', alignItems: 'center' }}> */}
                 <span style={{ marginRight: 6 }}>{isAdmin ? '🛡️' : '📢'}</span> {item.title || (isAdmin ? 'Thông báo từ Admin' : 'Thông báo từ tài xế')}
               </div>
               <div style={{ marginBottom: 4 }}>{item.content}</div>
