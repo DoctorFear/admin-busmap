@@ -145,6 +145,8 @@ httpServer.listen(PORT, () => {
 // app.use('/api/overview', overviewRoutes);
 // app.use('/api/driver-alerts', driverAlertRoutes);
 // app.use('/api/notifications', notificationRoutes);
+import adminNotificationRoutes from './routes/adminNotificationRoutes.js';
+app.use('/api/admin', adminNotificationRoutes);
 
 
 // // Testing

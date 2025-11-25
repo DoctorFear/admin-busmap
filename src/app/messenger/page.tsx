@@ -6,7 +6,14 @@ import MessagingForm from '@/components/MessagingForm';
 import IncidentTable from '@/components/IncidentTable';
 import Notification from '@/components/Notification';
 import styles from './page.module.css';
-import { Recipient, Incident, mockParents, mockDrivers, mockIncidents } from '@/lib/data_messaging';
+
+import {
+  Recipient,
+  Incident,
+  mockParents,
+  mockDrivers,
+  mockIncidents,
+} from '@/lib/data_messaging';
 
 interface NotificationRecord {
   notificationID: number;
@@ -20,17 +27,31 @@ interface NotificationRecord {
 }
 
 export default function MessagingPage() {
-  const [recipients, setRecipients] = useState<Recipient[]>([...mockParents, ...mockDrivers]);
+  const [recipients, setRecipients] = useState<Recipient[]>([
+    ...mockParents,
+    ...mockDrivers,
+  ]);
+
   const [incidents, setIncidents] = useState<Incident[]>(mockIncidents);
   const [searchTerm, setSearchTerm] = useState('');
-  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [recipientType, setRecipientType] = useState<'all' | 'parent' | 'driver'>('all');
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
+
+  const [recipientType, setRecipientType] = useState<'all' | 'parent' | 'driver'>(
+    'all'
+  );
+
   const [userID, setUserID] = useState<number | null>(null);
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
 
-  // Lấy user ID từ localStorage
+  // Load userID từ localStorage
   useEffect(() => {
     const storedUserID = localStorage.getItem('userID');
     if (storedUserID) {
@@ -38,21 +59,19 @@ export default function MessagingPage() {
     }
   }, []);
 
-  // Fetch notifications từ database
+  // Fetch danh sách thông báo
   useEffect(() => {
-    if (userID) {
-      fetchNotifications();
-    }
+    if (userID) fetchNotifications();
   }, [userID]);
 
   const fetchNotifications = async () => {
     if (!userID) return;
-    
+
     try {
       setLoadingNotifications(true);
       const res = await fetch(`/api/notifications/${userID}`);
       const data = await res.json();
-      
+
       if (data.success) {
         setNotifications(data.data || []);
       }
@@ -63,30 +82,35 @@ export default function MessagingPage() {
     }
   };
 
-  // Mark notification as read
+  // Đánh dấu đã đọc
   const handleMarkAsRead = async (notificationID: number) => {
     try {
       await fetch(`/api/notifications/${notificationID}/read`, {
         method: 'PUT',
       });
-      
-      setNotifications(prev =>
-        prev.map(n => n.notificationID === notificationID ? { ...n, readAt: new Date().toISOString() } : n)
+
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.notificationID === notificationID
+            ? { ...n, readAt: new Date().toISOString() }
+            : n
+        )
       );
     } catch (err) {
       console.error('Error marking as read:', err);
     }
   };
 
-  // Filter recipients based on search term, date, and recipient type
+  // Filter người nhận
   const filteredRecipients = recipients.filter(
     (recipient) =>
       recipient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (!recipient.availableDates || recipient.availableDates.includes(selectedDate)) &&
+      (!recipient.availableDates ||
+        recipient.availableDates.includes(selectedDate)) &&
       (recipientType === 'all' || recipient.type === recipientType)
   );
 
-  // Simulate receiving new incidents from drivers
+  // Fake nhận incident mới mỗi 60s
   useEffect(() => {
     const interval = setInterval(() => {
       const newIncident: Incident = {
@@ -97,39 +121,56 @@ export default function MessagingPage() {
         timestamp: new Date().toISOString(),
         status: 'pending',
       };
+
       setIncidents((prev) => [newIncident, ...prev]);
     }, 60000);
+
     return () => clearInterval(interval);
   }, [incidents]);
 
-  // Handle sending message
   const handleSendMessage = (recipientIds: string[], message: string) => {
     if (recipientIds.length === 0 || !message) {
-      setNotification({ message: 'Vui lòng chọn ít nhất một người nhận và nhập nội dung tin nhắn.', type: 'error' });
+      setNotification({
+        message: 'Vui lòng chọn ít nhất một người nhận và nhập nội dung tin nhắn.',
+        type: 'error',
+      });
       return;
     }
+
     console.log('Sending message to:', recipientIds, 'Message:', message);
     setNotification({ message: 'Gửi tin nhắn thành công!', type: 'success' });
   };
 
-  // Handle sending incident notification to parents
   const handleSendIncidentNotification = (incident: Incident) => {
-    const parentsForBus = mockParents.filter((parent) => parent.bus === incident.bus);
+    const parentsForBus = mockParents.filter(
+      (parent) => parent.bus === incident.bus
+    );
+
     if (parentsForBus.length === 0) {
-      setNotification({ message: 'Không có phụ huynh nào liên kết với xe này.', type: 'error' });
-      console.error('No parents linked to bus:', incident.bus);
+      setNotification({
+        message: 'Không có phụ huynh nào liên kết với xe này.',
+        type: 'error',
+      });
       return;
     }
-    console.log('Sending push notification to parents:', parentsForBus, 'Incident:', incident);
-    setNotification({ message: 'Gửi thông báo sự cố đến phụ huynh thành công!', type: 'success' });
-    // Update incident status to 'sent'
+
+    console.log('Sending notification:', parentsForBus, incident);
+
+    setNotification({
+      message: 'Gửi thông báo sự cố đến phụ huynh thành công!',
+      type: 'success',
+    });
+
     setIncidents((prev) =>
-      prev.map((inc) => (inc.id === incident.id ? { ...inc, status: 'sent' } : inc))
+      prev.map((inc) =>
+        inc.id === incident.id ? { ...inc, status: 'sent' } : inc
+      )
     );
   };
 
   return (
     <div className={styles.container}>
+      {/* Alert nhỏ hiện ra khi gửi tin */}
       {notification && (
         <Notification
           message={notification.message}
@@ -138,33 +179,51 @@ export default function MessagingPage() {
         />
       )}
 
+      {/* HEADER + FILTER */}
       <div className={styles.headerRow}>
         <div className={styles.searchWrapper}>
           <select
             value={recipientType}
-            onChange={(e) => setRecipientType(e.target.value as 'all' | 'parent' | 'driver')}
-            style={{ marginRight: '1rem', padding: '0.5rem', borderRadius: '5px', border: '2px solid #edbe80' }}
+            onChange={(e) =>
+              setRecipientType(e.target.value as 'all' | 'parent' | 'driver')
+            }
+            style={{
+              marginRight: '1rem',
+              padding: '0.5rem',
+              borderRadius: '5px',
+              border: '2px solid #edbe80',
+            }}
           >
             <option value="all">Tất cả</option>
             <option value="parent">Phụ huynh</option>
             <option value="driver">Tài xế</option>
           </select>
+
           <SearchBar onSearch={setSearchTerm} />
         </div>
       </div>
 
-      <MessagingForm  
+      {/* GỬI TIN NHẮN */}
+      <MessagingForm
         recipients={filteredRecipients}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
         onSend={handleSendMessage}
       />
 
-      <IncidentTable incidents={incidents} onSendNotification={handleSendIncidentNotification} />
+      {/* BẢNG SỰ CỐ */}
+      <IncidentTable
+        incidents={incidents}
+        onSendNotification={handleSendIncidentNotification}
+      />
 
-      {/* Thông báo từ database */}
+      {/* THÔNG BÁO NHẬN ĐƯỢC */}
       <div style={{ marginTop: '2rem', padding: '1rem' }}>
-        <h3>Thông báo nhận được ({notifications.filter(n => !n.readAt).length} chưa đọc)</h3>
+        <h3>
+          Thông báo nhận được (
+          {notifications.filter((n) => !n.readAt).length} chưa đọc)
+        </h3>
+
         {loadingNotifications ? (
           <p>Đang tải...</p>
         ) : notifications.length === 0 ? (
@@ -177,7 +236,9 @@ export default function MessagingPage() {
                 style={{
                   padding: '0.75rem',
                   backgroundColor: notif.readAt ? '#f5f5f5' : '#fffbf0',
-                  borderLeft: '4px solid ' + (notif.type === 'INCIDENT' ? '#FF5722' : '#2196F3'),
+                  borderLeft:
+                    '4px solid ' +
+                    (notif.type === 'INCIDENT' ? '#FF5722' : '#2196F3'),
                   borderRadius: '4px',
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -186,11 +247,14 @@ export default function MessagingPage() {
               >
                 <div style={{ flex: 1 }}>
                   <strong>{notif.title || notif.type}</strong>
-                  <p style={{ margin: '0.25rem 0', fontSize: '0.9em' }}>{notif.content}</p>
+                  <p style={{ margin: '0.25rem 0', fontSize: '0.9em' }}>
+                    {notif.content}
+                  </p>
                   <span style={{ fontSize: '0.8em', color: '#999' }}>
                     {new Date(notif.sentAt).toLocaleString('vi-VN')}
                   </span>
                 </div>
+
                 {!notif.readAt && (
                   <button
                     onClick={() => handleMarkAsRead(notif.notificationID)}
