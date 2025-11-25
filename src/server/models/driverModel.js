@@ -130,11 +130,13 @@ export const getDriverRoute = (driverID, callback) => {
     // LIMIT 1;  // Chỉ lấy tuyến đầu tiên (nếu có nhiều tuyến được phân công)
     
   db.query(sql, [driverID], (err, results) => {
+    console.log('[DriverModel] getDriverRoute - SQL executed', results);
     if (err) {
       console.error('Lỗi getDriverRoute:', err);
       return callback(err, null);
     }
     // Trả về tuyến xe hoặc null nếu không tìm thấy
-    callback(null, results.length > 0 ? results[0] : null);
+    callback(null, results.length > 0 ? results : null);
+    // callback(null, results.length > 0 ? results[0] : null);
   });
 }

@@ -50,6 +50,7 @@ export default function DriverPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [allowedBusIDs, setAllowedBusIDs] = useState<Set<number>>(new Set());
+  const [routeIDs, setRouteIDs] = useState<Set<number>>(new Set());
 
   // Schedule
   const [weeklySchedule, setWeeklySchedule] = useState<ScheduleItem[]>([]);
@@ -114,10 +115,13 @@ export default function DriverPage() {
         
         const data = await response.json();
         
-        console.log(' ->_<- API Response (driver route):', data);
+        console.log('✅ API Response (driver route):', data);
         
-        if (!data || !data.routeID || !data.assignedBusID) {
-          console.warn('⚠️ API trả về empty hoặc không có routeID/busID');
+        // ====================================================================
+        // API TRẢ VỀ ARRAY CÁC TRIPS (DRIVER CÓ THỂ CÓ NHIỀU CHUYẾN TRONG NGÀY)
+        // ====================================================================
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          console.warn('⚠️ API trả về empty hoặc không phải array');
           setBuses([]);
           setAllowedBusIDs(new Set());
           setError(null);
@@ -125,35 +129,45 @@ export default function DriverPage() {
           return;
         }
         
-        const busIDsSet = new Set<number>([data.assignedBusID]);
+        // Lưu TẤT CẢ busIDs được phép xem
+        const busIDsSet = new Set<number>();
+        data.forEach((trip: any) => {
+          if (trip.assignedBusID) {
+            busIDsSet.add(trip.assignedBusID);
+          }
+        });
         setAllowedBusIDs(busIDsSet);
         
         console.log('----------- Driver được xem buses -----------\n', Array.from(busIDsSet), '\n----------------------');
         
-        const busesData: Bus[] = [{
-          id: data.assignedBusID.toString(),
-          busNumber: `Bus ${data.assignedBusID}`,
-          driverName: `Tài xế (ID: ${driverID})`,
-          route: data.routeName || `Tuyến ${data.routeID}`,
-          status: 'stopped',
-          eta: new Date(Date.now() + 30 * 60000).toLocaleTimeString('vi-VN', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          x: 0,
-          y: 0,
-          lat: 10.759983082120561,
-          lng: 106.68225725256899,
-          lastUpdate: new Date(),
-          isTracking: true,
-          isOnline: true,
-          alerts: [],
-        } as any];
+        // Convert array thành buses array (mỗi trip = 1 bus entry)
+        const busesData: Bus[] = data.map((trip: any) => {
+          const busData: any = {
+            id: trip.assignedBusID.toString(),
+            busNumber: `Bus ${trip.assignedBusID}`,
+            driverName: `Tài xế (ID: ${driverID})`,
+            route: trip.routeName || `Tuyến ${trip.routeID}`,
+            status: 'stopped',
+            eta: new Date(Date.now() + 30 * 60000).toLocaleTimeString('vi-VN', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            }),
+            x: 0,
+            y: 0,
+            lat: 10.759983082120561,
+            lng: 106.68225725256899,
+            lastUpdate: new Date(),
+            isTracking: true,
+            isOnline: true,
+            alerts: [],
+            routeID: trip.routeID, // CRITICAL: Để BusMap_GG auto-select
+          };
+          return busData as Bus;
+        });
         
-        (busesData[0] as any).routeID = data.routeID;
-        
-        console.log(' ->_<- Đã tạo buses data:', busesData);
-        console.log(' ->_<- Route names từ buses:', busesData.map(b => b.route));
+        console.log('✅ Đã tạo buses data:', busesData);
+        console.log('✅ Route IDs:', busesData.map((b: any) => b.routeID));
+        console.log('✅ Route names:', busesData.map(b => b.route));
         setBuses(busesData);
         setError(null);
       } catch (err) {
