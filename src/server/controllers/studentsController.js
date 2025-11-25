@@ -140,8 +140,6 @@ export const getStudentsByParent = (req, res) => {
   });
 };
 
-
-
 // Config multer để upload ảnh
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

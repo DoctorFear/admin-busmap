@@ -55,7 +55,6 @@ export default function Information(): JSX.Element {
           throw new Error("Không thể tải thông tin học sinh (response không phải JSON)");
         }
         const data: StudentInfo = await res.json();
-        
         setStudent(data);
         setPickupPoint(data.pickupPoint || "");
         if (data.photoUrl) setPreview(data.photoUrl);
@@ -91,7 +90,9 @@ export default function Information(): JSX.Element {
     const data = await res.json();
     
     // Cập nhật preview và state student
-    setPreview(data.photoUrl);
+    const newPhotoUrl = `${data.photoUrl}?t=${Date.now()}`;
+    
+    setPreview(newPhotoUrl);
     setStudent(prev => prev ? { ...prev, photoUrl: data.photoUrl } : prev);
 
   } catch (err: any) {

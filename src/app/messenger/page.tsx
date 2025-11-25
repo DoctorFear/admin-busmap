@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import SearchBar from '@/components/SearchBar';
 import MessagingForm from '@/components/MessagingForm';
 import IncidentTable from '@/components/IncidentTable';
 import Notification from '@/components/Notification';
@@ -41,10 +40,6 @@ export default function MessagingPage() {
 
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0]
-  );
-
-  const [recipientType, setRecipientType] = useState<'all' | 'parent' | 'driver'>(
-    'all'
   );
 
   const [userID, setUserID] = useState<number | null>(null);
@@ -106,11 +101,10 @@ export default function MessagingPage() {
     (recipient) =>
       recipient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (!recipient.availableDates ||
-        recipient.availableDates.includes(selectedDate)) &&
-      (recipientType === 'all' || recipient.type === recipientType)
+        recipient.availableDates.includes(selectedDate))
   );
 
-  // Fake nhận incident mới mỗi 60s
+  // Fake nhận incident mỗi 60s
   useEffect(() => {
     const interval = setInterval(() => {
       const newIncident: Incident = {
@@ -179,36 +173,14 @@ export default function MessagingPage() {
         />
       )}
 
-      {/* HEADER + FILTER */}
-      <div className={styles.headerRow}>
-        <div className={styles.searchWrapper}>
-          <select
-            value={recipientType}
-            onChange={(e) =>
-              setRecipientType(e.target.value as 'all' | 'parent' | 'driver')
-            }
-            style={{
-              marginRight: '1rem',
-              padding: '0.5rem',
-              borderRadius: '5px',
-              border: '2px solid #edbe80',
-            }}
-          >
-            <option value="all">Tất cả</option>
-            <option value="parent">Phụ huynh</option>
-            <option value="driver">Tài xế</option>
-          </select>
-
-          <SearchBar onSearch={setSearchTerm} />
-        </div>
-      </div>
-
       {/* GỬI TIN NHẮN */}
       <MessagingForm
         recipients={filteredRecipients}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
         onSend={handleSendMessage}
+        searchTerm={searchTerm}
+        onSearch={setSearchTerm}
       />
 
       {/* BẢNG SỰ CỐ */}
