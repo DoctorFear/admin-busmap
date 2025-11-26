@@ -154,7 +154,8 @@ export default function Dashboard() {
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         padding: '24px 18px 12px 18px',
         marginBottom: '24px',
-        width: '100%',
+        // width: '61%',
+        width: '1200px',
         maxWidth: 'unset',
         marginLeft: 0,
         marginRight: 0,
@@ -192,7 +193,18 @@ export default function Dashboard() {
                 {/* <div style={{ fontWeight: 600, color: '#rgb(190, 0, 0)', marginBottom: '2px', fontSize: '1.08rem', display: 'flex', alignItems: 'center', gap: 6 }}> */}
                 <div style={{ fontWeight: 600, color: '#2d3a4a', marginBottom: '2px', fontSize: '1.08rem', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span role="img" aria-label="alert" style={{ fontSize: '1.1em' }}>📢</span>
-                  <span>{notif.title}</span>
+                  <span
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "800",
+                      color: "#ff0000be",
+                      display: "block",
+                      marginBottom: "6px",
+                    }}
+                  >
+                    {notif.title}
+                  </span>
+
                 </div>
                 {/* <div style={{ color: '#rgb(190, 0, 0)', fontSize: '0.98rem' }}>{notif.content}</div> */}
                 {/* <div style={{ color: '#rgb(190, 0, 0)', fontSize: '0.95rem', marginTop: '4px' }}> */}

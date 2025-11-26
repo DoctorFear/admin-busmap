@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import MessagingForm from '@/components/MessagingForm';
-import IncidentTable from '@/components/IncidentTable';
+// import IncidentTable from '@/components/IncidentTable';
 import Notification from '@/components/Notification';
 import styles from './page.module.css';
 
@@ -184,10 +184,10 @@ export default function MessagingPage() {
       />
 
       {/* BẢNG SỰ CỐ */}
-      <IncidentTable
+      {/* <IncidentTable
         incidents={incidents}
         onSendNotification={handleSendIncidentNotification}
-      />
+      /> */}
 
       {/* THÔNG BÁO NHẬN ĐƯỢC */}
       {/* <div style={{ marginTop: '2rem', padding: '1rem' }}>

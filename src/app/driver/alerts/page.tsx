@@ -190,22 +190,32 @@ export default function DriverAlertsPage() {
         <h3>Gửi cảnh báo</h3>
         <form className={styles.alertForm} onSubmit={handleAlertSubmit}>
           <label htmlFor="trip-id">Chuyến xe (đang chạy):</label>
-          <select
-            id="trip-id"
-            value={tripID ?? ""}
-            onChange={(e) =>
-              setTripID(e.target.value ? parseInt(e.target.value) : null)
-            }
-            disabled={loading || trips.length === 0}
-          >
-            <option value="">-- Chọn chuyến xe --</option>
-            {trips.map((trip) => (
-              <option key={trip.tripID} value={trip.tripID}>
-                Chuyến {trip.tripID} - Route {trip.routeID} (
-                {trip.studentCount} học sinh) - {trip.status}
-              </option>
-            ))}
-          </select>
+            <select
+              id="trip-id"
+              value={tripID ?? ""}
+              onChange={(e) =>
+                setTripID(e.target.value ? parseInt(e.target.value) : null)
+              }
+              disabled={loading || trips.length === 0}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                fontSize: "15px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                background: "#fff",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <option value="">-- Chọn chuyến xe --</option>
+              {trips.map((trip) => (
+                <option key={trip.tripID} value={trip.tripID}>
+                  Chuyến {trip.tripID} - Route {trip.routeID} ({trip.studentCount} học sinh) - {trip.status}
+                </option>
+              ))}
+            </select>
+
 
           {trips.length === 0 && (
             <div
@@ -220,29 +230,53 @@ export default function DriverAlertsPage() {
           )}
 
           <label htmlFor="alert-type">Loại sự cố:</label>
-          <select
-            id="alert-type"
-            value={alertType}
-            onChange={(e) => setAlertType(e.target.value)}
-          >
-            <option value="ENGINE_BREAKDOWN">Hỏng máy</option>
-            <option value="TRAFFIC_ACCIDENT">Tai nạn giao thông</option>
-            <option value="TRAFFIC_DELAY">Tắc đường</option>
-            <option value="VEHICLE_BREAKDOWN">Sự cố xe</option>
-            <option value="DELAYED_START">Khởi hành muộn</option>
-            <option value="OTHER">Khác</option>
-          </select>
+            <select
+              id="alert-type"
+              value={alertType}
+              onChange={(e) => setAlertType(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                fontSize: "15px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                background: "#fff",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                marginBottom: "12px",
+              }}
+            >
+              <option value="ENGINE_BREAKDOWN">Hỏng máy</option>
+              <option value="TRAFFIC_ACCIDENT">Tai nạn giao thông</option>
+              <option value="TRAFFIC_DELAY">Tắc đường</option>
+              <option value="VEHICLE_BREAKDOWN">Sự cố xe</option>
+              <option value="DELAYED_START">Khởi hành muộn</option>
+              <option value="OTHER">Khác</option>
+            </select>
+
 
           <label htmlFor="severity">Mức độ:</label>
-          <select
-            id="severity"
-            value={severity}
-            onChange={(e) => setSeverity(e.target.value)}
-          >
-            <option value="INFO">Thông tin</option>
-            <option value="WARNING">Cảnh báo</option>
-            <option value="CRITICAL">Nghiêm trọng</option>
-          </select>
+            <select
+              id="severity"
+              value={severity}
+              onChange={(e) => setSeverity(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                fontSize: "15px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                background: "#fff",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                marginBottom: "12px",
+              }}
+            >
+              <option value="INFO">Thông tin</option>
+              <option value="WARNING">Cảnh báo</option>
+              <option value="CRITICAL">Nghiêm trọng</option>
+            </select>
+
 
           <label htmlFor="alert-message">Mô tả sự cố:</label>
           <textarea
