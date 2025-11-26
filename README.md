@@ -21,6 +21,7 @@ npm run server
 1. Install: (at path: busmap_admin/)
 
 1.1 Create ssb-optimizer_python (i have created)
+
 1.2 Go to: *busmap_admin/ssb-optimizer_python*, create virtual environment (venv), create venv_ssb (environment for python):
 
 - [Linux] `sudo apt install python3-full`
@@ -159,18 +160,23 @@ Dữ liệu **giả lập (mock data)** và hàm tiện ích.
 
 ```
 
-### 2. mysql2 (connect MySQL): `npm install mysql2`
+### 2. mysql2 (connect MySQL): 
+
+`npm install mysql2`
 
 ### 3. socket.io (tracking realtime)
 
 `npm install socket.io`
 `npm install socket.io-client`
 
-### 4. Google Maps API: `npm install react-google-maps/api`
+### 4. Google Maps API: 
+`npm install react-google-maps/api`
 
-### 5. cookie-parser: `npm install cookie-parser`
+### 5. cookie-parser: 
+`npm install cookie-parser`
 
-### 6. axios dotenv: `npm install axios dotenv`
+### 6. axios dotenv: 
+`npm install axios dotenv`
 
 ### Utils
 
